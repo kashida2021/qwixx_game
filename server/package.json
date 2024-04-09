@@ -1,0 +1,30 @@
+{
+  "name": "qwixx_server",
+  "version": "1.0.0",
+  "description": "qwixx online game",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kashida2021/qwixx_game.git"
+  },
+  "author": "henry gardiner, ken ashida, michael lau",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kashida2021/qwixx_game/issues"
+  },
+  "homepage": "https://github.com/kashida2021/qwixx_game#readme",
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.12.6",
+    "express": "^4.19.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.4"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "socket.io": "^4.7.5"
+  }
+}
