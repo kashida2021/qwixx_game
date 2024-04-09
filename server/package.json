@@ -4,7 +4,10 @@
   "description": "qwixx online game",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "test",
+    "dev" : "ts-node src/index.ts",
+    "build": "tsc", 
+    "serve": "node dist/index.ts"
   },
   "repository": {
     "type": "git",
