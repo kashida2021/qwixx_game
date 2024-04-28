@@ -1,20 +1,21 @@
 import "./App.css";
-import { ChangeEvent } from "react";
+import { ChangeEvent, FormEvent } from "react";
 import { io } from "socket.io-client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const socket = io("http://localhost:3001");
 
-//TODO: Fix react rendering upon state change causing new socket connection
 function App() {
  const [room, setRoom] = useState("");
-  
+
  const handleRoomInput = (e: ChangeEvent<HTMLInputElement>) => {
   e.preventDefault();
   setRoom(e.target.value);
  };
 
- const joinRoom = () => {
+ //submitting form was re-rendering page. Added 'preventDefault'. 
+ const joinRoom = (e: FormEvent<HTMLButtonElement>) => {
+	e.preventDefault();
   if (room !== "") {
    socket.emit("join_room", room);
   }
