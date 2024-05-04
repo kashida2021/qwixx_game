@@ -4,7 +4,7 @@
   "description": "qwixx online game",
   "main": "index.js",
   "scripts": {
-    "test": "test",
+    "test": "jest",
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "serve": "node dist/index.ts"
@@ -21,10 +21,16 @@
   "homepage": "https://github.com/kashida2021/qwixx_game#readme",
   "devDependencies": {
     "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
     "@types/node": "^20.12.6",
+    "@types/socket.io-client": "^3.0.0",
+    "@types/supertest": "^6.0.2",
     "express": "^4.19.2",
     "jest": "^29.7.0",
     "nodemon": "^3.1.0",
+    "socket.io-client": "^4.7.5",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.4"
   },
