@@ -40,9 +40,9 @@ io.on("connection", (socket) => {
   console.log(roomSockets)
  });
 
-//  socket.on("disconnect", () => {
-//   console.log(`User ${socket.id} disconnected`);
-//  });
+ socket.on("disconnect", () => {
+  console.log(`User ${socket.id} disconnected`);
+ });
 });
 
 server.listen(3001, () => {
