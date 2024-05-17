@@ -55,10 +55,10 @@ describe("socket event handlers with 2 clients", () => {
  //  });
 
  test("client sockets should join same room", (done) => {
-  let clientsInRoom = 0;
+	let clientsInRoom = 0;
 
   const checkClientsInRoom = () => {
-   clientsInRoom++;
+		clientsInRoom++;
 
    if (clientsInRoom === 2) {
     const room = io.sockets.adapter.rooms.get("1");
@@ -76,17 +76,25 @@ describe("socket event handlers with 2 clients", () => {
 
  //This test is fails as no code has been implemented to ensure clients are only ever in 1 room
  test("clients should join different rooms", (done) => {
-  clientSocket1.emit("join_room", "1");
-  clientSocket2.emit("join_room", "2");
-  clientSocket1.on("join_room_success", () => {
-   const room = io.sockets.adapter.rooms.get("1");
-   expect(room?.has(clientSocket1.id ?? "")).toBe(true);
-   expect(room?.has(clientSocket2.id ?? "")).toBe(false);
-  });
-  clientSocket2.on("join_room_success", () => {
-   const room = io.sockets.adapter.rooms.get("2");
-   expect(room?.has(clientSocket1.id ?? "")).toBe(false);
-   expect(room?.has(clientSocket2.id ?? "")).toBe(true); 
-  });
+	let clientsInRoom = 0 
+
+	const checkClientsInRooms = () => {
+		clientsInRoom++; 
+   if (clientsInRoom === 2) {
+    const room1 = io.sockets.adapter.rooms.get("3");
+    const room2 = io.sockets.adapter.rooms.get("4");
+
+    expect(room1?.has(clientSocket1.id ?? "")).toBe(true);
+    expect(room1?.has(clientSocket2.id ?? "")).toBe(false);
+    expect(room2?.has(clientSocket1.id ?? "")).toBe(false);
+    expect(room2?.has(clientSocket2.id ?? "")).toBe(true);
+    done();
+   }
+  };
+
+  clientSocket1.emit("join_room", "3");
+  clientSocket2.emit("join_room", "4");
+  clientSocket1.on("join_room_success", checkClientsInRooms);
+  clientSocket2.on("join_room_success", checkClientsInRooms);
  });
 });
