@@ -24,6 +24,17 @@ io.on("connection", (socket) => {
  console.log(`A user connected: ${socket.id}`);
 
  socket.on("join_room", (data) => {
+  
+  //Checking if there are any rooms currently connected to. If so looping through each room and users. If user connected to a room, leave the room. Also remove the user from the room sockets object
+  if(roomSockets){
+   for(const[prevRoom, users] of Object.entries(roomSockets)){
+      if(users.includes(socket.id)){
+        socket.leave(prevRoom);
+        const index = users.indexOf(socket.id);
+        users.splice(index, 1);
+      }
+    }
+ }
   socket.join(data);
   console.log(`Socket ${socket.id} connected to room ${data}`)
 
@@ -36,6 +47,7 @@ io.on("connection", (socket) => {
   }
 
   console.log(roomSockets)
+  console.log(socket.rooms)
  });
 
  socket.on("disconnect", () => {
