@@ -1,6 +1,9 @@
 import { Server } from "socket.io";
 
 export default function initializeSocketHandler(io: Server) {
+ //For getting visibility on which sockets are in each room
+ // const roomSockets: Record<string, string[]> = {};
+
  io.on("connection", (socket) => {
   console.log(`A user connected: ${socket.id}`);
 
