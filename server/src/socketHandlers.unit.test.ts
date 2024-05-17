@@ -54,11 +54,11 @@ describe("socket event handlers with 2 clients", () => {
  //   });
  //  });
 
- test("client sockets should join same room", (done) => {
-	let clientsInRoom = 0;
+ test("client sockets can join same room", (done) => {
+  let clientsInRoom = 0;
 
   const checkClientsInRoom = () => {
-		clientsInRoom++;
+   clientsInRoom++;
 
    if (clientsInRoom === 2) {
     const room = io.sockets.adapter.rooms.get("1");
@@ -75,11 +75,11 @@ describe("socket event handlers with 2 clients", () => {
  });
 
  //This test is fails as no code has been implemented to ensure clients are only ever in 1 room
- test("clients should join different rooms", (done) => {
-	let clientsInRoom = 0 
+ test("clients can join different rooms", (done) => {
+  let clientsInRoom = 0;
 
-	const checkClientsInRooms = () => {
-		clientsInRoom++; 
+  const checkClientsInRooms = () => {
+   clientsInRoom++;
    if (clientsInRoom === 2) {
     const room1 = io.sockets.adapter.rooms.get("3");
     const room2 = io.sockets.adapter.rooms.get("4");
@@ -97,4 +97,7 @@ describe("socket event handlers with 2 clients", () => {
   clientSocket1.on("join_room_success", checkClientsInRooms);
   clientSocket2.on("join_room_success", checkClientsInRooms);
  });
+
+ test.todo("clients can leave a room");
+ test.todo("clients can only be in one room at a time");
 });
