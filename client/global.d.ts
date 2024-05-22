@@ -4,7 +4,7 @@ declare global {
   namespace jest {
     interface Matchers<R> {
       toHaveTextContent(text: string | RegExp): R;
-      toBeVisible(); 
+      toBeVisible(): R; 
       // Add other matchers from jest-dom if needed
     }
   }

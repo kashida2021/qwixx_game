@@ -4,6 +4,7 @@ import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import React from "react";
 import App from "../src/App.tsx";
+import "@testing-library/jest-dom"
 
 const user = userEvent.setup(); 
 // Tests
