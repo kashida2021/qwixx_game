@@ -55,7 +55,10 @@ describe("HomePage:", () => {
   await user.click(btnCreateLobby);
 
   const heading = screen.getByRole("heading", { name: "Lobby" });
+	const roomNum = screen.getByText("1234");
+
   expect(heading).toBeVisible();
+	expect(roomNum).toBeVisible(); 
  });
 
  test("'Join Lobby' modal can pop up and close", async () => {
@@ -66,14 +69,14 @@ describe("HomePage:", () => {
   );
 
   expect(
-   screen.queryByText("Enter the 4 digit room ID.")
+   screen.queryByText("Enter the 4 digit lobby ID.")
   ).not.toBeInTheDocument();
 
   const btnJoinLobby = screen.getByRole("button", { name: "Join Lobby" });
 
   await user.click(btnJoinLobby);
 
-  const instructions = screen.getByText("Enter the 4 digit room ID.");
+  const instructions = screen.getByText("Enter the 4 digit lobby ID.");
 
   expect(instructions).toBeVisible();
 
@@ -82,38 +85,34 @@ describe("HomePage:", () => {
   await user.click(btnClose);
 
   expect(
-   screen.queryByText("Enter the 4 digit room ID.")
+   screen.queryByText("Enter the 4 digit lobby ID.")
   ).not.toBeInTheDocument();
  });
+
+ test("Joining a lobby navigates to the correct lobby page", async () => {
+  render(
+   <MemoryRouter initialEntries={["/"]}>
+    <Routes>
+     <Route path="/" element={<Home />} />
+     <Route path="/lobby" element={<Lobby />} />
+    </Routes>
+   </MemoryRouter>
+  );
+
+  const btnJoinLobby = screen.getByRole("button", { name: "Join Lobby" });
+
+  await user.click(btnJoinLobby);
+
+  const input = screen.getByRole("textbox");
+  const btnJoinLobby2 = screen.getAllByRole("button", { name: "Join Lobby" })[1];
+  
+	await user.type(input, "1234");
+	await user.click(btnJoinLobby2); 
+
+	const heading = screen.getByRole("heading", { name: "Lobby" });
+	const roomNum = screen.getByText("1234");
+
+  expect(heading).toBeVisible();
+	expect(roomNum).toBeVisible(); 
+ });
 });
-
-// describe("HomePage", () => {
-//  it("renders the page", () => {
-//   render(<Home />);
-//   const h1 = screen.getByRole("heading");
-// //   const input = screen.getByRole("textbox", { name: "" });
-// //   const btn = screen.getByRole("button", { name: "Join Room" });
-//   expect(h1).toHaveTextContent("Qwixx");
-// //   expect(input).toBeVisible();
-// //   expect(btn).toBeVisible();
-//  });
-
-//  //A user can select to join a room or to make a lobby
-//  //If make a lobby, then the room no. can be randomly assigned
-//  //User clicks on make lobby
-//  //Get's navigated to a new page
-//  //Expect on new page elements.
-
-//  //Maybe can mock the random room no. so that thest is more controlled
-
-//  test("when a user successfully joins a room", () => {
-//   render(<Home />);
-//   const input = screen.getByRole("textbox", { name: "" });
-//   const btn = screen.getByRole("button", { name: "Join Room" });
-//   user.type(input, "1");
-//   user.click(btn);
-
-//   const roomNum = screen.getByText("Lobby");
-//   expect(roomNum).toBeVisible();
-//  });
-// });

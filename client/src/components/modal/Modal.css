@@ -1,4 +1,4 @@
-/* .modal, .overlay {
+.modal, .overlay {
     width: 100vw; 
     height: 100vh; 
     top: 0;
@@ -30,4 +30,4 @@
     top: 10px;
     right: 10px;
     padding: 5px 7px; 
-} */
+}

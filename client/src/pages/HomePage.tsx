@@ -2,6 +2,7 @@
 import "./HomePage.css";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { Modal } from "../components/modal/Modal";
 // import { Socket } from "socket.io-client";
 
 // interface FuncProps {
@@ -70,19 +71,7 @@ export const Home: React.FC = () => {
 
    <button onClick={toggleModal}>Join Lobby</button>
 
-   {modal && (
-    <div className="modal">
-     <div className="overlay"></div>
-     <div className="modal-content">
-      <h2>Enter the 4 digit room ID.</h2>
-      <input></input>
-      <button>Join Lobby</button>
-      <button className="close-modal" onClick={toggleModal}>
-       X
-      </button>
-     </div>
-    </div>
-   )}
+   {modal && <Modal toggleModal={toggleModal} />}
   </>
  );
 };
