@@ -1,13 +1,38 @@
-import { describe, test, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, test, it, expect, vi } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import React from "react";
 import Home from "../../src/pages/HomePage";
 import Lobby from "../../src/pages/Lobby";
 import "@testing-library/jest-dom";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
+import { io } from "socket.io-client";
 
 const user = userEvent.setup();
+
+vi.mock("socket.io-client", () => {
+ const socketMock = {
+  connect: vi.fn(),
+  emit: vi.fn(),
+  on: vi.fn((event, callback) => {
+   if (event === "create_lobby") {
+		console.log("create_lobby success")
+    setTimeout(() => {
+     callback("1234");
+    }, 100);
+   }
+  }),
+ };
+ return { io: () => socketMock };
+});
+
+const mockSocket = io();
+
+// const lobbyIdMock = "1234";
+
+const createLobbyMock = () => {
+ mockSocket.emit("create_lobby");
+};
 
 // HomePage
 // Create Lobby btn
@@ -28,7 +53,7 @@ describe("HomePage:", () => {
  it("renders the page", () => {
   render(
    <MemoryRouter>
-    <Home />
+    <Home createLobby={createLobbyMock} lobbyId={""} />
    </MemoryRouter>
   );
   const h1 = screen.getByRole("heading", { level: 1 });
@@ -44,8 +69,11 @@ describe("HomePage:", () => {
   render(
    <MemoryRouter initialEntries={["/"]}>
     <Routes>
-     <Route path="/" element={<Home />} />
-     <Route path="/lobby" element={<Lobby />} />
+     <Route
+      path="/"
+      element={<Home createLobby={createLobbyMock} lobbyId={""} />}
+     />
+     <Route path="/lobby/:lobbyId" element={<Lobby lobbyId={""} />} />
     </Routes>
    </MemoryRouter>
   );
@@ -54,17 +82,19 @@ describe("HomePage:", () => {
 
   await user.click(btnCreateLobby);
 
-  const heading = screen.getByRole("heading", { name: "Lobby" });
-	const roomNum = screen.getByText("1234");
+  await waitFor(() => {
+   const heading = screen.getByRole("heading", { name: "Lobby" });
+   const roomNum = screen.getByText("1234");
 
-  expect(heading).toBeVisible();
-	expect(roomNum).toBeVisible(); 
+   expect(heading).toBeVisible();
+   expect(roomNum).toBeVisible();
+  });
  });
 
  test("'Join Lobby' modal can pop up and close", async () => {
   render(
    <MemoryRouter>
-    <Home />
+    <Home createLobby={createLobbyMock} lobbyId={""} />
    </MemoryRouter>
   );
 
@@ -93,8 +123,8 @@ describe("HomePage:", () => {
   render(
    <MemoryRouter initialEntries={["/"]}>
     <Routes>
-     <Route path="/" element={<Home />} />
-     <Route path="/lobby" element={<Lobby />} />
+     <Route path="/" element={<Home  createLobby={createLobbyMock} lobbyId={""}/>} />
+     <Route path="/lobby" element={<Lobby lobbyId={""}/>} />
     </Routes>
    </MemoryRouter>
   );
@@ -104,15 +134,17 @@ describe("HomePage:", () => {
   await user.click(btnJoinLobby);
 
   const input = screen.getByRole("textbox");
-  const btnJoinLobby2 = screen.getAllByRole("button", { name: "Join Lobby" })[1];
-  
-	await user.type(input, "1234");
-	await user.click(btnJoinLobby2); 
+  const btnJoinLobby2 = screen.getAllByRole("button", {
+   name: "Join Lobby",
+  })[1];
 
-	const heading = screen.getByRole("heading", { name: "Lobby" });
-	const roomNum = screen.getByText("1234");
+  await user.type(input, "1234");
+  await user.click(btnJoinLobby2);
+
+  const heading = screen.getByRole("heading", { name: "Lobby" });
+  const roomNum = screen.getByText("1234");
 
   expect(heading).toBeVisible();
-	expect(roomNum).toBeVisible(); 
+  expect(roomNum).toBeVisible();
  });
 });

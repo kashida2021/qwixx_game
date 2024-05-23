@@ -1,9 +1,8 @@
 // import { ChangeEvent, FormEvent } from "react";
 import "./HomePage.css";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, MouseEvent, useEffect } from "react";
 import { Modal } from "../components/modal/Modal";
-// import { Socket } from "socket.io-client";
+import { useNavigate } from "react-router-dom";
 
 // interface FuncProps {
 //     handleRoomInput(arg:ChangeEvent<HTMLInputElement>):void;
@@ -15,59 +14,42 @@ import { Modal } from "../components/modal/Modal";
 //  setRoom: React.Dispatch<React.SetStateAction<string>>;
 //  socket: Socket;
 // }
-// export const Home: React.FC<Props> = ({ room, setRoom, socket }) => {
-//  const navigate = useNavigate();
 
-//  const handleRoomInput = (e: ChangeEvent<HTMLInputElement>): void => {
-//   e.preventDefault();
-//   setRoom(e.target.value);
-//  };
+//TODO:
+//Need to handle "Create Lobby" button correctly
+//Should randomly generate a lobby ID
+//Set the "room" state with "setRoom"
+//Emit socket event to socket server
+//Navigate to lobby with url "/lobby/:room"
+//Lobby should have "heading" with "Lobby" and "room(lobbyID)" somewhere visible
 
-//  const joinRoom = (e: FormEvent<HTMLButtonElement>): void => {
-//   e.preventDefault();
-//   if (room !== "") {
-//    socket.emit("join_room", room);
-//   }
-//   navigate("/lobby")
-//  };
+interface props {
+ createLobby(): void;
+ lobbyId: string; 
+}
 
-//  return (
-//   <div>
-//    <h1> Qwixx </h1>
-//    <form>
-//     <input
-//      id="input"
-//      type="text"
-//      placeholder="Enter room no."
-//      onChange={handleRoomInput}
-//     ></input>
-//     <p>Room:</p>
-//     <p>{room}</p>
-//     <button onClick={joinRoom}> Join Room </button>
-//    </form>
-//   </div>
-//  );
-// };
-
-export const Home: React.FC = () => {
- const navigate = useNavigate();
+export const Home: React.FC<props> = ({ lobbyId, createLobby }) => {
  const [modal, setModal] = useState(false);
+ const navigate = useNavigate();
 
  const toggleModal = () => {
   setModal(!modal);
  };
 
+ const handleCreateLobby = (e: MouseEvent<HTMLButtonElement>): void => {
+  e.preventDefault();
+  createLobby();
+	console.log("HomePage - createLobby() called")
+	navigate(`/lobby/${lobbyId}`)
+	console.log("navigate called")
+ };
+
+
  return (
   <>
    <h1> Qwixx</h1>
 
-   <button
-    onClick={() => {
-     navigate("/lobby");
-    }}
-   >
-    Create Lobby
-   </button>
+   <button onClick={handleCreateLobby}>Create Lobby</button>
 
    <button onClick={toggleModal}>Join Lobby</button>
 

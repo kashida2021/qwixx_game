@@ -37,6 +37,12 @@ export default function initializeSocketHandler(io: Server) {
    console.log(roomSockets)
   });
 
+  socket.on("create_lobby", () => {
+    socket.join("1234");
+    socket.emit("create_lobby_success", "1234");
+    console.log("create_room_success")
+  })
+
   socket.on("disconnect", () => {
    console.log(`User ${socket.id} disconnected`);
   });
