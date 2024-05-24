@@ -40,7 +40,7 @@ export default function initializeSocketHandler(io: Server) {
   socket.on("create_lobby", () => {
     socket.join("1234");
     socket.emit("create_lobby_success", "1234");
-    console.log("create_room_success")
+    console.log("Server: create_lobby_success")
   })
 
   socket.on("disconnect", () => {

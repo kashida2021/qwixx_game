@@ -31,11 +31,10 @@ import { useNavigate } from "react-router-dom";
 //Lobby should have "heading" with "Lobby" and "room(lobbyID)" somewhere visible
 
 interface IHomeProps {
- lobbyId: string;
  setLobbyId: Dispatch<SetStateAction<string>>;
 }
 
-export const Home: React.FC<IHomeProps> = ({ lobbyId, setLobbyId }) => {
+export const Home: React.FC<IHomeProps> = ({ setLobbyId }) => {
  const [modal, setModal] = useState(false);
 
  const navigate = useNavigate();
@@ -53,7 +52,7 @@ export const Home: React.FC<IHomeProps> = ({ lobbyId, setLobbyId }) => {
   console.log("Registering socket listener for create_lobby_success");
   socketService.on("create_lobby_success", (newLobbyId) => {
    console.log("Client: Received create_lobby_success event", newLobbyId);
-   setTimeout(() => {setLobbyId(newLobbyId)}, 1000);
+   setLobbyId(newLobbyId);
    navigate(`/lobby/${newLobbyId}`);
   });
 
@@ -62,7 +61,7 @@ export const Home: React.FC<IHomeProps> = ({ lobbyId, setLobbyId }) => {
    console.log("Cleaning up socket listener for create_lobby_success");
    socketService.getSocket()?.off("create_lobby_success");
   };
- }, [setLobbyId, navigate, lobbyId]);
+ }, [setLobbyId, navigate]);
 
  return (
   <>

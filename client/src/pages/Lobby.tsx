@@ -1,8 +1,7 @@
 interface Prop {
-    lobbyId: string; 
+ lobbyId: string;
 }
-
-const Lobby: React.FC<Prop> = ({lobbyId}) => {
+const Lobby: React.FC<Prop> = ({ lobbyId }) => {
  return (
   <>
    <h1> Lobby </h1>
