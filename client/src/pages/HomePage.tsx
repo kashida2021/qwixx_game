@@ -1,8 +1,8 @@
 // import { ChangeEvent, FormEvent } from "react";
 import "./HomePage.css";
-import { useState, MouseEvent, useEffect } from "react";
+import { useState, MouseEvent } from "react";
 import { Modal } from "../components/modal/Modal";
-import { useNavigate } from "react-router-dom";
+import socketSerice from "../services/socketServices";
 
 // interface FuncProps {
 //     handleRoomInput(arg:ChangeEvent<HTMLInputElement>):void;
@@ -23,14 +23,13 @@ import { useNavigate } from "react-router-dom";
 //Navigate to lobby with url "/lobby/:room"
 //Lobby should have "heading" with "Lobby" and "room(lobbyID)" somewhere visible
 
-interface props {
+interface IHomeProps {
  createLobby(): void;
- lobbyId: string; 
+ lobbyId: string;
 }
 
-export const Home: React.FC<props> = ({ lobbyId, createLobby }) => {
+export const Home: React.FC<IHomeProps> = () => {
  const [modal, setModal] = useState(false);
- const navigate = useNavigate();
 
  const toggleModal = () => {
   setModal(!modal);
@@ -38,12 +37,9 @@ export const Home: React.FC<props> = ({ lobbyId, createLobby }) => {
 
  const handleCreateLobby = (e: MouseEvent<HTMLButtonElement>): void => {
   e.preventDefault();
-  createLobby();
-	console.log("HomePage - createLobby() called")
-	navigate(`/lobby/${lobbyId}`)
-	console.log("navigate called")
+  console.log("HomePage - createLobby() called");
+    socketSerice.emit("create_lobby")
  };
-
 
  return (
   <>

@@ -7,13 +7,14 @@ import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/HomePage";
 import Lobby from "./pages/Lobby";
+import socketService from "./services/socketServices";
 
-const socket = io("http://localhost:3001");
+// const socket = io("http://localhost:3001");
 
 function App() {
  const [lobbyId, setLobbyId] = useState("");
 
-//  const navigate = useNavigate();
+ //  const navigate = useNavigate();
  //  const handleRoomInput = (e: ChangeEvent<HTMLInputElement>):void => {
  //   e.preventDefault();
  //   setRoom(e.target.value);
@@ -26,27 +27,22 @@ function App() {
  //   }
  //  };
 
- const createLobby = () => {
-  if (lobbyId == "") {
-   socket.emit("create_lobby");
-  }
- };
+ const connectSocket = () => {
+    const socket = socketService.connect("http://localhost:3001"); 
+ }; 
 
+ 
  useEffect(() => {
-  socket.on("create_lobby_success", (id: string) => {
-    console.log("App.tsx useEffect triggered")
-   setLobbyId(id);
-  });
-
-  return () => {
-    socket.off('create_lobby_success');
-  }
- }, [socket]);
+    connectSocket();
+  }, []);
 
  return (
   <Router>
    <Routes>
-    <Route path="/" element={<Home lobbyId = {lobbyId} createLobby={createLobby} />} />
+    <Route
+     path="/"
+     element={<Home/>}
+    />
     <Route path="/lobby" element={<Lobby lobbyId={lobbyId} />} />
    </Routes>
   </Router>
