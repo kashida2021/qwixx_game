@@ -1,8 +1,15 @@
 // import { ChangeEvent, FormEvent } from "react";
 import "./HomePage.css";
-import { useState, MouseEvent } from "react";
+import {
+ useState,
+ MouseEvent,
+ useEffect,
+ SetStateAction,
+ Dispatch,
+} from "react";
 import { Modal } from "../components/modal/Modal";
-import socketSerice from "../services/socketServices";
+import socketService from "../services/socketServices";
+import { useNavigate } from "react-router-dom";
 
 // interface FuncProps {
 //     handleRoomInput(arg:ChangeEvent<HTMLInputElement>):void;
@@ -24,22 +31,38 @@ import socketSerice from "../services/socketServices";
 //Lobby should have "heading" with "Lobby" and "room(lobbyID)" somewhere visible
 
 interface IHomeProps {
- createLobby(): void;
  lobbyId: string;
+ setLobbyId: Dispatch<SetStateAction<string>>;
 }
 
-export const Home: React.FC<IHomeProps> = () => {
+export const Home: React.FC<IHomeProps> = ({ lobbyId, setLobbyId }) => {
  const [modal, setModal] = useState(false);
 
+ const navigate = useNavigate();
  const toggleModal = () => {
   setModal(!modal);
  };
 
  const handleCreateLobby = (e: MouseEvent<HTMLButtonElement>): void => {
   e.preventDefault();
-  console.log("HomePage - createLobby() called");
-    socketSerice.emit("create_lobby")
+  console.log("Client: HomePage - createLobby() called");
+  socketService.emit("create_lobby");
  };
+
+ useEffect(() => {
+  console.log("Registering socket listener for create_lobby_success");
+  socketService.on("create_lobby_success", (newLobbyId) => {
+   console.log("Client: Received create_lobby_success event", newLobbyId);
+   setTimeout(() => {setLobbyId(newLobbyId)}, 1000);
+   navigate(`/lobby/${newLobbyId}`);
+  });
+
+  // Clean up the event listener when the component unmounts
+  return () => {
+   console.log("Cleaning up socket listener for create_lobby_success");
+   socketService.getSocket()?.off("create_lobby_success");
+  };
+ }, [setLobbyId, navigate, lobbyId]);
 
  return (
   <>
