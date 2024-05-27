@@ -12,6 +12,58 @@ function waitFor(socket: ServerSocket | ClientSocket, event: string) {
  });
 }
 
+describe("socket event handlers with 1 client", () => {
+ let io: Server, serverSocket: ServerSocket, clientSocket1: ClientSocket;
+ beforeEach((done) => {
+  const httpServer = createServer();
+  io = new Server(httpServer);
+  httpServer.listen(() => {
+   const port = (httpServer.address() as AddressInfo).port;
+   clientSocket1 = ioc(`http://localhost:${port}`);
+   // Instead of using "io.on()" as shown in socket.io documentation above,
+   // pass the server instance to our imported "initalizeSocketHandler" so that we can test our event handlers
+   initializeSocketHandler(io);
+   clientSocket1.on("connect", () => {
+    done();
+   });
+  });
+ });
+
+ afterEach((done) => {
+  io.close();
+  clientSocket1.disconnect();
+  done();
+ });
+
+ test("client socket can create a room", (done) => {
+  clientSocket1.emit("create_lobby");
+
+  clientSocket1.on("create_lobby_success", () => {
+   const rooms = io.sockets.adapter.rooms.size;
+   expect(rooms).toEqual(2);
+   done();
+  });
+ });
+
+ test("client can only create a single room", (done) => {
+  let emitEventsCount = 0;
+
+  const checkRoomQuantity = () => {
+   emitEventsCount++;
+
+   if (emitEventsCount === 2) {
+    const rooms = io.sockets.adapter.rooms.size;
+    expect(rooms).toEqual(2);
+    done();
+   }
+  };
+
+  clientSocket1.emit("create_lobby");
+  clientSocket1.emit("create_lobby");
+  clientSocket1.on("create_lobby_success", checkRoomQuantity);
+ });
+});
+
 describe("socket event handlers with 2 clients", () => {
  let io: Server,
   serverSocket: ServerSocket,
