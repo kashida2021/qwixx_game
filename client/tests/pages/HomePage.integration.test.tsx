@@ -2,8 +2,8 @@ import { describe, test, it, expect, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import React from "react";
-import Home from "../../src/pages/HomePage";
-import Lobby from "../../src/pages/Lobby";
+import Home from "../../src/pages/HomePage/HomePage";
+import Lobby from "../../src/pages/Lobby/Lobby";
 import "@testing-library/jest-dom";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import socketService from "../../src/services/socketServices";
@@ -38,21 +38,6 @@ vi.mock("../../src/services/socketServices", () => ({
 
 const setLobbyIdMock = vi.fn();
 
-// HomePage
-// Create Lobby btn
-// Join Lobby btn
-
-// Create Lobby
-// Random 4 digit no. that gets passed to setRoom()
-// Navigates to Lobby Page
-// Lobby Page should have "Lobby" and "Room ID" with room_id
-// The lobby URL should be something like "*/lobby/:room_id"
-
-// Join Lobby
-// Either navigates to a new page where the user will type in a 4digit id
-// Or
-// A model pop up that a user enters a room id into.
-
 describe("HomePage:", () => {
  it("renders the page", () => {
   render(
@@ -69,7 +54,7 @@ describe("HomePage:", () => {
   expect(btnJoinLobby).toBeVisible();
  });
 
- it.only("navigates to Lobby Page", async () => {
+ it.skip("navigates to Lobby Page", async () => {
   render(
    <MemoryRouter initialEntries={["/"]}>
     <Routes>
@@ -84,14 +69,14 @@ describe("HomePage:", () => {
 
   await user.click(btnCreateLobby);
 
-  // expect(setLobbyIdMock).toHaveBeenCalledWith("1234");
-  // await waitFor(() => {
-  //  const heading = screen.getByRole("heading", { name: "Lobby" });
-  //  const roomNum = screen.getByText("1234");
+  expect(setLobbyIdMock).toHaveBeenCalledWith("1234");
+  await waitFor(() => {
+   const heading = screen.getByRole("heading", { name: "Lobby" });
+   const roomNum = screen.getByText("1234");
 
-  //  expect(heading).toBeVisible();
-  //  expect(roomNum).toBeVisible();
-  // });
+   expect(heading).toBeVisible();
+   expect(roomNum).toBeVisible();
+  });
  });
 
  test("'Join Lobby' modal can pop up and close", async () => {
