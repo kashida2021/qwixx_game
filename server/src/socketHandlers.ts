@@ -1,4 +1,5 @@
 import { Server } from "socket.io";
+import { generateUniqueRoomId } from "./roomUtils";
 
 export default function initializeSocketHandler(io: Server) {
  //For getting visibility on which sockets are in each room
@@ -6,6 +7,13 @@ export default function initializeSocketHandler(io: Server) {
 
  io.on("connection", (socket) => {
   console.log(`A user connected: ${socket.id}`);
+
+  //Useful methods for getting visibilty on rooms
+  //Shows all sockets in all rooms
+  //io.sockets.adapter.rooms
+
+  //Shows all sockets connected to a specificed room
+  // io.sockets.adapter.rooms.get(room_id);
 
   socket.on("join_room", (data: string) => {
    //Checking if there are any rooms currently connected to. If so looping through each room and users. If user connected to a room, leave the room. Also remove the user from the room sockets object
@@ -38,28 +46,25 @@ export default function initializeSocketHandler(io: Server) {
   });
 
   socket.on("create_lobby", () => {
-   //Need to check if the socket is already in a room
-   //Need to check that the new room isn't the same as the old room
+   const rooms = Array.from(io.sockets.adapter.rooms).map(
+    ([roomName, sockets]) => roomName
+   );
+   let room = generateUniqueRoomId(rooms);
 
-   const room = Math.floor(1000 + Math.random() * 9000).toString();
-
+   //Returns all the rooms a socket is currently in.
+   //  let socketRoomsArray = Array.from(socket.rooms.values()).filter((room) => room !==socket.id);
    let socketRoomsArray = Array.from(socket.rooms);
-   //  if(socketRooms.has(room)){
-   //   //call function again
-   //  }
 
+   //Makes sures a socket can only ever be in one room
    if (socket.rooms.size === 2) {
-    socket.leave(socketRoomsArray[1])
+    socket.leave(socketRoomsArray[1]);
     socket.join(room);
    }
 
-   socket.join(room)
-   //  socketRooms.forEach((values, keys) => {
-   //   console.log(values, keys);
-   //  });
-
+   socket.join(room);
    socket.emit("create_lobby_success", room);
    console.log(`Server: create_lobby_success: ${room}`);
+   console.log(`Client socket is in these rooms:${Array.from(socket.rooms)}`);
   });
 
   socket.on("disconnect", () => {
