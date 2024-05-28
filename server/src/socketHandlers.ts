@@ -1,44 +1,105 @@
 import { Server } from "socket.io";
 
 export default function initializeSocketHandler(io: Server) {
- //For getting visibility on which sockets are in each room
- const roomSockets: Record<string, string[]> = {};
+ //Object tracks current Lobby for each socketId. Key is SocketId and value is roomId
+ const roomSockets: {[key: string]: string} = {};
+
+ //Object tracks all lobbies and connected users in an array of strings
+ const lobbies: {[key: string]: string[]} = {};
+
+ // Object that maps each socket.id to corresponding userId - can access this when disconnects
+ const userIdList: {[key: string]: string} = {};
+ 
 
  io.on("connection", (socket) => {
   console.log(`A user connected: ${socket.id}`);
 
-  socket.on("join_room", (data: string) => {
-   //Checking if there are any rooms currently connected to. If so looping through each room and users. If user connected to a room, leave the room. Also remove the user from the room sockets object
-   if (roomSockets) {
-    for (const [prevRoom, users] of Object.entries(roomSockets)) {
-     if (users.includes(socket.id)) {
-      socket.leave(prevRoom);
-      const index = users.indexOf(socket.id);
-      users.splice(index, 1);
-     }
+  //function to filter room within lobby object to remove target Id
+  const filterLobbyIds = (lobby: string[], userId: string): string[] => {
+    return lobby.filter(id => id !== userId);
+  };
+  
+  // Loops through each lobby in lobbies object and then callback filter function 
+  const updateLobbies = (lobbies: {[key: string]: string[]}, userId: string): void => {
+    for(const roomId in lobbies){
+      if(lobbies.hasOwnProperty(roomId)){
+        lobbies[roomId] = filterLobbyIds(lobbies[roomId], userId);
+      }
     }
-   }
+  };
+  
+  socket.on("join_room", ({roomId, userId}) => {
+    //adds socket.id userId pair to userIdList object 
+    userIdList[socket.id] = userId;
 
-   socket.join(data);
-   console.log(`Socket ${socket.id} connected to room ${data}`);
-   socket.emit("join_room_success", data);
-   //Setting data inside the roomSockets object above for visibility on what sockets are in what room
-   //Can delete later if necessary
-   if (!roomSockets[data]) {
-     roomSockets[data] = [socket.id];
-   }else {
-     roomSockets[data].push(socket.id)
-   }
+    if(!lobbies[roomId]){
+      lobbies[roomId] = [];
+    }
+
+    if (roomSockets[socket.id]) {
+      const currentLobby = roomSockets[socket.id];
+      socket.leave(currentLobby);
+      io.to(currentLobby).emit('userLeft', {userId: socket.id});
+    }
+
+
+    if(lobbies[roomId].length < 4){
+      lobbies[roomId].push(userId);
+      socket.join(roomId);
+      roomSockets[socket.id] = roomId;
+      io.to(roomId).emit('playerJoined', lobbies[roomId]);
+      console.log(roomSockets);
+      console.log(lobbies);
+    } else {
+      socket.emit("lobbyFull");
+    }
+  })
    
-   const room = io.sockets.adapter.rooms.get(data);
-   console.log("Sockets in room", room);
 
-   console.log("Rooms a socket is connected to", socket.rooms);
-   console.log(roomSockets)
-  });
+  // When a player explicity leaves a room - checks if roomId is already in roomSockets object. Then it will leave the currentRoom and also remove from roomSockets object. 
+   socket.on("leave_room", ({roomId, userId}) => {
+    if(roomSockets[socket.id] === roomId){
+      socket.leave(roomId);
+      console.log(`Socket ${userId} has left Room ${roomId}`)
+      delete roomSockets[socket.id];
+      delete userIdList[socket.id];
+    }
 
-  socket.on("disconnect", () => {
-   console.log(`User ${socket.id} disconnected`);
+    updateLobbies(lobbies, userId);
+
+    io.to(roomId).emit('userLeft', {userId: socket.id});
+
+    if(lobbies[roomId] && lobbies[roomId].length <= 0){
+      delete lobbies[roomId];
+    }
+
+    console.log(roomSockets);
+    console.log(lobbies);
+    console.log(userIdList);
+    
+      })
+
+   // Handles disconnect. If disconnected check to see if socketId is connected to a room. Will remove the socket from an existing room and delete from roomSockets object. 
+   socket.on('disconnect', () => {
+    const currentLobby = roomSockets[socket.id];
+    updateLobbies(lobbies, userIdList[socket.id]);
+    
+    if(currentLobby) {
+      socket.leave(currentLobby);
+      console.log(`Socket ${socket.id} has left Room ${currentLobby}`)
+      io.to(currentLobby).emit('userLeft', {userId: socket.id});
+      delete roomSockets[socket.id];
+      delete userIdList[socket.id];
+    }
+
+      if(lobbies[currentLobby] && lobbies[currentLobby].length <= 0){
+        delete lobbies[currentLobby];
+      }
+
+      console.log(roomSockets);
+      console.log(lobbies);
+      console.log(userIdList);
+      })
   });
- });
 }
+    

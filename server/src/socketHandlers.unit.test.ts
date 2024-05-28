@@ -99,5 +99,28 @@ describe("socket event handlers with 2 clients", () => {
  });
 
  test.todo("clients can leave a room");
- test.todo("clients can only be in one room at a time");
+ test.only("clients can only be in one room at a time", (done) => {
+    let clientsInRoom = 0;
+
+  const checkClientsInRooms = () => {
+   clientsInRoom++;
+   if (clientsInRoom === 5) {
+    const room3 = io.sockets.adapter.rooms.get("3");
+    const room6 = io.sockets.adapter.rooms.get("6");
+
+    expect(room3?.has(clientSocket1.id ?? "")).toBe(true);
+    expect(room3?.has(clientSocket2.id ?? "")).toBe(false);
+    expect(room6?.has(clientSocket1.id ?? "")).toBe(false);
+    expect(room6?.has(clientSocket2.id ?? "")).toBe(true);
+    done();
+   }
+  };
+
+  clientSocket1.emit("join_room", "3");
+  clientSocket2.emit("join_room", "3");
+  clientSocket2.emit("join_room", "6");
+  clientSocket1.on("join_room_success", checkClientsInRooms);
+  clientSocket2.on("join_room_success", checkClientsInRooms);
+  clientSocket2.on("join_room_success", checkClientsInRooms);
+ });
 });
