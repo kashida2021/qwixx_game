@@ -38,31 +38,41 @@ export default function initializeSocketHandler(io: Server) {
    }
   };
 
-  socket.on("join_room", ({ roomId, userId }) => {
+  socket.on("join_room", ({ lobbyId, userId }) => {
    //adds socket.id userId pair to userIdList object
-   console.log("join_room event received")
+   console.log(`join_room event received: ${lobbyId}, ${userId}`)
    
    userIdList[socket.id] = userId;
 
-   if (!lobbies[roomId]) {
-    lobbies[roomId] = [];
+   //If the lobby doesn't exist, create that room
+   if (!lobbies[lobbyId]) {
+    lobbies[lobbyId] = [];
    }
 
+   //If the socket is in a room, leave it
    if (roomSockets[socket.id]) {
     const currentLobby = roomSockets[socket.id];
     socket.leave(currentLobby);
     io.to(currentLobby).emit("user_left", { userId: socket.id });
+    console.log("socket left room")
    }
 
-   if (lobbies[roomId].length < 4) {
-    lobbies[roomId].push(userId);
-    socket.join(roomId);
-    roomSockets[socket.id] = roomId;
-    io.to(roomId).emit("player_joined", lobbies[roomId]);
-    // console.log(roomSockets);
+   //If that lobby has less than 4 players
+   //Add the userId to that lobby
+   //Join that room
+   //Add that room to that sockets list of rooms
+   //Emit to other players that a player has joined
+   //Else emit lobby is full
+   if (lobbies[lobbyId].length < 4) {
+    lobbies[lobbyId].push(userId);
+    socket.join(lobbyId);
+    roomSockets[socket.id] = lobbyId;
+    io.to(lobbyId).emit("player_joined", lobbies[lobbyId]);
+    console.log("The socket is in", roomSockets[socket.id], lobbyId);
     // console.log(lobbies);
    } else {
-    socket.emit("lobbyFull");
+    socket.emit("lobby_full");
+    console.log("Lobby full")
    }
   });
 

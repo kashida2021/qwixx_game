@@ -26,9 +26,10 @@ describe("socket event handler test", () => {
   serverSocket: ServerSocket,
   clientSocket1: ClientSocket,
   clientSocket2: ClientSocket;
-
+ const lobbies: { [key: string]: string[] } = {};
  describe("2 clients:", () => {
   beforeEach((done) => {
+   generateUniqueRoomIdMock.mockReset();
    const httpServer = createServer();
    io = new Server(httpServer);
    httpServer.listen(() => {
@@ -72,7 +73,7 @@ describe("socket event handler test", () => {
   });
 
   test("clients can leave a room", (done) => {
-    generateUniqueRoomIdMock.mockReturnValue("1234");
+   generateUniqueRoomIdMock.mockReturnValue("1234");
    const checkClientsInRoom = () => {
     const room = io.sockets.adapter.rooms.get("1234");
 
@@ -87,10 +88,10 @@ describe("socket event handler test", () => {
    });
 
    clientSocket2.on("player_joined", () => {
-    clientSocket2.emit("leave_room", {roomId: "1234"})
+    clientSocket2.emit("leave_room", { roomId: "1234" });
    });
 
-   clientSocket1.on("user_left", checkClientsInRoom)
+   clientSocket1.on("user_left", checkClientsInRoom);
   });
 
   test("clients can only be in one room at a time", (done) => {
@@ -123,5 +124,7 @@ describe("socket event handler test", () => {
 
    clientSocket2.on("create_lobby_success", checkClientsInRooms);
   });
+
+  test.todo("client cannot join a full room");
  });
 });
