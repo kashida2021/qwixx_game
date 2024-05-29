@@ -66,10 +66,10 @@ describe("socket event handler test", () => {
 
    clientSocket1.emit("create_lobby");
    clientSocket1.on("create_lobby_success", () => {
-    clientSocket2.emit("join_room", { roomId: "1234", userId: "testUser" });
+    clientSocket2.emit("join_lobby", { lobbyId: "1234", userId: "testUser" });
    });
 
-   clientSocket2.on("player_joined", checkClientsInRoom);
+   clientSocket2.on("joined_lobby", checkClientsInRoom);
   });
 
   test("clients can leave a room", (done) => {
@@ -84,11 +84,11 @@ describe("socket event handler test", () => {
 
    clientSocket1.emit("create_lobby");
    clientSocket1.on("create_lobby_success", () => {
-    clientSocket2.emit("join_room", { roomId: "1234", userId: "testUser" });
+    clientSocket2.emit("join_lobby", { lobbyId: "1234", userId: "testUser" });
    });
 
-   clientSocket2.on("player_joined", () => {
-    clientSocket2.emit("leave_room", { roomId: "1234" });
+   clientSocket2.on("joined_lobby", () => {
+    clientSocket2.emit("leave_lobby", { lobbyId: "1234" });
    });
 
    clientSocket1.on("user_left", checkClientsInRoom);
@@ -99,26 +99,35 @@ describe("socket event handler test", () => {
     .mockReturnValueOnce("1234")
     .mockReturnValueOnce("5678");
 
-   const checkClientsInRooms = () => {
-    const room1234 = io.sockets.adapter.rooms.get("1234");
-    const room5678 = io.sockets.adapter.rooms.get("5678");
+   let checks = 0;
 
-    expect(room1234?.has(clientSocket1.id ?? "")).toBe(true);
-    expect(room1234?.has(clientSocket2.id ?? "")).toBe(false);
-    expect(room5678?.has(clientSocket1.id ?? "")).toBe(false);
-    expect(room5678?.has(clientSocket2.id ?? "")).toBe(true);
-    done();
+   const checkClientsInRooms = () => {
+    checks++;
+
+    if (checks === 2) {
+     console.log("checkingClientsInRooms");
+     const room1234 = io.sockets.adapter.rooms.get("1234");
+     const room5678 = io.sockets.adapter.rooms.get("5678");
+
+     expect(room1234).toBeDefined();
+     expect(room5678).toBeDefined();
+     expect(room1234?.has(clientSocket1.id ?? "")).toBe(true);
+     expect(room1234?.has(clientSocket2.id ?? "")).toBe(false);
+     expect(room5678?.has(clientSocket1.id ?? "")).toBe(false);
+     expect(room5678?.has(clientSocket2.id ?? "")).toBe(true);
+     done();
+    }
    };
 
    clientSocket1.emit("create_lobby");
    clientSocket1.on("create_lobby_success", () => {
-    clientSocket2.emit("join_room", {
-     roomId: "1234",
+    clientSocket2.emit("join_lobby", {
+     lobbyId: "1234",
      userId: "clientSocket2",
     });
    });
 
-   clientSocket2.on("player_joined", () => {
+   clientSocket2.on("joined_lobby", () => {
     clientSocket2.emit("create_lobby");
    });
 

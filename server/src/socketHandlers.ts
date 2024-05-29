@@ -1,5 +1,11 @@
 import { Server } from "socket.io";
 import { generateUniqueRoomId } from "./roomUtils";
+//Useful methods for getting visibilty on rooms
+//Shows all sockets in all rooms
+//io.sockets.adapter.rooms
+
+//Shows all sockets connected to a specificed room
+// io.sockets.adapter.rooms.get(room_id);
 
 export default function initializeSocketHandler(io: Server) {
  //Object tracks current Lobby for each socketId. Key is SocketId and value is roomId
@@ -13,13 +19,6 @@ export default function initializeSocketHandler(io: Server) {
 
  io.on("connection", (socket) => {
   console.log(`A user connected: ${socket.id}`);
-
-  //Useful methods for getting visibilty on rooms
-  //Shows all sockets in all rooms
-  //io.sockets.adapter.rooms
-
-  //Shows all sockets connected to a specificed room
-  // io.sockets.adapter.rooms.get(room_id);
 
   //function to filter room within lobby object to remove target Id
   const filterLobbyIds = (lobby: string[], userId: string): string[] => {
@@ -37,11 +36,36 @@ export default function initializeSocketHandler(io: Server) {
     }
    }
   };
+  socket.on("create_lobby", () => {
+   const rooms = Array.from(io.sockets.adapter.rooms).map(
+    ([roomName, sockets]) => roomName
+   );
+   let room = generateUniqueRoomId(rooms);
 
-  socket.on("join_room", ({ lobbyId, userId }) => {
+   //Returns all the rooms a socket is currently in.
+   //  let socketRoomsArray = Array.from(socket.rooms.values()).filter((room) => room !==socket.id);
+   let socketRoomsArray = Array.from(socket.rooms);
+
+   //Makes sures a socket can only ever be in one room
+   if (socket.rooms.size === 2) {
+    socket.leave(socketRoomsArray[1]);
+    socket.join(room);
+   }
+
+   socket.join(room);
+   io.emit("create_lobby_success", room);
+   console.log(`Server: create_lobby_success: ${room}`);
+   console.log(
+    `Client socket is in room:${Array.from(socket.rooms.values()).filter(
+     (room) => room !== socket.id
+    )}`
+   );
+  });
+
+  socket.on("join_lobby", ({ lobbyId, userId }) => {
    //adds socket.id userId pair to userIdList object
-   console.log(`join_room event received: ${lobbyId}, ${userId}`)
-   
+   console.log(`join_lobby event received: ${lobbyId}, ${userId}`);
+
    userIdList[socket.id] = userId;
 
    //If the lobby doesn't exist, create that room
@@ -54,7 +78,7 @@ export default function initializeSocketHandler(io: Server) {
     const currentLobby = roomSockets[socket.id];
     socket.leave(currentLobby);
     io.to(currentLobby).emit("user_left", { userId: socket.id });
-    console.log("socket left room")
+    console.log("socket left room");
    }
 
    //If that lobby has less than 4 players
@@ -65,37 +89,39 @@ export default function initializeSocketHandler(io: Server) {
    //Else emit lobby is full
    if (lobbies[lobbyId].length < 4) {
     lobbies[lobbyId].push(userId);
-    socket.join(lobbyId);
     roomSockets[socket.id] = lobbyId;
+
+    socket.join(lobbyId);
     io.to(lobbyId).emit("player_joined", lobbies[lobbyId]);
-    console.log("The socket is in", roomSockets[socket.id], lobbyId);
-    // console.log(lobbies);
+    io.emit("joined_lobby", lobbyId);
+    console.log("The socket is in", roomSockets[socket.id], lobbyId),
+     lobbies[lobbyId];
    } else {
     socket.emit("lobby_full");
-    console.log("Lobby full")
+    console.log("Lobby full");
    }
   });
 
   // When a player explicity leaves a room - checks if roomId is already in roomSockets object. Then it will leave the currentRoom and also remove from roomSockets object.
-  socket.on("leave_room", ({ roomId, userId }) => {
-   if (roomSockets[socket.id] === roomId) {
-    socket.leave(roomId);
-    // console.log(`Socket ${userId} has left Room ${roomId}`);
+  socket.on("leave_lobby", ({ lobbyId, userId }) => {
+   if (roomSockets[socket.id] === lobbyId) {
+    socket.leave(lobbyId);
+    // console.log(`Socket ${userId} has left Room ${lobbyId}`);
     delete roomSockets[socket.id];
     delete userIdList[socket.id];
    }
 
    updateLobbies(lobbies, userId);
 
-   io.to(roomId).emit("user_left", { userId: socket.id });
+   io.to(lobbyId).emit("user_left", { userId: socket.id });
 
-   if (lobbies[roomId] && lobbies[roomId].length <= 0) {
-    delete lobbies[roomId];
+   if (lobbies[lobbyId] && lobbies[lobbyId].length <= 0) {
+    delete lobbies[lobbyId];
    }
 
-  //  console.log(roomSockets);
-  //  console.log(lobbies);
-  //  console.log(userIdList);
+   //  console.log(roomSockets);
+   //  console.log(lobbies);
+   //  console.log(userIdList);
   });
 
   // Handles disconnect. If disconnected check to see if socketId is connected to a room. Will remove the socket from an existing room and delete from roomSockets object.
@@ -115,31 +141,9 @@ export default function initializeSocketHandler(io: Server) {
     delete lobbies[currentLobby];
    }
 
-  //  console.log(roomSockets);
-  //  console.log(lobbies);
-  //  console.log(userIdList);
-  });
-
-  socket.on("create_lobby", () => {
-   const rooms = Array.from(io.sockets.adapter.rooms).map(
-    ([roomName, sockets]) => roomName
-   );
-   let room = generateUniqueRoomId(rooms);
-
-   //Returns all the rooms a socket is currently in.
-   //  let socketRoomsArray = Array.from(socket.rooms.values()).filter((room) => room !==socket.id);
-   let socketRoomsArray = Array.from(socket.rooms);
-
-   //Makes sures a socket can only ever be in one room
-   if (socket.rooms.size === 2) {
-    socket.leave(socketRoomsArray[1]);
-    socket.join(room);
-   }
-
-   socket.join(room);
-   socket.emit("create_lobby_success", room);
-   console.log(`Server: create_lobby_success: ${room}`);
-   console.log(`Client socket is in rooms:${Array.from(socket.rooms)}`);
+   //  console.log(roomSockets);
+   //  console.log(lobbies);
+   //  console.log(userIdList);
   });
  });
 }

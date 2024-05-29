@@ -5,18 +5,34 @@ import {
  useEffect,
  SetStateAction,
  Dispatch,
+ ChangeEvent,
 } from "react";
-import { Modal } from "../../components/modal/Modal";
+import { Modal } from "../../components/modal/modal";
 // import socketService from "../../services/socketServices";
 import SocketService from "../../services/socketServices";
 import { useNavigate } from "react-router-dom";
 
 interface IHomeProps {
- setLobbyId: Dispatch<SetStateAction<string>>;
  socketService: typeof SocketService;
+ lobbyId: string;
+ setLobbyId: Dispatch<SetStateAction<string>>;
+ userId: string;
+ setUserId: Dispatch<SetStateAction<string>>;
+ handleInputChange: (
+  setter: React.Dispatch<React.SetStateAction<string>>
+ ) => (e: ChangeEvent<HTMLInputElement>) => void;
+ error: string;
+ setError: Dispatch<SetStateAction<string>>;
 }
 
-export const Home: React.FC<IHomeProps> = ({ setLobbyId, socketService }) => {
+export const Home: React.FC<IHomeProps> = ({
+ lobbyId,
+ setLobbyId,
+ socketService,
+ userId,
+ handleInputChange,
+ setUserId,
+}) => {
  const [modal, setModal] = useState(false);
 
  const navigate = useNavigate();
@@ -26,10 +42,11 @@ export const Home: React.FC<IHomeProps> = ({ setLobbyId, socketService }) => {
 
  const handleCreateLobby = (e: MouseEvent<HTMLButtonElement>): void => {
   e.preventDefault();
-  socketService.emit("create_lobby");
+  socketService.emit("create_lobby", userId);
  };
 
  useEffect(() => {
+  //Can this be a callback?
   socketService.on("create_lobby_success", (newLobbyId) => {
    setLobbyId(newLobbyId);
    navigate(`/lobby/${newLobbyId}`);
@@ -44,12 +61,29 @@ export const Home: React.FC<IHomeProps> = ({ setLobbyId, socketService }) => {
  return (
   <>
    <h1> Qwixx</h1>
+   <form>
+    <input
+     id="input"
+     name="userId"
+     type="text"
+     placeholder="Enter UserId."
+     onChange={handleInputChange(setUserId)}
+    ></input>
+   </form>
 
    <button onClick={handleCreateLobby}>Create Lobby</button>
 
    <button onClick={toggleModal}>Join Lobby</button>
 
-   {modal && <Modal toggleModal={toggleModal} />}
+   {modal && (
+    <Modal
+     setLobbyId={setLobbyId}
+     toggleModal={toggleModal}
+     socketService={socketService}
+     lobbyId={lobbyId}
+     userId={userId}
+    />
+   )}
   </>
  );
 };

@@ -1,45 +1,23 @@
 import "./App.css";
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, ChangeEvent, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/HomePage/HomePage";
 import Lobby from "./pages/Lobby/Lobby";
 import socketService from "./services/socketServices";
 
 function App() {
- const [roomId, setRoomId] = useState("");
  const [lobbyId, setLobbyId] = useState("");
- const [isLoading, setIsLoading] = useState(false);
  const [userId, setUserId] = useState("");
+ const [isLoading, setIsLoading] = useState(true);
  const [error, setError] = useState("");
 
- socket.on("lobbyFull", () => {
-  setError("Lobby is full");
- })
-
- const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>) =>
- (e: ChangeEvent<HTMLInputElement>) => {
-  e.preventDefault();
-  setter(e.target.value);
- };
-
- //submitting form was re-rendering page. Added 'preventDefault'. 
- const joinRoom = (e: FormEvent<HTMLButtonElement>) => {
-	e.preventDefault();
-  if(roomId && userId){
-    socket.emit("join_room", {roomId, userId});
-    setError("");
-  } else{
-    setError("UserId and RoomId is required");
-  }
- };
-
- const LeaveRoom = (e: FormEvent<HTMLButtonElement>) => {
-	e.preventDefault();
-  if(roomId && userId){
-    socket.emit("leave_room", {roomId, userId});
- }
-}
+ //Need to consier if this is overkill for our app as it's only being used in one place. 
+ const handleInputChange =
+  (setter: React.Dispatch<React.SetStateAction<string>>) =>
+  (e: ChangeEvent<HTMLInputElement>) => {
+   e.preventDefault();
+   setter(e.target.value);
+  };
 
  // At the moment, the socketService class gets instantiated when the .connect() method is called.
  // Can consider refactoring to use a custom hook or useContext() api.
@@ -57,7 +35,7 @@ function App() {
  const connectSocket = () => {
   socketService.connect("http://localhost:3001");
   if (socketService) {
-   setIsLoading(true);
+   setIsLoading(false);
   }
  };
 
@@ -65,38 +43,27 @@ function App() {
   connectSocket();
  }, []);
 
- if (!isLoading) {
+ if (isLoading) {
   return <div>Loading...</div>;
  }
 
  return (
-  // <>
-  //  <h1>Hello</h1>
-  //  <form>
-  //  <input
-  //    id="input"
-  //    name="userId"
-  //    type="text"
-  //    placeholder="Enter UserId."
-  //    onChange={handleInputChange(setUserId)}
-  //   ></input>
-  //   <input
-  //    id="input"
-  //    name="roomId"
-  //    type="text"
-  //    placeholder="Enter room no."
-  //    onChange={handleInputChange(setRoomId)}
-  //   ></input>
-  //   <button onClick={joinRoom}> Join Room </button>
-  //   <button onClick={LeaveRoom}> Leave Room </button>
-  //   {error && <p>{error}</p>}
-  //  </form>
-  // </>
   <Router>
    <Routes>
     <Route
      path="/"
-     element={<Home setLobbyId={setLobbyId} socketService={socketService} />}
+     element={
+      <Home
+       socketService={socketService} //Used throughout the application
+       lobbyId={lobbyId} //Doesn't get used in Home => Used in Modal & Lobby
+       setLobbyId={setLobbyId} //Used in both home and modal
+       userId={userId} //Used in both home and modal
+       setUserId={setUserId} //Used in home
+       handleInputChange={handleInputChange} //Used in Home and modal, is it better than writing "handleInputChange" in the component?
+       error={error} // Maybe don't need this so high up
+       setError={setError} //Maybe don't need this so high up
+      />
+     }
     />
     <Route path={`/lobby/${lobbyId}`} element={<Lobby lobbyId={lobbyId} />} />
    </Routes>
@@ -105,16 +72,3 @@ function App() {
 }
 
 export default App;
-
-//  const navigate = useNavigate();
-//  const handleRoomInput = (e: ChangeEvent<HTMLInputElement>):void => {
-//   e.preventDefault();
-//   setRoom(e.target.value);
-//  };
-
-//  const joinRoom = (e: FormEvent<HTMLButtonElement>):void => {
-//   e.preventDefault();
-//   if (room !== "") {
-//    socket.emit("join_room", room);
-//   }
-//  };
