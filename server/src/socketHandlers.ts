@@ -53,7 +53,7 @@ export default function initializeSocketHandler(io: Server) {
    }
 
    socket.join(room);
-   io.emit("create_lobby_success", room);
+   socket.emit("create_lobby_success", room);
    console.log(`Server: create_lobby_success: ${room}`);
    console.log(
     `Client socket is in room:${Array.from(socket.rooms.values()).filter(
@@ -93,7 +93,7 @@ export default function initializeSocketHandler(io: Server) {
 
     socket.join(lobbyId);
     io.to(lobbyId).emit("player_joined", lobbies[lobbyId]);
-    io.emit("joined_lobby", lobbyId);
+    socket.emit("joined_lobby", lobbyId);
     console.log("The socket is in", roomSockets[socket.id], lobbyId),
      lobbies[lobbyId];
    } else {
@@ -114,7 +114,7 @@ export default function initializeSocketHandler(io: Server) {
    updateLobbies(lobbies, userId);
 
    io.to(lobbyId).emit("user_left", { userId: socket.id });
-
+   socket.emit("left_lobby")
    if (lobbies[lobbyId] && lobbies[lobbyId].length <= 0) {
     delete lobbies[lobbyId];
    }

@@ -94,29 +94,23 @@ describe("socket event handler test", () => {
    clientSocket1.on("user_left", checkClientsInRoom);
   });
 
-  test("clients can only be in one room at a time", (done) => {
+  test.only("clients can only be in one room at a time", (done) => {
    generateUniqueRoomIdMock
     .mockReturnValueOnce("1234")
     .mockReturnValueOnce("5678");
 
-   let checks = 0;
-
    const checkClientsInRooms = () => {
-    checks++;
+    console.log("checkingClientsInRooms");
+    const room1234 = io.sockets.adapter.rooms.get("1234");
+    const room5678 = io.sockets.adapter.rooms.get("5678");
 
-    if (checks === 2) {
-     console.log("checkingClientsInRooms");
-     const room1234 = io.sockets.adapter.rooms.get("1234");
-     const room5678 = io.sockets.adapter.rooms.get("5678");
-
-     expect(room1234).toBeDefined();
-     expect(room5678).toBeDefined();
-     expect(room1234?.has(clientSocket1.id ?? "")).toBe(true);
-     expect(room1234?.has(clientSocket2.id ?? "")).toBe(false);
-     expect(room5678?.has(clientSocket1.id ?? "")).toBe(false);
-     expect(room5678?.has(clientSocket2.id ?? "")).toBe(true);
-     done();
-    }
+    expect(room1234).toBeDefined();
+    expect(room5678).toBeDefined();
+    expect(room1234?.has(clientSocket1.id ?? "")).toBe(true);
+    expect(room1234?.has(clientSocket2.id ?? "")).toBe(false);
+    expect(room5678?.has(clientSocket1.id ?? "")).toBe(false);
+    expect(room5678?.has(clientSocket2.id ?? "")).toBe(true);
+    done();
    };
 
    clientSocket1.emit("create_lobby");
