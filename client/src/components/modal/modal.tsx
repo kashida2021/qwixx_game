@@ -4,14 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { FormEvent } from "react";
 import { Socket } from "socket.io-client";
 
-interface funcProp {
+interface IModalProps {
  setLobbyId: Dispatch<SetStateAction<string>>;
  toggleModal(): void;
  socket: Socket;
  userId: string;
 }
 
-export const Modal: React.FC<funcProp> = ({
+export const Modal: React.FC<IModalProps> = ({
  toggleModal,
  socket,
  userId,
@@ -19,7 +19,7 @@ export const Modal: React.FC<funcProp> = ({
 }) => {
  const navigate = useNavigate();
  const [localLobbyId, setLocalLobbyId] = useState("");
- const [error, setError] = useState("");
+ const [localErrorMessage, setLocalErrorMessage] = useState("");
 
  const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
   e.preventDefault();
@@ -32,19 +32,29 @@ export const Modal: React.FC<funcProp> = ({
 
  const handleJoinLobby = (e: FormEvent<HTMLFormElement>): void => {
   e.preventDefault();
-  if (localLobbyId && userId) {
-   socket.emit(
-    "join_lobby",
-    { localLobbyId, userId },
-    (confirmedLobbyId: string) => {
-     setError("");
-     setLobbyId(confirmedLobbyId);
-     navigate(`/lobby/${confirmedLobbyId}`);
-    }
-   );
-  } else {
-   setError("UserId and lobbyId is required");
+
+  if (!localLobbyId || !userId) {
+   setLocalErrorMessage("User ID and Lobby ID is required");
+   return;
   }
+
+  socket.emit(
+   "join_lobby",
+   { localLobbyId, userId },
+   (response: {
+    success: boolean;
+    confirmedLobbyId: string;
+    error: string;
+   }) => {
+    if (response.success) {
+     setLocalErrorMessage("");
+     setLobbyId(response.confirmedLobbyId);
+     navigate(`/lobby/${response.confirmedLobbyId}`);
+    } else {
+     setLocalErrorMessage(response.error);
+    }
+   }
+  );
  };
 
  return (
@@ -64,11 +74,11 @@ export const Modal: React.FC<funcProp> = ({
       />
      </label>
      <button type="submit">Join Lobby</button>
+     {localErrorMessage && <p>{localErrorMessage}</p>}
     </form>
     <button className="close-modal" onClick={toggleModal}>
      X
     </button>
-    {error && <p>{error}</p>}
    </div>
   </div>
  );
