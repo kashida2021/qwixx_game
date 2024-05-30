@@ -1,71 +1,52 @@
 import "./Modal.css";
-import {
- ChangeEvent,
- useState,
- useEffect,
- Dispatch,
- SetStateAction,
-} from "react";
+import { ChangeEvent, useState, Dispatch, SetStateAction } from "react";
 import { useNavigate } from "react-router-dom";
 import { FormEvent } from "react";
-import SocketService from "../../services/socketServices";
+import { Socket } from "socket.io-client";
 
 interface funcProp {
  setLobbyId: Dispatch<SetStateAction<string>>;
- lobbyId: string;
  toggleModal(): void;
- socketService: typeof SocketService;
+ socket: Socket;
  userId: string;
 }
 
 export const Modal: React.FC<funcProp> = ({
  toggleModal,
- socketService,
+ socket,
  userId,
- lobbyId,
  setLobbyId,
 }) => {
  const navigate = useNavigate();
-
+ const [localLobbyId, setLocalLobbyId] = useState("");
  const [error, setError] = useState("");
 
  const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
   e.preventDefault();
-  console.log(e.target.value);
   const inputValue = e.target.value;
 
   if (/^\d{0,4}$/.test(inputValue)) {
-   setLobbyId(inputValue);
+   setLocalLobbyId(inputValue);
   }
-
  };
 
- //submitting form was re-rendering page. Added 'preventDefault'.
  const handleJoinLobby = (e: FormEvent<HTMLFormElement>): void => {
   e.preventDefault();
-  if (lobbyId && userId) {
-   console.log(lobbyId);
-   socketService.emit("join_lobby", { lobbyId, userId });
-   setError("");
+  if (localLobbyId && userId) {
+   socket.emit(
+    "join_lobby",
+    { localLobbyId, userId },
+    (confirmedLobbyId: string) => {
+     setError("");
+     setLobbyId(confirmedLobbyId);
+     navigate(`/lobby/${confirmedLobbyId}`);
+    }
+   );
   } else {
    setError("UserId and lobbyId is required");
   }
  };
 
- useEffect(() => {
-  socketService.on("lobby_full", () => {
-   setError("Lobby is full");
-  });
-
-  //Can I use a call back on this?
-  socketService.on("joined_lobby", (newLobbyId) => {
-   navigate(`/lobby/${newLobbyId}`);
-  });
-  return () => {
-    socketService.off("lobby_full")
-    socketService.off("joined_lobby")
-  }
- });
  return (
   <div className="modal">
    <div className="overlay"></div>
@@ -78,7 +59,7 @@ export const Modal: React.FC<funcProp> = ({
        id="lobbyIdInput"
        type="text"
        onChange={handleInputChange}
-       value={lobbyId}
+       value={localLobbyId}
        placeholder="Lobby ID..."
       />
      </label>

@@ -1,37 +1,27 @@
 import "./HomePage.css";
-import {
- useState,
- MouseEvent,
- useEffect,
- SetStateAction,
- Dispatch,
- ChangeEvent,
-} from "react";
+import { useState, MouseEvent, SetStateAction, Dispatch } from "react";
 import { Modal } from "../../components/modal/modal";
-// import socketService from "../../services/socketServices";
-import SocketService from "../../services/socketServices";
 import { useNavigate } from "react-router-dom";
+import { Socket } from "socket.io-client";
 
 interface IHomeProps {
- socketService: typeof SocketService;
- lobbyId: string;
+ socket: Socket;
+ isConnected: boolean;
  setLobbyId: Dispatch<SetStateAction<string>>;
  userId: string;
  setUserId: Dispatch<SetStateAction<string>>;
- handleInputChange: (
-  setter: React.Dispatch<React.SetStateAction<string>>
- ) => (e: ChangeEvent<HTMLInputElement>) => void;
  error: string;
  setError: Dispatch<SetStateAction<string>>;
 }
 
 export const Home: React.FC<IHomeProps> = ({
- lobbyId,
+ socket,
+ isConnected,
  setLobbyId,
- socketService,
  userId,
- handleInputChange,
  setUserId,
+ error,
+ setError,
 }) => {
  const [modal, setModal] = useState(false);
 
@@ -40,23 +30,24 @@ export const Home: React.FC<IHomeProps> = ({
   setModal(!modal);
  };
 
- const handleCreateLobby = (e: MouseEvent<HTMLButtonElement>): void => {
+ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
   e.preventDefault();
-  socketService.emit("create_lobby", userId);
+  const inputValue = e.currentTarget.value;
+  setUserId(inputValue);
  };
 
- useEffect(() => {
-  //Can this be a callback?
-  socketService.on("create_lobby_success", (newLobbyId) => {
-   setLobbyId(newLobbyId);
-   navigate(`/lobby/${newLobbyId}`);
-  });
-
-  // Clean up the event listener when the component unmounts
-  return () => {
-   socketService.off("create_lobby_success");
-  };
- }, [setLobbyId, navigate, socketService]);
+ const handleCreateLobby = (e: MouseEvent<HTMLButtonElement>): void => {
+  e.preventDefault();
+  if (userId) {
+   socket.emit("create_lobby", userId, (newLobbyId: string) => {
+    setLobbyId(newLobbyId);
+    setError("");
+    navigate(`/lobby/${newLobbyId}`);
+   });
+  } else {
+   setError("Please input user ID first");
+  }
+ };
 
  return (
   <>
@@ -67,20 +58,24 @@ export const Home: React.FC<IHomeProps> = ({
      name="userId"
      type="text"
      placeholder="Enter UserId."
-     onChange={handleInputChange(setUserId)}
+     value={userId}
+     onChange={handleInputChange}
     ></input>
    </form>
 
-   <button onClick={handleCreateLobby}>Create Lobby</button>
+   <button onClick={handleCreateLobby} disabled={!isConnected}>
+    Create Lobby
+   </button>
 
-   <button onClick={toggleModal}>Join Lobby</button>
-
+   <button onClick={toggleModal} disabled={!isConnected}>
+    Join Lobby
+   </button>
+   {error && <p>{error}</p>}
    {modal && (
     <Modal
      setLobbyId={setLobbyId}
      toggleModal={toggleModal}
-     socketService={socketService}
-     lobbyId={lobbyId}
+     socket={socket}
      userId={userId}
     />
    )}
