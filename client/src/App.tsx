@@ -9,7 +9,7 @@ function App() {
  const [isConnected, setIsConnected] = useState(socket.connected);
  const [lobbyId, setLobbyId] = useState("");
  const [userId, setUserId] = useState("");
- const [error, setError] = useState("");
+ const [globalError, setGlobalError] = useState("");
 
  //Need to consier if this is overkill for our app as it's only being used in one place.
  //  const handleInputChange =
@@ -64,8 +64,6 @@ function App() {
        setLobbyId={setLobbyId}
        userId={userId}
        setUserId={setUserId}
-       error={error}
-       setError={setError}
       />
      }
     />

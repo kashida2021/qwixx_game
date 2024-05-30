@@ -10,8 +10,6 @@ interface IHomeProps {
  setLobbyId: Dispatch<SetStateAction<string>>;
  userId: string;
  setUserId: Dispatch<SetStateAction<string>>;
- error: string;
- setError: Dispatch<SetStateAction<string>>;
 }
 
 export const Home: React.FC<IHomeProps> = ({
@@ -20,10 +18,9 @@ export const Home: React.FC<IHomeProps> = ({
  setLobbyId,
  userId,
  setUserId,
- error,
- setError,
 }) => {
  const [modal, setModal] = useState(false);
+ const [localErrorMessage, setLocalErrorMessage] = useState("");
 
  const navigate = useNavigate();
  const toggleModal = () => {
@@ -41,11 +38,11 @@ export const Home: React.FC<IHomeProps> = ({
   if (userId) {
    socket.emit("create_lobby", userId, (newLobbyId: string) => {
     setLobbyId(newLobbyId);
-    setError("");
+    setLocalErrorMessage("");
     navigate(`/lobby/${newLobbyId}`);
    });
   } else {
-   setError("Please input user ID first");
+   setLocalErrorMessage("Please input user ID first");
   }
  };
 
@@ -70,7 +67,7 @@ export const Home: React.FC<IHomeProps> = ({
    <button onClick={toggleModal} disabled={!isConnected}>
     Join Lobby
    </button>
-   {error && <p>{error}</p>}
+   {localErrorMessage && <p>{localErrorMessage}</p>}
    {modal && (
     <Modal
      setLobbyId={setLobbyId}
