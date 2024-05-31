@@ -67,7 +67,7 @@ function App() {
       />
      }
     />
-    <Route path={`/lobby/${lobbyId}`} element={<Lobby lobbyId={lobbyId} />} />
+    <Route path={`/lobby/${lobbyId}`} element={<Lobby socket={socket} lobbyId={lobbyId} userId={userId}/>} />
    </Routes>
   </Router>
  );
