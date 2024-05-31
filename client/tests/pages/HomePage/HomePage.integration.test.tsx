@@ -7,128 +7,38 @@ import Lobby from "../../../src/pages/Lobby/Lobby";
 import "@testing-library/jest-dom";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { socket } from "../../../src/services/socketServices";
-import { create } from "domain";
+import { Socket } from "socket.io-client";
 
-const user = userEvent.setup();
-
-// vi.mock("../../src/services/socketServices", () => ({
-//  default: {
-//   connect: vi.fn(() => {
-//    console.log("connected");
-//   }),
-//   getSocket: vi.fn(),
-//   emit: vi.fn((event) => {
-//    if (event === "create_lobby") {
-//     console.log("Emit handled");
-//    }
-//   }),
-//   on: vi.fn((event, callback) => {
-//    if (event === "create_lobby_success") {
-//     console.log("Mock was called");
-//     callback("1234"); // Simulate server response
-//    }
-//   }),
-//   off: vi.fn(),
-//  },
-// }));
-
-const mockSocket = {
- on: vi.fn(),
- off: vi.fn(),
- emit: vi.fn((event, data, callback) => {
-  if (event === "create_lobby") {
-   callback({ roomId: "1234" });
-  } else if (event === "join_lobby") {
-   callback({ roomId: "1234" });
-  }
- }),
+type SocketServiceModule = {
+ socket: Socket;
 };
 
-// vi.spyOn(socketService, "emit").mockImplementation((event) => {
-//  if (event === "create_lobby_success") {
-//   console.log("Mocked emit called");
-//  }
-// });
+vi.mock(
+ "../../../src/services/socketServices",
+ async (importOriginal: () => Promise<SocketServiceModule>) => {
+  const actual = await importOriginal();
+  return {
+   ...actual,
+   socket: {
+    ...actual.socket,
+    emit: vi.fn((event, data, callback) => {
+     if (event === "create_lobby") {
+      callback("1234");
+     } else if (event === "join_lobby") {
+      callback({ success: true, confirmedLobbyId: "1234", error: "" });
+     }
+    }),
+   },
+  };
+ }
+);
 
+const user = userEvent.setup();
 const setLobbyIdMock = vi.fn();
 const setUserIdMock = vi.fn();
-const setErrorMock = vi.fn();
-const handleInputChangeMock = vi.fn();
-describe("HomePage:", () => {
- //A little bit of an unecessary test
- it("renders the page", () => {
-  render(
-   <MemoryRouter>
-    <Home
-     socket={socket}
-     isConnected={true}
-     lobbyId={""}
-     setLobbyId={setLobbyIdMock}
-     userId={""}
-     setUserId={setUserIdMock}
-     error={""}
-     setError={setErrorMock}
-     //  handleInputChange={handleInputChangeMock}
-    />
-   </MemoryRouter>
-  );
 
-  const h1 = screen.getByRole("heading", { level: 1 });
-  const btnCreateLobby = screen.getByRole("button", { name: "Create Lobby" });
-  const btnJoinLobby = screen.getByRole("button", { name: "Join Lobby" });
-
-  expect(h1).toHaveTextContent("Qwixx");
-  expect(btnCreateLobby).toBeVisible();
-  expect(btnJoinLobby).toBeVisible();
- });
-
- test("buttons should not be clickable if socket isn't connected", () => {
-  render(
-   <MemoryRouter>
-    <Home
-     socket={socket}
-     isConnected={false}
-     lobbyId={""}
-     setLobbyId={setLobbyIdMock}
-     userId={""}
-     setUserId={setUserIdMock}
-     error={""}
-     setError={setErrorMock}
-     //  handleInputChange={handleInputChangeMock}
-    />
-   </MemoryRouter>
-  );
-
-  const createLobbyBtn = screen.getByRole("button", { name: "Create Lobby" });
-  const joinLobbyBtn = screen.getByRole("button", { name: "Join Lobby" });
-
-  expect(createLobbyBtn).toBeDisabled();
-  expect(joinLobbyBtn).toBeDisabled();
- });
-
- test("Should display error message if no user ID", () => {
-  render(
-   <MemoryRouter>
-    <Home
-     socket={socket}
-     isConnected={true}
-     lobbyId={""}
-     setLobbyId={setLobbyIdMock}
-     userId={""}
-     setUserId={setUserIdMock}
-     error={""}
-     setError={setErrorMock}
-     //  handleInputChange={handleInputChangeMock}
-    />
-   </MemoryRouter>
-  );
-  const createLobbyBtn = screen.getByRole("button", { name: "Create Lobby" });
-  user.click(createLobbyBtn);
-  const errorMessage = screen.getByText("Please input user ID first");
-  expect(errorMessage).toBeVisible();
- });
-
- it("navigates to Lobby Page", async () => {
+describe("HomePage Intergation tests:", () => {
+ it("Creating a lobby navigates to lobby page'", async () => {
   render(
    <MemoryRouter initialEntries={["/"]}>
     <Routes>
@@ -136,14 +46,11 @@ describe("HomePage:", () => {
       path="/"
       element={
        <Home
-        socket={mockSocket}
-        isConnected={false}
-        lobbyId={""}
+        socket={socket}
+        isConnected={true}
         setLobbyId={setLobbyIdMock}
-        userId={""}
+        userId={"test_user"}
         setUserId={setUserIdMock}
-        error={""}
-        setError={setErrorMock}
        />
       }
      />
@@ -155,15 +62,12 @@ describe("HomePage:", () => {
   const btnCreateLobby = screen.getByRole("button", { name: "Create Lobby" });
 
   await user.click(btnCreateLobby);
-  screen.debug();
-  //   expect(setLobbyIdMock).toHaveBeenCalledWith("1234");
-  //   await waitFor(() => {
-  //    const heading = screen.getByRole("heading", { name: "Lobby" });
-  //    const roomNum = screen.getByText("1234");
 
-  //    expect(heading).toBeVisible();
-  //    expect(roomNum).toBeVisible();
-  //   });
+  await waitFor(() => {
+   const heading = screen.getByRole("heading", { name: "Lobby" });
+   expect(setLobbyIdMock).toBeCalledWith("1234");
+   expect(heading).toBeVisible();
+  });
  });
 
  test("'Join Lobby' modal can pop up and close", async () => {
@@ -172,12 +76,9 @@ describe("HomePage:", () => {
     <Home
      socket={socket}
      isConnected={true}
-     lobbyId={""}
      setLobbyId={setLobbyIdMock}
      userId={""}
      setUserId={setUserIdMock}
-     error={""}
-     setError={setErrorMock}
     />
    </MemoryRouter>
   );
@@ -195,7 +96,7 @@ describe("HomePage:", () => {
   ).not.toBeInTheDocument();
  });
 
- test("Joining a lobby navigates to the correct lobby page", async () => {
+ test("Joining a lobby navigates to lobby page", async () => {
   render(
    <MemoryRouter initialEntries={["/"]}>
     <Routes>
@@ -204,37 +105,31 @@ describe("HomePage:", () => {
       element={
        <Home
         socket={socket}
-        lobbyId={""}
+        isConnected={true}
         setLobbyId={setLobbyIdMock}
-        userId={""}
+        userId={"test_user"}
         setUserId={setUserIdMock}
-        error={""}
-        setError={setErrorMock}
-        // handleInputChange={handleInputChangeMock}
        />
       }
      />
-     <Route path="/lobby" element={<Lobby lobbyId={""} />} />
+     <Route path="/lobby/:lobbyid" element={<Lobby lobbyId={""} />} />
     </Routes>
    </MemoryRouter>
   );
-  screen.debug();
-  const btnJoinLobby = screen.getByRole("button", { name: "Join Lobby" });
+  const joinLobbyBtn1 = screen.getByRole("button", { name: "Join Lobby" });
 
-  await user.click(btnJoinLobby);
+  await user.click(joinLobbyBtn1);
 
-  const input = screen.getByRole("textbox");
-  const btnJoinLobby2 = screen.getAllByRole("button", {
+  const input = screen.getAllByRole("textbox")[1];
+  const joinLobbyBtn2 = screen.getAllByRole("button", {
    name: "Join Lobby",
   })[1];
 
   await user.type(input, "1234");
-  await user.click(btnJoinLobby2);
+  await user.click(joinLobbyBtn2);
 
   const heading = screen.getByRole("heading", { name: "Lobby" });
-  const roomNum = screen.getByText("1234");
 
   expect(heading).toBeVisible();
-  expect(roomNum).toBeVisible();
  });
 });

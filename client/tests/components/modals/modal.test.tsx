@@ -13,35 +13,12 @@ const user = userEvent.setup();
 const toggleModalMock = vi.fn();
 const setLobbyIdMock = vi.fn();
 
-// vi.mock("../../src/services/socketServices", () => ({
-//  default: {
-//   connect: vi.fn(() => {
-//    console.log("connected");
-//   }),
-//   getSocket: vi.fn(),
-//   emit: vi.fn((event) => {
-//    if (event === "create_lobby") {
-//     console.log("Emit handled");
-//    }
-//   }),
-//   on: vi.fn((event, callback) => {
-//    if (event === "create_lobby_success") {
-//     console.log("Mock was called");
-//     callback("1234"); // Simulate server response
-//    }
-//   }),
-//   off: vi.fn(),
-//  },
-// }));
-
 describe("Modal:", () => {
  beforeEach(() => {
   vi.restoreAllMocks();
  });
 
  test("User can input lobby id", async () => {
-  // setLobbyIdMock.mockReturnValue("1234");
-
   render(
    <MemoryRouter>
     <Modal
@@ -56,7 +33,7 @@ describe("Modal:", () => {
   const input = screen.getByRole("textbox");
 
   await user.type(input, "1234");
-  screen.debug();
+
   expect(input).toHaveValue("1234");
  });
 
@@ -94,5 +71,48 @@ describe("Modal:", () => {
 
   await user.type(input, "12xd");
   expect(input).toHaveValue("12");
+ });
+
+ test("User can't trigger join_lobby unless a user ID and lobby ID is set", async () => {
+  render(
+   <MemoryRouter>
+    <Modal
+     socket={socket}
+     userId={""}
+     setLobbyId={setLobbyIdMock}
+     toggleModal={toggleModalMock}
+    />
+   </MemoryRouter>
+  );
+
+  const input = screen.getByRole("textbox");
+  const joinLobbyBtn = screen.getByRole("button", { name: "Join Lobby" });
+
+  await user.type(input, "1234");
+  await user.click(joinLobbyBtn);
+
+  const errorMessage = screen.getByText("User ID and Lobby ID is required");
+  expect(errorMessage).toBeVisible();
+  expect(setLobbyIdMock).not.toHaveBeenCalled();
+ });
+
+ test("User can trigger join_lobby when user ID and lobby ID is set", async () => {
+  render(
+   <MemoryRouter>
+    <Modal
+     socket={socket}
+     userId={"test_user"}
+     setLobbyId={setLobbyIdMock}
+     toggleModal={toggleModalMock}
+    />
+   </MemoryRouter>
+  );
+  const input = screen.getByRole("textbox");
+  const joinLobbyBtn = screen.getByRole("button", { name: "Join Lobby" });
+
+  await user.type(input, "1234");
+  await user.click(joinLobbyBtn);
+
+  expect(setLobbyIdMock).toHaveBeenCalledWith("1234");
  });
 });
