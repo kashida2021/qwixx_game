@@ -43,12 +43,14 @@ export default function initializeSocketHandler(io: Server) {
     }
    }
   };
-  
+
   socket.on("create_lobby", (userId, callback) => {
    const rooms = Array.from(io.sockets.adapter.rooms).map(
     ([roomName, sockets]) => roomName
    );
    let room = generateUniqueRoomId(rooms);
+
+   lobbies[room] = [userId];
 
    //Returns all the rooms a socket is currently in.
    let socketRoomsArray = Array.from(socket.rooms);
@@ -61,23 +63,39 @@ export default function initializeSocketHandler(io: Server) {
 
    socket.join(room);
    callback(room);
-   console.log(`Server: create_lobby_success: ${room}`);
-  //  console.log(
-  //   `Client socket is in room:${Array.from(socket.rooms.values()).filter(
-  //    (room) => room !== socket.id
-  //   )}`
-  //  );
+   console.log(`Server: create_lobby_success: Client "${userId}" created ${room}`);
+   //  console.log(
+   //   `Client socket is in room:${Array.from(socket.rooms.values()).filter(
+   //    (room) => room !== socket.id
+   //   )}`
+   //  );
   });
 
   socket.on("join_lobby", ({ localLobbyId, userId }, callback) => {
    //adds socket.id userId pair to userIdList object
-   console.log(`join_lobby event received: ${localLobbyId}, ${userId}`);
-
    userIdList[socket.id] = userId;
 
-   //If the lobby doesn't exist, create that room
+   //If the lobby doesn't exist, return error
    if (!lobbies[localLobbyId]) {
-    lobbies[localLobbyId] = [];
+    callback({
+     success: false,
+     confirmedLobbyId: "",
+     error: "Couldn't find lobby. Does it exist?",
+    });
+    return;
+   }
+
+   //Checks if lobby is full
+   if (
+    Array.isArray(lobbies[localLobbyId]) &&
+    lobbies[localLobbyId].length === 4
+   ) {
+    callback({
+     success: false,
+     confirmedLobbyId: "",
+     error: "Lobby is full",
+    });
+    return;
    }
 
    //If the socket is in a room, leave it
@@ -88,19 +106,14 @@ export default function initializeSocketHandler(io: Server) {
     console.log("socket left room");
    }
 
-   if (lobbies[localLobbyId].length < 4) {
-    lobbies[localLobbyId].push(userId);
-    roomSockets[socket.id] = localLobbyId;
+   //Join lobby
+   lobbies[localLobbyId].push(userId);
+   roomSockets[socket.id] = localLobbyId;
 
-    socket.join(localLobbyId);
-    io.to(localLobbyId).emit("player_joined", lobbies[localLobbyId]);
-    callback({success: true, confirmedLobbyId: localLobbyId, error: ""})
-    console.log("The socket is in", roomSockets[socket.id], localLobbyId),
-     lobbies[localLobbyId];
-   } else {
-    callback({success: false, confirmedLobbyId: "", error: "Lobby is full"})
-    console.log("Lobby full");
-   }
+   socket.join(localLobbyId);
+   io.to(localLobbyId).emit("player_joined", lobbies[localLobbyId]);
+   callback({ success: true, confirmedLobbyId: localLobbyId, error: "" });
+   console.log(`Client "${userId}" joined: ${roomSockets[socket.id]}`);
   });
 
   // When a player explicity leaves a room - checks if roomId is already in roomSockets object. Then it will leave the currentRoom and also remove from roomSockets object.

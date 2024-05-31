@@ -119,7 +119,6 @@ describe("socket event handler test", () => {
     .mockReturnValueOnce("5678");
 
    const checkClientsInRooms = () => {
-    console.log("checkingClientsInRooms");
     const room1234 = io.sockets.adapter.rooms.get("1234");
     const room5678 = io.sockets.adapter.rooms.get("5678");
 
