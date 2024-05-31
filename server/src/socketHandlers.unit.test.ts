@@ -16,6 +16,12 @@ function waitFor(socket: ServerSocket | ClientSocket, event: string) {
  });
 }
 
+interface JoinLobbyResponse {
+    success: boolean;
+    confirmedLobbyId: string;
+    error: string;
+}
+
 //Mock the "generateUniqueRoomId" function for controlled testing
 jest.mock("./roomUtils", () => {
  const generateUniqueRoomId = jest.fn();
@@ -62,7 +68,7 @@ describe("socket event handler test", () => {
   test("client socket can create a room and have others join", (done) => {
    //This lets us mock our function's return value for controlled testing
    generateUniqueRoomIdMock.mockReturnValue("1234");
-   
+
    //This function is called to run our test assertions once all the "events" have finished
    //Pass the "done()" to it to let our test know when to finish.
    //If it doesn't reach "done()", it means either the source code or test setup has a problem.
@@ -147,6 +153,21 @@ describe("socket event handler test", () => {
    });
   });
 
-  test.todo("client cannot join a full room");
+  test("client can't join a room that doesn't exist", (done) => {
+   clientSocket1.emit(
+    "join_lobby",
+    {
+     localLobbyId: "1234",
+     userId: "clientSocket1",
+    },
+    (response:JoinLobbyResponse) => {
+     const room1234 = io.sockets.adapter.rooms.get("1234");
+     expect(room1234).toBeUndefined(); 
+     expect(response.success).toEqual(false); 
+     expect(response.error).toBe("Couldn't find lobby. Does it exist?")
+     done();
+    }
+   );
+  });
  });
 });
