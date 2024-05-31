@@ -4,7 +4,9 @@ describe("generateUniqueRoomId:", () => {
  it("should generate a unique room id", () => {
   const rooms: string[] = [];
   
-  const recursions = 9000;
+  //Can set a higher recursion. Maybe 9999 is the maximum.
+  //The higher the recursion, the slower the test
+  const recursions = 1000;
 
   for (let i = 0; i < recursions; i++) {
    const newRoom = generateUniqueRoomId(rooms);

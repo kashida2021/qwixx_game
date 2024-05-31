@@ -35,9 +35,7 @@ describe("socket event handler test", () => {
   });
 
   test("client socket can create a room", (done) => {
-   clientSocket1.emit("create_lobby");
-
-   clientSocket1.on("create_lobby_success", () => {
+   clientSocket1.emit("create_lobby", "clientSocket1", () => {
     const rooms = io.sockets.adapter.rooms.size;
     expect(rooms).toEqual(2);
     done();
@@ -56,10 +54,12 @@ describe("socket event handler test", () => {
      done();
     }
    };
-   //   console.log(`clientSocket1_id: ${clientSocket1.id}`)
-   clientSocket1.emit("create_lobby");
-   clientSocket1.emit("create_lobby");
-   clientSocket1.on("create_lobby_success", checkRoomQuantity);
+   clientSocket1.emit("create_lobby", "clientSocket1", () => {
+    checkRoomQuantity(); 
+   });
+   clientSocket1.emit("create_lobby", "clientSocket1", () => {
+    checkRoomQuantity(); 
+   });
   });
  });
 });

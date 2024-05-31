@@ -16,6 +16,7 @@ function waitFor(socket: ServerSocket | ClientSocket, event: string) {
  });
 }
 
+//Mock the "generateUniqueRoomId" function for controlled testing
 jest.mock("./roomUtils", () => {
  const generateUniqueRoomId = jest.fn();
  return { generateUniqueRoomId };
@@ -26,10 +27,13 @@ describe("socket event handler test", () => {
   serverSocket: ServerSocket,
   clientSocket1: ClientSocket,
   clientSocket2: ClientSocket;
- const lobbies: { [key: string]: string[] } = {};
+
  describe("2 clients:", () => {
   beforeEach((done) => {
+   //Clean up mock for each test
    generateUniqueRoomIdMock.mockReset();
+
+   //Create mock clients for testing
    const httpServer = createServer();
    io = new Server(httpServer);
    httpServer.listen(() => {
@@ -48,6 +52,7 @@ describe("socket event handler test", () => {
   });
 
   afterEach((done) => {
+   //Make sure to close connections for clean tests
    io.close();
    clientSocket1.disconnect();
    clientSocket2.disconnect();
@@ -55,7 +60,12 @@ describe("socket event handler test", () => {
   });
 
   test("client socket can create a room and have others join", (done) => {
+   //This lets us mock our function's return value for controlled testing
    generateUniqueRoomIdMock.mockReturnValue("1234");
+   
+   //This function is called to run our test assertions once all the "events" have finished
+   //Pass the "done()" to it to let our test know when to finish.
+   //If it doesn't reach "done()", it means either the source code or test setup has a problem.
    const checkClientsInRoom = () => {
     const room = io.sockets.adapter.rooms.get("1234");
 
@@ -64,12 +74,17 @@ describe("socket event handler test", () => {
     done();
    };
 
-   clientSocket1.emit("create_lobby");
-   clientSocket1.on("create_lobby_success", () => {
-    clientSocket2.emit("join_lobby", { lobbyId: "1234", userId: "testUser" });
+   //As "create_lobby" & "join_lobby" expects a callback, we have to chain emits like this
+   //If re-written to have "io.emit" or "socket.emit", then set up "event listeners" instead.
+   clientSocket1.emit("create_lobby", "clientSocket1", () => {
+    clientSocket2.emit(
+     "join_lobby",
+     { localLobbyId: "1234", userId: "clientSocket2" },
+     () => {
+      checkClientsInRoom();
+     }
+    );
    });
-
-   clientSocket2.on("joined_lobby", checkClientsInRoom);
   });
 
   test("clients can leave a room", (done) => {
@@ -82,13 +97,17 @@ describe("socket event handler test", () => {
     done();
    };
 
-   clientSocket1.emit("create_lobby");
-   clientSocket1.on("create_lobby_success", () => {
-    clientSocket2.emit("join_lobby", { lobbyId: "1234", userId: "testUser" });
-   });
-
-   clientSocket2.on("joined_lobby", () => {
-    clientSocket2.emit("leave_lobby", { lobbyId: "1234" });
+   clientSocket1.emit("create_lobby", "clientSocket1", () => {
+    clientSocket2.emit(
+     "join_lobby",
+     {
+      localLobbyId: "1234",
+      userId: "clientSocket2",
+     },
+     () => {
+      clientSocket2.emit("leave_lobby", { lobbyId: "1234" });
+     }
+    );
    });
 
    clientSocket1.on("user_left", checkClientsInRoom);
@@ -99,39 +118,34 @@ describe("socket event handler test", () => {
     .mockReturnValueOnce("1234")
     .mockReturnValueOnce("5678");
 
-   let checks = 0;
-
    const checkClientsInRooms = () => {
-    checks++;
+    console.log("checkingClientsInRooms");
+    const room1234 = io.sockets.adapter.rooms.get("1234");
+    const room5678 = io.sockets.adapter.rooms.get("5678");
 
-    if (checks === 2) {
-     console.log("checkingClientsInRooms");
-     const room1234 = io.sockets.adapter.rooms.get("1234");
-     const room5678 = io.sockets.adapter.rooms.get("5678");
-
-     expect(room1234).toBeDefined();
-     expect(room5678).toBeDefined();
-     expect(room1234?.has(clientSocket1.id ?? "")).toBe(true);
-     expect(room1234?.has(clientSocket2.id ?? "")).toBe(false);
-     expect(room5678?.has(clientSocket1.id ?? "")).toBe(false);
-     expect(room5678?.has(clientSocket2.id ?? "")).toBe(true);
-     done();
-    }
+    expect(room1234).toBeDefined();
+    expect(room5678).toBeDefined();
+    expect(room1234?.has(clientSocket1.id ?? "")).toBe(true);
+    expect(room1234?.has(clientSocket2.id ?? "")).toBe(false);
+    expect(room5678?.has(clientSocket1.id ?? "")).toBe(false);
+    expect(room5678?.has(clientSocket2.id ?? "")).toBe(true);
+    done();
    };
 
-   clientSocket1.emit("create_lobby");
-   clientSocket1.on("create_lobby_success", () => {
-    clientSocket2.emit("join_lobby", {
-     lobbyId: "1234",
-     userId: "clientSocket2",
-    });
+   clientSocket1.emit("create_lobby", "clientSocket1", () => {
+    clientSocket2.emit(
+     "join_lobby",
+     {
+      localLobbyId: "1234",
+      userId: "clientSocket2",
+     },
+     () => {
+      clientSocket2.emit("create_lobby", "clientSocket2", () => {
+       checkClientsInRooms();
+      });
+     }
+    );
    });
-
-   clientSocket2.on("joined_lobby", () => {
-    clientSocket2.emit("create_lobby");
-   });
-
-   clientSocket2.on("create_lobby_success", checkClientsInRooms);
   });
 
   test.todo("client cannot join a full room");
