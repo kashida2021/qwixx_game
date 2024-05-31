@@ -18,7 +18,8 @@ import { io, Socket } from "socket.io-client";
 //  //     });
 //  //   }
 
+const developmentURL = "http://localhost:3001"
 
-const URL = process.env.NODE_ENV === "production" ? undefined: "http://localhost:3001"
+const URL = process.env.NODE_ENV === "production" ? undefined: developmentURL
 
-export const socket: Socket = io(URL); 
+export const socket: Socket = URL? io(URL) : io(); 
