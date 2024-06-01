@@ -9,6 +9,7 @@ Though initializing vite with react and TS get's most of it set up, there are st
 1. React testing library
 2. jestdom
 3. user-event
+4. react-router-dom
 
 There are also some config inside vite.config and tsconfig that need to be set up. 
 
@@ -20,7 +21,7 @@ You can also create a setup.ts file for the tests that runs a clean after each t
 Please check package.json, vite.config.ts, tsconfig.json, and tests/setup.ts, as reference. 
 
 # Additional setup:
-
+****
 Though following the guides linked above got me most of the way, there were some Types issues which I resolved with the following: 
 
 - Although "import React from "react"" is usually unecessary, I found that an error from Typescript won't go away in the test file unless I have that import even thought it didn't seem to stop the test from running. I believe this only happens with Typescript and isn't flagged when writing in vanilla JS. 

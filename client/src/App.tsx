@@ -1,66 +1,75 @@
 import "./App.css";
-import { ChangeEvent, FormEvent } from "react";
-import { io } from "socket.io-client";
-import { useState } from "react";
-
-const socket = io("http://localhost:3001");
+import { useEffect, ChangeEvent, useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./pages/HomePage/HomePage";
+import Lobby from "./pages/Lobby/Lobby";
+import { socket } from "./services/socketServices";
 
 function App() {
- const [roomId, setRoomId] = useState("");
+ const [isConnected, setIsConnected] = useState(socket.connected);
+ const [lobbyId, setLobbyId] = useState("");
  const [userId, setUserId] = useState("");
- const [error, setError] = useState("");
+ const [globalError, setGlobalError] = useState("");
 
- socket.on("lobbyFull", () => {
-  setError("Lobby is full");
- })
+ //Need to consier if this is overkill for our app as it's only being used in one place.
+ //  const handleInputChange =
+ //   (setter: React.Dispatch<React.SetStateAction<string>>) =>
+ //   (e: ChangeEvent<HTMLInputElement>) => {
+ //    e.preventDefault();
+ //    setter(e.target.value);
+ //   };
 
- const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>) =>
- (e: ChangeEvent<HTMLInputElement>) => {
-  e.preventDefault();
-  setter(e.target.value);
- };
+ // At the moment, the socketService class gets instantiated when the .connect() method is called.
+ // Can consider refactoring to use a custom hook or useContext() api.
 
- //submitting form was re-rendering page. Added 'preventDefault'. 
- const joinRoom = (e: FormEvent<HTMLButtonElement>) => {
-	e.preventDefault();
-  if(roomId && userId){
-    socket.emit("join_room", {roomId, userId});
-    setError("");
-  } else{
-    setError("UserId and RoomId is required");
-  }
- };
+ // The better way with error handling:
+ //  const connectSocket = async () => {
+ //   try {
+ //    await socketService.connect("http://localhost:3001");
+ //    setIsLoading(true);
+ //   } catch (err) {
+ //    console.error("Failed to connect to server", err);
+ //   }
+ //  };
 
- const LeaveRoom = (e: FormEvent<HTMLButtonElement>) => {
-	e.preventDefault();
-  if(roomId && userId){
-    socket.emit("leave_room", {roomId, userId});
- }
-}
+ useEffect(() => {
+  const onConnect = () => {
+   console.log("connected to server");
+   setIsConnected(true);
+  };
+
+  const onDisconnect = () => {
+   console.log("disconnected from server");
+   setIsConnected(false);
+  };
+
+  socket.on("connect", onConnect);
+  socket.on("disconnect", onDisconnect);
+
+  return () => {
+   socket.off("connect");
+   socket.off("disconnect");
+  };
+ }, []);
 
  return (
-  <>
-   <h1>Hello</h1>
-   <form>
-   <input
-     id="input"
-     name="userId"
-     type="text"
-     placeholder="Enter UserId."
-     onChange={handleInputChange(setUserId)}
-    ></input>
-    <input
-     id="input"
-     name="roomId"
-     type="text"
-     placeholder="Enter room no."
-     onChange={handleInputChange(setRoomId)}
-    ></input>
-    <button onClick={joinRoom}> Join Room </button>
-    <button onClick={LeaveRoom}> Leave Room </button>
-    {error && <p>{error}</p>}
-   </form>
-  </>
+  <Router>
+   <Routes>
+    <Route
+     path="/"
+     element={
+      <Home
+       socket={socket}
+       isConnected={isConnected}
+       setLobbyId={setLobbyId}
+       userId={userId}
+       setUserId={setUserId}
+      />
+     }
+    />
+    <Route path={`/lobby/${lobbyId}`} element={<Lobby socket={socket} lobbyId={lobbyId} userId={userId}/>} />
+   </Routes>
+  </Router>
  );
 }
 
