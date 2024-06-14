@@ -63,6 +63,7 @@ export default function initializeSocketHandler(io: Server) {
     }
 
    socket.join(room);
+   roomSockets[socket.id] = room;
    callback(room);
    console.log(`Server: create_lobby_success: Client "${userId}" created ${room}`);
    //  console.log(
@@ -121,7 +122,7 @@ export default function initializeSocketHandler(io: Server) {
   });
 
   // When a player explicity leaves a room - checks if roomId is already in roomSockets object. Then it will leave the currentRoom and also remove from roomSockets object.
-  socket.on("leave_room", ({ lobbyId, userId }, callback) => {
+  socket.on("leave_lobby", ({ lobbyId, userId }, callback) => {
    if (roomSockets[socket.id] === lobbyId) {
     socket.leave(lobbyId);
     // console.log(`Socket ${userId} has left Room ${lobbyId}`);

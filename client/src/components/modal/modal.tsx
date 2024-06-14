@@ -9,7 +9,6 @@ interface IModalProps {
  toggleModal(): void;
  socket: Socket;
  userId: string;
- members: string[];
  setMembers: Dispatch<SetStateAction<string[]>>;
 }
 

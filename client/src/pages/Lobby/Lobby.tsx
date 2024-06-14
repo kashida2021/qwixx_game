@@ -1,6 +1,6 @@
 import "./Lobby.css"
 import { Socket } from "socket.io-client";
-import { SetStateAction, Dispatch, MouseEvent, useEffect, useState } from "react";
+import { SetStateAction, Dispatch, MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface ILobbyProps {
@@ -9,6 +9,8 @@ interface ILobbyProps {
  userId: string; 
  members: string[];
  setMembers: Dispatch<SetStateAction<string[]>>;
+ notifications: string[];
+ setNotifications: Dispatch<SetStateAction<string[]>>;
 }
 
 //The lobby page should:
@@ -28,18 +30,20 @@ interface ILobbyProps {
 
 //Have a button to start game (logic doesn't need to be implemented yet)
 
-export const Lobby: React.FC<ILobbyProps> = ({socket, lobbyId, userId, setMembers, members }) => {
+export const Lobby: React.FC<ILobbyProps> = ({socket, lobbyId, userId, members, notifications, setMembers, setNotifications }) => {
  
- const [notifications, setNotifications] = useState<string[]>([]);
  const navigate = useNavigate();
  
  
  const leaveRoom = (e: MouseEvent<HTMLButtonElement>): void => {
   e.preventDefault();
   if (lobbyId && userId) {
-   socket.emit("leave_room", { lobbyId, userId }, (response: {success: boolean}) => {
+   socket.emit("leave_lobby", { lobbyId, userId }, (response: {success: boolean}) => {
     if(response.success){
+        setNotifications([]);
+        setMembers([]);
         navigate("/");
+        
     }
    });
   }
@@ -57,34 +61,34 @@ export const Lobby: React.FC<ILobbyProps> = ({socket, lobbyId, userId, setMember
  };
 
 
- useEffect(() => {
+ //useEffect(() => {
   // should these be stored in handler functions
-    socket.on("player_joined", (lobbyMembers, user) => {
-        setMembers(lobbyMembers);
-        setNotifications((prevNotifications) => [...prevNotifications, `${user} has joined`])
-    })
+    //socket.on("player_joined", (lobbyMembers, user) => {
+       // setMembers(lobbyMembers);
+        //setNotifications((prevNotifications) => [...prevNotifications, `${user} has joined`])
+    //})
 
-    socket.on("user_left", (lobbyMembers, user) => {
-        setMembers(lobbyMembers);
-        setNotifications((prevNotifications) => [...prevNotifications, `${user} has left`])
-    })
+    //socket.on("user_left", (lobbyMembers, user) => {
+       // setMembers(lobbyMembers);
+        //setNotifications((prevNotifications) => [...prevNotifications, `${user} has left`])
+    //})
 
-    socket.on("user_disconnected", (lobbyMembers, user) => {
-      setMembers(lobbyMembers);
-      setNotifications((prevNotifications) => [...prevNotifications, `${user} has disconnected`])
-    })
+    //socket.on("user_disconnected", (lobbyMembers, user) => {
+      //setMembers(lobbyMembers);
+      //setNotifications((prevNotifications) => [...prevNotifications, `${user} has disconnected`])
+    //})
 
-    socket.on("current_members", (lobbyMembers) => {
-      setMembers(lobbyMembers);
-    })
+    //socket.on("current_members", (lobbyMembers) => {
+      //setMembers(lobbyMembers);
+    //})
 
-    return () => {
-        socket.off("player_joined");
-        socket.off("user_left");
-        socket.off("user_disconnected");
-        socket.off("current_members");
-    }
- }, [setMembers, setNotifications]);
+    //return () => {
+        //socket.off("player_joined");
+        //socket.off("user_left");
+        //socket.off("user_disconnected");
+        //socket.off("current_members");
+    //}
+ //}, [setMembers, setNotifications]);
 
  return (
   <div className="Lobby-container">
