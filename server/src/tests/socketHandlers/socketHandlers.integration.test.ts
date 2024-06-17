@@ -4,7 +4,7 @@ import { createServer } from "node:http";
 import { type AddressInfo } from "node:net";
 import { io as ioc, type Socket as ClientSocket } from "socket.io-client";
 import { Server, type Socket as ServerSocket } from "socket.io";
-import initializeSocketHandler from "./socketHandlers";
+import initializeSocketHandler from "../../socketHandlers/socketHandlers";
 
 describe("socket event handler test", () => {
  let io: Server,
