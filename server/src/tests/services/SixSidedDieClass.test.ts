@@ -1,14 +1,17 @@
 import SixSidedDie from "../../SixSidedDieClass";
 
-let testDie: SixSidedDie; 
+let testDie: SixSidedDie;
 
 describe("Die Class tests", () => {
   beforeEach(() => {
     testDie = new SixSidedDie();
   });
+  it("should initialize with 'active' as true", () => {
+    expect(testDie.active).toBe(true);
+  });
 
   it("Should return its value", () => {
-    expect(testDie.value).toEqual(0);
+    expect(testDie.value).toEqual(1);
   });
 
   test("When the rollDie method is called it updates the die's value", () => {
@@ -43,5 +46,16 @@ describe("Die Class tests", () => {
     const uniqueResults = new Set(result);
     expect(uniqueResults.size).toBeGreaterThan(1);
     expect(uniqueResults.size).toBeLessThan(7);
+  });
+
+  it("can disable the die", () => {
+    const initalValue = testDie.active;
+
+    testDie.disable();
+
+    const newValue = testDie.active;
+
+    expect(newValue).toEqual(false);
+    expect(initalValue).not.toEqual(newValue);
   });
 });

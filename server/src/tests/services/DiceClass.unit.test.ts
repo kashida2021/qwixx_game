@@ -1,5 +1,6 @@
 import Dice from "../../DiceClass";
 
+
 describe("Dice Class tests", () => {
   it("should roll all dice and return an object with length of 6", () => {
     const testDice = new Dice();
