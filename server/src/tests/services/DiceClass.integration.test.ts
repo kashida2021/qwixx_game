@@ -1,5 +1,5 @@
-import Dice from "../../DiceClass";
-import SixSidedDie from "../../SixSidedDieClass";
+import Dice from "../../models/DiceClass";
+import SixSidedDie from "../../models/SixSidedDieClass";
 import { DiceColour } from "../../enums/DiceColours";
 
 let testDice: Dice;

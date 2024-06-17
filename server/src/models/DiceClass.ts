@@ -1,5 +1,5 @@
 import SixSidedDie from "./SixSidedDieClass";
-import { DiceColour } from "./enums/DiceColours";
+import { DiceColour } from "../enums/DiceColours";
 
 export default class Dice {
   private _dice: Record<DiceColour, SixSidedDie>;

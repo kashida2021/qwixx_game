@@ -4,8 +4,8 @@ import { createServer } from "node:http";
 import { type AddressInfo } from "node:net";
 import { io as ioc, type Socket as ClientSocket } from "socket.io-client";
 import { Server, type Socket as ServerSocket } from "socket.io";
-import initializeSocketHandler from "./socketHandlers";
-import { generateUniqueRoomId } from "./roomUtils";
+import initializeSocketHandler from "../../socketHandlers/socketHandlers";
+import { generateUniqueRoomId } from "../../roomUtils";
 const generateUniqueRoomIdMock = generateUniqueRoomId as jest.MockedFunction<
  typeof generateUniqueRoomId
 >;
@@ -23,7 +23,7 @@ interface JoinLobbyResponse {
 }
 
 //Mock the "generateUniqueRoomId" function for controlled testing
-jest.mock("./roomUtils", () => {
+jest.mock("../../roomUtils", () => {
  const generateUniqueRoomId = jest.fn();
  return { generateUniqueRoomId };
 });

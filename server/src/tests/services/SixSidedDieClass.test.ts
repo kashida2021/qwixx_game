@@ -1,4 +1,4 @@
-import SixSidedDie from "../../SixSidedDieClass";
+import SixSidedDie from "../../models/SixSidedDieClass";
 
 let testDie: SixSidedDie;
 
