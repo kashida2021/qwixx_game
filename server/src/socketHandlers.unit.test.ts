@@ -111,12 +111,13 @@ describe("socket event handler test", () => {
       userId: "clientSocket2",
      },
      () => {
-      clientSocket2.emit("leave_lobby", { lobbyId: "1234" });
+      console.log("test");  
+      clientSocket2.emit("leave_lobby", { lobbyId: "1234" }, checkClientsInRoom);
      }
     );
    });
 
-   clientSocket1.on("user_left", checkClientsInRoom);
+   //clientSocket1.on("user_left", checkClientsInRoom);
   });
 
   test("clients can only be in one room at a time", (done) => {

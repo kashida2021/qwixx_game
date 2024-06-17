@@ -45,9 +45,9 @@ export default function initializeSocketHandler(io: Server) {
   };
 
   socket.on("create_lobby", (userId, callback) => {
-   const rooms = Array.from(io.sockets.adapter.rooms).map(
-    ([roomName, sockets]) => roomName
-   );
+   
+   // Returns an array of rooms 
+   const rooms = Array.from(io.sockets.adapter.rooms.keys());
    let room = generateUniqueRoomId(rooms);
 
    lobbies[room] = [userId];
@@ -55,13 +55,15 @@ export default function initializeSocketHandler(io: Server) {
    //Returns all the rooms a socket is currently in.
    let socketRoomsArray = Array.from(socket.rooms);
 
-   //Makes sures a socket can only ever be in one room
-   if (socket.rooms.size === 2) {
-    socket.leave(socketRoomsArray[1]);
-    socket.join(room);
-   }
+   //Makes sures a socket can only ever be in one room excluding its own unique room
+   if (socketRoomsArray.length > 1) {
+    for (let i = 1; i < socketRoomsArray.length; i++) {
+      socket.leave(socketRoomsArray[i]);
+        }
+    }
 
    socket.join(room);
+   roomSockets[socket.id] = room;
    callback(room);
    console.log(`Server: create_lobby_success: Client "${userId}" created ${room}`);
    //  console.log(
@@ -70,6 +72,7 @@ export default function initializeSocketHandler(io: Server) {
    //   )}`
    //  );
   });
+
 
   socket.on("join_lobby", ({ localLobbyId, userId }, callback) => {
    //adds socket.id userId pair to userIdList object
@@ -81,6 +84,7 @@ export default function initializeSocketHandler(io: Server) {
      success: false,
      confirmedLobbyId: "",
      error: "Couldn't find lobby. Does it exist?",
+     lobbyMembers: []
     });
     return;
    }
@@ -94,6 +98,7 @@ export default function initializeSocketHandler(io: Server) {
      success: false,
      confirmedLobbyId: "",
      error: "Lobby is full",
+     lobbyMembers: []
     });
     return;
    }
@@ -111,31 +116,29 @@ export default function initializeSocketHandler(io: Server) {
    roomSockets[socket.id] = localLobbyId;
 
    socket.join(localLobbyId);
-   io.to(localLobbyId).emit("player_joined", lobbies[localLobbyId]);
-   callback({ success: true, confirmedLobbyId: localLobbyId, error: "" });
+   io.to(localLobbyId).emit("player_joined", lobbies[localLobbyId], userId);
+   callback({ success: true, confirmedLobbyId: localLobbyId, error: "", lobbyMembers: lobbies[localLobbyId] });
    console.log(`Client "${userId}" joined: ${roomSockets[socket.id]}`);
   });
 
   // When a player explicity leaves a room - checks if roomId is already in roomSockets object. Then it will leave the currentRoom and also remove from roomSockets object.
-  socket.on("leave_lobby", ({ lobbyId, userId }) => {
+  socket.on("leave_lobby", ({ lobbyId, userId }, callback) => {
    if (roomSockets[socket.id] === lobbyId) {
     socket.leave(lobbyId);
     // console.log(`Socket ${userId} has left Room ${lobbyId}`);
+    callback({ success: true });
     delete roomSockets[socket.id];
     delete userIdList[socket.id];
    }
 
    updateLobbies(lobbies, userId);
 
-   io.to(lobbyId).emit("user_left", { userId: socket.id });
+   io.to(lobbyId).emit("user_left", lobbies[lobbyId], userId);
 
    if (lobbies[lobbyId] && lobbies[lobbyId].length <= 0) {
     delete lobbies[lobbyId];
    }
 
-   //  console.log(roomSockets);
-   //  console.log(lobbies);
-   //  console.log(userIdList);
   });
 
   // Handles disconnect. If disconnected check to see if socketId is connected to a room. Will remove the socket from an existing room and delete from roomSockets object.
@@ -146,7 +149,7 @@ export default function initializeSocketHandler(io: Server) {
    if (currentLobby) {
     socket.leave(currentLobby);
     // console.log(`Socket ${socket.id} has left Room ${currentLobby}`);
-    io.to(currentLobby).emit("user_left", { userId: socket.id });
+    io.to(currentLobby).emit("user_disconnected", lobbies[currentLobby], userIdList[socket.id]);
     delete roomSockets[socket.id];
     delete userIdList[socket.id];
    }
@@ -159,5 +162,10 @@ export default function initializeSocketHandler(io: Server) {
    //  console.log(lobbies);
    //  console.log(userIdList);
   });
+
+  socket.on("start_game", ({lobbyId, userId}) => {
+    console.log(`Game started in lobby ${lobbyId}`);
+  });
+
  });
 }

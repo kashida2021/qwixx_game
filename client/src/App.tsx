@@ -1,5 +1,5 @@
 import "./App.css";
-import { useEffect, ChangeEvent, useState } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/HomePage/HomePage";
 import Lobby from "./pages/Lobby/Lobby";
@@ -9,7 +9,9 @@ function App() {
  const [isConnected, setIsConnected] = useState(socket.connected);
  const [lobbyId, setLobbyId] = useState("");
  const [userId, setUserId] = useState("");
- const [globalError, setGlobalError] = useState("");
+ //const [globalError, setGlobalError] = useState("");
+ const [members, setMembers] = useState<string[]>([]);
+ const [notifications, setNotifications] = useState<string[]>([]);
 
  //Need to consier if this is overkill for our app as it's only being used in one place.
  //  const handleInputChange =
@@ -43,12 +45,40 @@ function App() {
    setIsConnected(false);
   };
 
+  const handlePlayerJoined = (lobbyMembers: string[], user: string) => {
+    setMembers(lobbyMembers);
+    setNotifications((prevNotifications) => [...prevNotifications, `${user} has joined`])
+  };
+
+  const handleUserLeft = (lobbyMembers: string[], user: string) => {
+    setMembers(lobbyMembers);
+    setNotifications((prevNotifications) => [...prevNotifications, `${user} has left`])
+  };
+
+  const handleUserDisconnected = (lobbyMembers: string[], user: string) => {
+    setMembers(lobbyMembers);
+    setNotifications((prevNotifications) => [...prevNotifications, `${user} has disconnected`]);
+  };
+
+  const currentMembers = (lobbyMembers: string[]) => {
+    setMembers(lobbyMembers);
+  }
+
   socket.on("connect", onConnect);
   socket.on("disconnect", onDisconnect);
+  socket.on("player_joined", handlePlayerJoined);
+  socket.on("user_left", handleUserLeft);
+  socket.on("user_disconnected", handleUserDisconnected);
+  socket.on("current_members", currentMembers);
+
 
   return () => {
    socket.off("connect");
    socket.off("disconnect");
+   socket.off("player_joined");
+   socket.off("user_left");
+   socket.off("user_disconnected");
+   socket.off("current_members");
   };
  }, []);
 
@@ -64,10 +94,11 @@ function App() {
        setLobbyId={setLobbyId}
        userId={userId}
        setUserId={setUserId}
+       setMembers={setMembers}
       />
      }
     />
-    <Route path={`/lobby/${lobbyId}`} element={<Lobby socket={socket} lobbyId={lobbyId} userId={userId}/>} />
+    <Route path={`/lobby/${lobbyId}`} element={<Lobby socket={socket} lobbyId={lobbyId} userId={userId} members={members} setMembers={setMembers} notifications={notifications} setNotifications={setNotifications}/>} />
    </Routes>
   </Router>
  );

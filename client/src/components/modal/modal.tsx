@@ -9,6 +9,7 @@ interface IModalProps {
  toggleModal(): void;
  socket: Socket;
  userId: string;
+ setMembers: Dispatch<SetStateAction<string[]>>;
 }
 
 export const Modal: React.FC<IModalProps> = ({
@@ -16,6 +17,7 @@ export const Modal: React.FC<IModalProps> = ({
  socket,
  userId,
  setLobbyId,
+ setMembers
 }) => {
  const navigate = useNavigate();
  const [localLobbyId, setLocalLobbyId] = useState("");
@@ -45,10 +47,12 @@ export const Modal: React.FC<IModalProps> = ({
     success: boolean;
     confirmedLobbyId: string;
     error: string;
+    lobbyMembers: string[];
    }) => {
     if (response.success) {
      setLocalErrorMessage("");
      setLobbyId(response.confirmedLobbyId);
+     setMembers(response.lobbyMembers);
      navigate(`/lobby/${response.confirmedLobbyId}`);
     } else {
      setLocalErrorMessage(response.error);

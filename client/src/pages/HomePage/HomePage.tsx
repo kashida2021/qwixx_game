@@ -10,6 +10,7 @@ interface IHomeProps {
  setLobbyId: Dispatch<SetStateAction<string>>;
  userId: string;
  setUserId: Dispatch<SetStateAction<string>>;
+ setMembers: Dispatch<SetStateAction<string[]>>;
 }
 
 export const Home: React.FC<IHomeProps> = ({
@@ -18,6 +19,7 @@ export const Home: React.FC<IHomeProps> = ({
  setLobbyId,
  userId,
  setUserId,
+ setMembers
 }) => {
  const [modal, setModal] = useState(false);
  const [localErrorMessage, setLocalErrorMessage] = useState("");
@@ -74,6 +76,7 @@ export const Home: React.FC<IHomeProps> = ({
      toggleModal={toggleModal}
      socket={socket}
      userId={userId}
+    setMembers={setMembers}
     />
    )}
   </>
