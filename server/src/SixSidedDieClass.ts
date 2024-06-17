@@ -1,12 +1,15 @@
-export default class SixSidedDie{
-    private _value: number = 0; 
+export default class SixSidedDie {
+  private _value: number;
 
-    get value(): number{
-        return this._value; 
-    }
+  constructor() {
+    this._value = 1;
+  }
+  
+  get value(): number {
+    return this._value;
+  }
 
-    rollDie(): void{
-        this._value = Math.floor(Math.random()*6)+1
-    }
-
+  rollDie(): void {
+    this._value = Math.floor(Math.random() * 6) + 1;
+  }
 }
