@@ -1,5 +1,6 @@
 import Dice from "../../DiceClass";
 import SixSidedDie from "../../SixSidedDieClass";
+import { DiceColour } from "../../enums/DiceColours";
 
 let testDice: Dice;
 
@@ -37,13 +38,15 @@ describe("Dice integration tests", () => {
   test("disableDie() should disable the die and the value should return 0", () => {
     testDice.rollAllDice();
 
-    testDice.disableDie("red");
+    testDice.disableDie(DiceColour.Red);
     testDice.rollAllDice();
 
     expect(testDice.diceValues["red"]).toBe(0);
   });
 
   test("disabling a non-existant die should not throw an error", () => {
-    expect(() => testDice.disableDie("purple")).not.toThrow(); 
-  })
+    expect(() => testDice.disableDie("purple" as DiceColour)).toThrow(
+      "Die colour purple does not exist"
+    );
+  });
 });

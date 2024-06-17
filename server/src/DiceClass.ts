@@ -1,48 +1,52 @@
 import SixSidedDie from "./SixSidedDieClass";
+import { DiceColour } from "./enums/DiceColours";
 
 export default class Dice {
-  private _dice: Record<string, SixSidedDie>;
-  private _diceValues: Record<string, number>;
+  private _dice: Record<DiceColour, SixSidedDie>;
+  private _diceValues: Record<DiceColour, number>;
 
   constructor(die: typeof SixSidedDie) {
     this._dice = {
-      white1: new die(),
-      white2: new die(),
-      red: new die(),
-      yellow: new die(),
-      green: new die(),
-      blue: new die(),
+      [DiceColour.White1]: new die(),
+      [DiceColour.White2]: new die(),
+      [DiceColour.Red]: new die(),
+      [DiceColour.Yellow]: new die(),
+      [DiceColour.Green]: new die(),
+      [DiceColour.Blue]: new die(),
     };
 
     this._diceValues = {
-      white1: 0,
-      white2: 0,
-      red: 0,
-      yellow: 0,
-      green: 0,
-      blue: 0,
+      [DiceColour.White1]: 0,
+      [DiceColour.White2]: 0,
+      [DiceColour.Red]: 0,
+      [DiceColour.Yellow]: 0,
+      [DiceColour.Green]: 0,
+      [DiceColour.Blue]: 0,
     };
   }
 
   rollAllDice(): void {
-    let diceColors = Object.keys(this._dice);
-    diceColors.forEach((colour) => {
-      if (this._dice[colour].active === false) {
-        this._diceValues[colour] = 0;
+    let diceColours = Object.keys(this._dice);
+    diceColours.forEach((colour) => {
+      const dieColour = colour as DiceColour;
+      if (this._dice[dieColour].active === false) {
+        this._diceValues[dieColour] = 0;
       } else {
-        this._dice[colour].rollDie();
-        this._diceValues[colour] = this._dice[colour].value;
+        this._dice[dieColour].rollDie();
+        this._diceValues[dieColour] = this._dice[dieColour].value;
       }
     });
   }
 
-  get diceValues(): Record<string, number> {
+  get diceValues(): Record<DiceColour, number> {
     return this._diceValues;
   }
 
-  disableDie(colour: string): void {
+  disableDie(colour: DiceColour): void {
     if (this._dice[colour]) {
       this._dice[colour].disable();
+    } else {
+      throw new Error(`Die colour ${colour} does not exist`);
     }
   }
 }
