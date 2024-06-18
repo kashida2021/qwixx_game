@@ -1,4 +1,4 @@
-import { generateUniqueRoomId } from "./roomUtils";
+import { generateUniqueRoomId } from "../../utils/roomUtils";
 
 describe("generateUniqueRoomId:", () => {
  it("should generate a unique room id", () => {

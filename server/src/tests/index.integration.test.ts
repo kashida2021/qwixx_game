@@ -1,5 +1,5 @@
 import request from "supertest";
-import { app, server, io } from "./index";
+import { app, server, io } from "../index";
 import { io as ioc, type Socket as ClientSocket } from "socket.io-client";
 
 describe("Express App", () => {

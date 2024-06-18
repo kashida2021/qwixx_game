@@ -2,7 +2,7 @@ import express from "express";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
 import cors from "cors";
-import initializeSocketHandler from "./socketHandlers";
+import initializeSocketHandler from "./socketHandlers/socketHandlers";
 import { instrument } from "@socket.io/admin-ui";
 
 const app = express(); // This creates an express app.

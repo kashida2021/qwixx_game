@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import { generateUniqueRoomId } from "./roomUtils";
+import { generateUniqueRoomId } from "../utils/roomUtils";
 //Useful methods for getting visibilty on rooms
 
 //Shows all sockets in all rooms:
