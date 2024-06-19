@@ -1,4 +1,4 @@
-import Player from "../../services/PlayerClass";
+import Player from "../../models/PlayerClass";
 
 const mockScoreCard = {
   redRow: [1, 3, 5, 6],
