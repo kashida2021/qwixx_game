@@ -66,6 +66,7 @@ describe("socket event handler test", () => {
       done();
     });
 
+    
     test("client socket can create a room and have others join", (done) => {
       //This lets us mock our function's return value for controlled testing
       generateUniqueRoomIdMock.mockReturnValue("1234");
@@ -176,28 +177,35 @@ describe("socket event handler test", () => {
       );
     });
 
-    test.only("client can start a game", (done) => {
+    test("client can start a game", async () => {
       generateUniqueRoomIdMock.mockReturnValueOnce("1234");
 
-      clientSocket1.emit("create_lobby", "clientSocket1", () => {
-        clientSocket2.emit(
-          "join_lobby",
-          {
-            localLobbyId: "1234",
-            userId: "clientSocket2",
-          },
-          () => {
-            clientSocket1.emit("start_game", {
-              lobbyId: "1234",
-              userId: "clientSocket1",
-            });
-          }
-        );
+      await new Promise<void>((resolve) => {
+        clientSocket1.emit("create_lobby", "clientSocket1", () => {
+          clientSocket2.emit(
+            "join_lobby",
+            {
+              localLobbyId: "1234",
+              userId: "clientSocket2",
+            },
+            () => {
+              clientSocket1.emit("start_game", {
+                lobbyId: "1234",
+                playerNames: ["clientSocket1", "clientSocket2"],
+              });
+              resolve();
+            }
+          );
+        });
       });
 
-      clientSocket1.on("game_started", () => {
-        console.log("game started")
-      })
+      await new Promise<void>((resolve) => {
+        clientSocket1.on("game_started", (players) => {
+          expect(players[0]._name).toBe("clientSocket1");
+          expect(players[1]._name).toBe("clientSocket2");
+          resolve();
+        });
+      });
     });
   });
 });
