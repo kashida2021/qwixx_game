@@ -1,4 +1,4 @@
-import { Socket } from "socket.io";
+// import { Socket } from "socket.io";
 
 //Uses a simple do/while loop to check the generated random id is unique
 //If there are too many rooms, I wonder if it'll take too long and
@@ -12,12 +12,12 @@ export const generateUniqueRoomId = (rooms: string[]): string => {
  return room;
 };
 
-export const removeSocketFromRooms = (socket:Socket): void => {
-    console.log("removeSocketFromRooms was called")
-    let socketRoomsArray = Array.from(socket.rooms); 
-    if(socketRoomsArray.length > 1){
-        for(let i = 1; i < socketRoomsArray.length; i++){
-            socket.leave(socketRoomsArray[i]); 
-        }
-    }
-}
+// export const removeSocketFromRooms = (socket:Socket): void => {
+//     console.log("removeSocketFromRooms was called")
+//     let socketRoomsArray = Array.from(socket.rooms); 
+//     if(socketRoomsArray.length > 1){
+//         for(let i = 1; i < socketRoomsArray.length; i++){
+//             socket.leave(socketRoomsArray[i]); 
+//         }
+//     }
+// }
