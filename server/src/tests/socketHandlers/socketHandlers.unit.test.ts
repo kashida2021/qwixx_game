@@ -1,21 +1,14 @@
-// Setup for this test came from socket.io website @https://socket.io/docs/v4/testing/
+// // Setup for this test came from socket.io website @https://socket.io/docs/v4/testing/
 
 import { createServer } from "node:http";
 import { type AddressInfo } from "node:net";
 import { io as ioc, type Socket as ClientSocket } from "socket.io-client";
 import { Server, type Socket as ServerSocket } from "socket.io";
 import initializeSocketHandler from "../../socketHandlers/socketHandlers";
-import {
-  generateUniqueRoomId,
-  removeSocketFromRooms,
-} from "../../utils/roomUtils";
+import { generateUniqueRoomId } from "../../utils/roomUtils";
 
 const generateUniqueRoomIdMock = generateUniqueRoomId as jest.MockedFunction<
   typeof generateUniqueRoomId
->;
-
-const removeSocketFromRoomsMock = removeSocketFromRooms as jest.MockedFunction<
-  typeof removeSocketFromRooms
 >;
 
 function waitFor(socket: ServerSocket | ClientSocket, event: string) {
@@ -33,8 +26,7 @@ interface JoinLobbyResponse {
 //Mock the "generateUniqueRoomId" function for controlled testing
 jest.mock("../../utils/roomUtils", () => {
   const generateUniqueRoomId = jest.fn();
-  const removeSocketFromRooms = jest.fn((socket) => socket.leave());
-  return { generateUniqueRoomId, removeSocketFromRooms };
+  return { generateUniqueRoomId };
 });
 
 describe("socket event handler test", () => {
@@ -133,7 +125,7 @@ describe("socket event handler test", () => {
       //clientSocket1.on("user_left", checkClientsInRoom);
     });
 
-    test.only("clients can only be in one room at a time", (done) => {
+    test("clients can only be in one room at a time", (done) => {
       generateUniqueRoomIdMock
         .mockReturnValueOnce("1234")
         .mockReturnValueOnce("5678");
@@ -184,7 +176,7 @@ describe("socket event handler test", () => {
       );
     });
 
-    test("client can start a game", (done) => {
+    test.only("client can start a game", (done) => {
       generateUniqueRoomIdMock.mockReturnValueOnce("1234");
 
       clientSocket1.emit("create_lobby", "clientSocket1", () => {
@@ -194,9 +186,18 @@ describe("socket event handler test", () => {
             localLobbyId: "1234",
             userId: "clientSocket2",
           },
-          done()
+          () => {
+            clientSocket1.emit("start_game", {
+              lobbyId: "1234",
+              userId: "clientSocket1",
+            });
+          }
         );
       });
+
+      clientSocket1.on("game_started", () => {
+        console.log("game started")
+      })
     });
   });
 });

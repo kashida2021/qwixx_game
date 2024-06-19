@@ -1,10 +1,8 @@
-import { Server } from "socket.io";
-import {
-  generateUniqueRoomId,
-  removeSocketFromRooms,
-} from "../utils/roomUtils";
+import { Server, Socket } from "socket.io";
+import { generateUniqueRoomId } from "../utils/roomUtils";
 import GameBoard from "../../../shared/GameBoard";
 
+import QwixxLogic from "../services/QwixxLogic";
 
 //Useful methods for getting visibilty on rooms
 
@@ -20,16 +18,40 @@ import GameBoard from "../../../shared/GameBoard";
 //Can filter out the socket's own private room:
 //  let socketRoomsArray = Array.from(socket.rooms.values()).filter((room) => room !==socket.id);
 
+const removeSocketFromRooms = (socket: Socket): void => {
+  let socketRoomsArray = Array.from(socket.rooms);
+  if (socketRoomsArray.length > 1) {
+    for (let i = 1; i < socketRoomsArray.length; i++) {
+      socket.leave(socketRoomsArray[i]);
+    }
+  }
+};
+
+//function to filter room within lobby object to remove target Id
+const filterLobbyIds = (lobby: string[], userId: string): string[] => {
+  return lobby.filter((id) => id !== userId);
+};
+
+// Loops through each lobby in lobbies object and then callback filter function
+const updateLobbies = (
+  lobbies: { [key: string]: string[] },
+  userId: string
+): void => {
+  for (const roomId in lobbies) {
+    if (lobbies.hasOwnProperty(roomId)) {
+      lobbies[roomId] = filterLobbyIds(lobbies[roomId], userId);
+    }
+  }
+};
+
 export default function initializeSocketHandler(io: Server) {
   //Object tracks current Lobby for each socketId. Key is SocketId and value is roomId
   const roomSockets: { [key: string]: string } = {};
-
   //Object tracks all lobbies and connected users in an array of strings
   const lobbies: { [key: string]: string[] } = {};
-
   // Object that maps each socket.id to corresponding userId - can access this when disconnects
   const userIdList: { [key: string]: string } = {};
-
+  
   interface LobbyGameBoards {
     [lobbyId: string]: {
       [clientId: string]: GameBoard;
@@ -37,39 +59,14 @@ export default function initializeSocketHandler(io: Server) {
   }
 
   const lobbyGameBoards: LobbyGameBoards = {};
-
   io.on("connection", (socket) => {
     console.log(`A user connected: ${socket.id}`);
-
-    //function to filter room within lobby object to remove target Id
-    const filterLobbyIds = (lobby: string[], userId: string): string[] => {
-      return lobby.filter((id) => id !== userId);
-    };
-
-    // Loops through each lobby in lobbies object and then callback filter function
-    const updateLobbies = (
-      lobbies: { [key: string]: string[] },
-      userId: string
-    ): void => {
-      for (const roomId in lobbies) {
-        if (lobbies.hasOwnProperty(roomId)) {
-          lobbies[roomId] = filterLobbyIds(lobbies[roomId], userId);
-        }
-      }
-    };
 
     socket.on("create_lobby", (userId, callback) => {
       const rooms = Array.from(io.sockets.adapter.rooms.keys());
       let room = generateUniqueRoomId(rooms);
 
       lobbies[room] = [userId];
-
-      //  let socketRoomsArray = Array.from(socket.rooms);
-      //  if (socketRoomsArray.length > 1) {
-      //   for (let i = 1; i < socketRoomsArray.length; i++) {
-      //     socket.leave(socketRoomsArray[i]);
-      //       }
-      //   }
 
       removeSocketFromRooms(socket);
 
@@ -183,6 +180,11 @@ export default function initializeSocketHandler(io: Server) {
 
       socket.emit("gameBoard_created", gameBoard.serialize());
       callback({ success: true });
+
+      //Create an array of player objects
+      //Instantiate the Qwixx Logic class with the array and dice class
+      //Pass back the state of the game (All the player's scoreboard state)
+      io.to(lobbyId).emit("game_started", userId); 
     });
   });
 }
