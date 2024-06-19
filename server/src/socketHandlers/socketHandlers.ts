@@ -1,6 +1,10 @@
 import { Server } from "socket.io";
-import { generateUniqueRoomId } from "../utils/roomUtils";
+import {
+  generateUniqueRoomId,
+  removeSocketFromRooms,
+} from "../utils/roomUtils";
 import GameBoard from "../../../shared/GameBoard";
+
 
 //Useful methods for getting visibilty on rooms
 
@@ -55,21 +59,19 @@ export default function initializeSocketHandler(io: Server) {
     };
 
     socket.on("create_lobby", (userId, callback) => {
-      // Returns an array of rooms
       const rooms = Array.from(io.sockets.adapter.rooms.keys());
       let room = generateUniqueRoomId(rooms);
 
       lobbies[room] = [userId];
 
-      //Returns all the rooms a socket is currently in.
-      let socketRoomsArray = Array.from(socket.rooms);
+      //  let socketRoomsArray = Array.from(socket.rooms);
+      //  if (socketRoomsArray.length > 1) {
+      //   for (let i = 1; i < socketRoomsArray.length; i++) {
+      //     socket.leave(socketRoomsArray[i]);
+      //       }
+      //   }
 
-      //Makes sures a socket can only ever be in one room excluding its own unique room
-      if (socketRoomsArray.length > 1) {
-        for (let i = 1; i < socketRoomsArray.length; i++) {
-          socket.leave(socketRoomsArray[i]);
-        }
-      }
+      removeSocketFromRooms(socket);
 
       socket.join(room);
       roomSockets[socket.id] = room;
@@ -77,11 +79,6 @@ export default function initializeSocketHandler(io: Server) {
       console.log(
         `Server: create_lobby_success: Client "${userId}" created ${room}`
       );
-      //  console.log(
-      //   `Client socket is in room:${Array.from(socket.rooms.values()).filter(
-      //    (room) => room !== socket.id
-      //   )}`
-      //  );
     });
 
     socket.on("join_lobby", ({ localLobbyId, userId }, callback) => {
@@ -140,7 +137,6 @@ export default function initializeSocketHandler(io: Server) {
     socket.on("leave_lobby", ({ lobbyId, userId }, callback) => {
       if (roomSockets[socket.id] === lobbyId) {
         socket.leave(lobbyId);
-        // console.log(`Socket ${userId} has left Room ${lobbyId}`);
         callback({ success: true });
         delete roomSockets[socket.id];
         delete userIdList[socket.id];
@@ -162,7 +158,6 @@ export default function initializeSocketHandler(io: Server) {
 
       if (currentLobby) {
         socket.leave(currentLobby);
-        // console.log(`Socket ${socket.id} has left Room ${currentLobby}`);
         io.to(currentLobby).emit(
           "user_disconnected",
           lobbies[currentLobby],
@@ -175,10 +170,6 @@ export default function initializeSocketHandler(io: Server) {
       if (lobbies[currentLobby] && lobbies[currentLobby].length <= 0) {
         delete lobbies[currentLobby];
       }
-
-      //  console.log(roomSockets);
-      //  console.log(lobbies);
-      //  console.log(userIdList);
     });
 
     socket.on("start_game", ({ lobbyId, userId }, callback) => {
