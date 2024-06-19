@@ -20,4 +20,8 @@ export default class QwixxLogic {
     }
     return "Player not found";
   }
+
+  get players(){
+    return this._playersArray; 
+  }
 }

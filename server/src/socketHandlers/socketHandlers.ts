@@ -3,6 +3,10 @@ import { generateUniqueRoomId } from "../utils/roomUtils";
 import GameBoard from "../../../shared/GameBoard";
 
 import QwixxLogic from "../services/QwixxLogic";
+import { initializePlayers } from "../models/InitializePlayer";
+import { initializeScoreBoards } from "../models/InitializeScoreBoard";
+import Dice from "../models/DiceClass";
+import SixSidedDie from "../models/SixSidedDieClass";
 
 //Useful methods for getting visibilty on rooms
 
@@ -43,6 +47,8 @@ const updateLobbies = (
     }
   }
 };
+
+let game;
 
 export default function initializeSocketHandler(io: Server) {
   //Object tracks current Lobby for each socketId. Key is SocketId and value is roomId
@@ -169,7 +175,7 @@ export default function initializeSocketHandler(io: Server) {
       }
     });
 
-    socket.on("start_game", ({ lobbyId, userId }, callback) => {
+    socket.on("start_game", ({ lobbyId, playerNames }, callback) => {
       const gameBoard = new GameBoard();
 
       if (!lobbyGameBoards[lobbyId]) {
@@ -180,11 +186,12 @@ export default function initializeSocketHandler(io: Server) {
 
       socket.emit("gameBoard_created", gameBoard.serialize());
       callback({ success: true });
-
-      //Create an array of player objects
-      //Instantiate the Qwixx Logic class with the array and dice class
-      //Pass back the state of the game (All the player's scoreboard state)
-      io.to(lobbyId).emit("game_started", userId); 
+      const scoreBoards = initializeScoreBoards(playerNames);
+      const playerObjects = initializePlayers(playerNames, scoreBoards);
+      const dice = new Dice(SixSidedDie);
+      game = new QwixxLogic(playerObjects, dice);
+      const players = game.players;
+      io.to(lobbyId).emit("game_started", players);
     });
   });
 }
