@@ -3,8 +3,9 @@ name: Server CI Tests
 on:
   push:
     branches:
-      - main
-      - "feature/*"
+      #   - main
+      #   - "feature/*"
+      - "**"
   pull_request:
     branches:
       - main
