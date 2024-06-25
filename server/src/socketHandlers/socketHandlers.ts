@@ -1,5 +1,7 @@
 import { Server } from "socket.io";
 import { generateUniqueRoomId } from "../utils/roomUtils";
+import GameBoard from '../../../shared/GameBoard';
+
 //Useful methods for getting visibilty on rooms
 
 //Shows all sockets in all rooms:
@@ -23,6 +25,14 @@ export default function initializeSocketHandler(io: Server) {
 
  // Object that maps each socket.id to corresponding userId - can access this when disconnects
  const userIdList: { [key: string]: string } = {};
+
+ interface LobbyGameBoards {
+  [lobbyId: string]: {
+    [clientId: string]: GameBoard;
+  };
+}
+
+  const lobbyGameBoards: LobbyGameBoards = {};
 
  io.on("connection", (socket) => {
   console.log(`A user connected: ${socket.id}`);
@@ -163,8 +173,17 @@ export default function initializeSocketHandler(io: Server) {
    //  console.log(userIdList);
   });
 
-  socket.on("start_game", ({lobbyId, userId}) => {
-    console.log(`Game started in lobby ${lobbyId}`);
+  socket.on("start_game", ({lobbyId, userId}, callback) => {
+    const gameBoard = new GameBoard();
+    
+    if(!lobbyGameBoards[lobbyId]){
+      lobbyGameBoards[lobbyId] = {};
+    }
+
+    lobbyGameBoards[lobbyId][userId] = gameBoard;
+
+    socket.emit("gameBoard_created", gameBoard.serialize());
+    callback({ success: true});
   });
 
  });

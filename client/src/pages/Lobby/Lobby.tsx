@@ -54,41 +54,11 @@ export const Lobby: React.FC<ILobbyProps> = ({socket, lobbyId, userId, members, 
   if (lobbyId && userId) {
    socket.emit("start_game", { lobbyId, userId }, (response: {success: boolean}) => {
     if(response.success){
-        navigate(`/game:${lobbyId}`);
+        navigate(`/game/${lobbyId}`);
     }
    });
   }
  };
-
-
- //useEffect(() => {
-  // should these be stored in handler functions
-    //socket.on("player_joined", (lobbyMembers, user) => {
-       // setMembers(lobbyMembers);
-        //setNotifications((prevNotifications) => [...prevNotifications, `${user} has joined`])
-    //})
-
-    //socket.on("user_left", (lobbyMembers, user) => {
-       // setMembers(lobbyMembers);
-        //setNotifications((prevNotifications) => [...prevNotifications, `${user} has left`])
-    //})
-
-    //socket.on("user_disconnected", (lobbyMembers, user) => {
-      //setMembers(lobbyMembers);
-      //setNotifications((prevNotifications) => [...prevNotifications, `${user} has disconnected`])
-    //})
-
-    //socket.on("current_members", (lobbyMembers) => {
-      //setMembers(lobbyMembers);
-    //})
-
-    //return () => {
-        //socket.off("player_joined");
-        //socket.off("user_left");
-        //socket.off("user_disconnected");
-        //socket.off("current_members");
-    //}
- //}, [setMembers, setNotifications]);
 
  return (
   <div className="Lobby-container">
