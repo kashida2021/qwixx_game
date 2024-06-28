@@ -1,16 +1,16 @@
-import "./Lobby.css"
+import "./Lobby.css";
 import { Socket } from "socket.io-client";
 import { SetStateAction, Dispatch, MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface ILobbyProps {
- socket: Socket;
- lobbyId: string;
- userId: string; 
- members: string[];
- setMembers: Dispatch<SetStateAction<string[]>>;
- notifications: string[];
- setNotifications: Dispatch<SetStateAction<string[]>>;
+  socket: Socket;
+  lobbyId: string;
+  userId: string;
+  members: string[];
+  setMembers: Dispatch<SetStateAction<string[]>>;
+  notifications: string[];
+  setNotifications: Dispatch<SetStateAction<string[]>>;
 }
 
 //The lobby page should:
@@ -30,24 +30,34 @@ interface ILobbyProps {
 
 //Have a button to start game (logic doesn't need to be implemented yet)
 
-export const Lobby: React.FC<ILobbyProps> = ({socket, lobbyId, userId, members, notifications, setMembers, setNotifications }) => {
- 
- const navigate = useNavigate();
- 
- 
- const leaveRoom = (e: MouseEvent<HTMLButtonElement>): void => {
-  e.preventDefault();
-  if (lobbyId && userId) {
-   socket.emit("leave_lobby", { lobbyId, userId }, (response: {success: boolean}) => {
-    if(response.success){
-        setNotifications([]);
-        setMembers([]);
-        navigate("/");
-        
+export const Lobby: React.FC<ILobbyProps> = ({
+  socket,
+  lobbyId,
+  userId,
+  members,
+  notifications,
+  setMembers,
+  setNotifications,
+}) => {
+  const navigate = useNavigate();
+
+  const leaveRoom = (e: MouseEvent<HTMLButtonElement>): void => {
+    e.preventDefault();
+    if (lobbyId && userId) {
+      socket.emit(
+        "leave_lobby",
+        { lobbyId, userId },
+        (response: { success: boolean }) => {
+          if (response.success) {
+            setNotifications([]);
+            setMembers([]);
+            navigate("/");
+          }
+        }
+      );
     }
    });
-  }
- };
+
 
  const startGame = (e: MouseEvent<HTMLButtonElement>): void => {
   e.preventDefault();
@@ -64,27 +74,32 @@ export const Lobby: React.FC<ILobbyProps> = ({socket, lobbyId, userId, members, 
   <div className="Lobby-container">
     <div className="Lobby-message-board">
         <h2>Notifications</h2>
-        <ul>
+        <ul className="notifications-list" aria-label="notifications-list">
           {notifications.map((notification, index) => (
-            <li key={index}>{notification}</li>
+            <li key={index} className="notification-item">
+              {notification}
+            </li>
           ))}
         </ul>
-    </div>
-    <div className="Lobby-main-content">
+      </div>
+      <div className="Lobby-main-content">
         <h1> Qwixx Game </h1>
         <p>Lobby: {lobbyId}</p>
         <h2>Lobby Members</h2>
-        {members.map((member, index) => (
-            <li key={index}>{member}</li>
+        <ul className="members-list" aria-label="members-list">
+          {members.map((member, index) => (
+            <li key={index} className="member-item">
+              {member}
+            </li>
           ))}
+        </ul>
         <form>
-            <button onClick={startGame}>Start Game</button>
-            <button onClick={leaveRoom}>Leave Lobby</button>
+          <button onClick={startGame}>Start Game</button>
+          <button onClick={leaveRoom}>Leave Lobby</button>
         </form>
+      </div>
     </div>
-  </div>
- );
+  );
 };
-
 
 export default Lobby;
