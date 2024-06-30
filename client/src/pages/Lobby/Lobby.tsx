@@ -66,7 +66,7 @@ export const Lobby: React.FC<ILobbyProps> = ({
         { lobbyId, userId },
         (response: { success: boolean }) => {
           if (response.success) {
-            navigate(`/game:${lobbyId}`);
+            navigate(`/game/${lobbyId}`);
           }
         }
       );
