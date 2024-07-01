@@ -1,19 +1,19 @@
 import Player from "../../models/PlayerClass";
+import qwixxBaseGameCard from "../../models/QwixxBaseGameCard";
 
-const mockScoreCard = {
-  redRow: [1, 3, 5, 6],
+const mockGameCard: Partial<qwixxBaseGameCard> = {
 };
 
 describe("Player Class tests", () => {
   it("Should take a name and be able to return it", () => {
-    const testPlayer = new Player("testPlayer", mockScoreCard);
+    const testPlayer = new Player("testPlayer", mockGameCard as qwixxBaseGameCard);
 
     expect(testPlayer.name).toEqual("testPlayer");
   });
 
   it("Should take a score card in its constructor and be able to return it", () => {
-    const testPlayer = new Player("testPlayer", mockScoreCard);
-
-    expect(testPlayer.scoreCard).toEqual(mockScoreCard);
+    const testPlayer = new Player("testPlayer", mockGameCard as qwixxBaseGameCard);
+    console.log(testPlayer.gameCard)
+    expect(testPlayer.gameCard).toEqual(mockGameCard);
   });
 });
