@@ -34,7 +34,7 @@ export default class QwixxLogic {
     for (const player of this._playersArray) {
       if (player.name === playerName) {
         // console.log(playerName);
-        if (player.scoreCard.markNumbers(colourToMark, num)) {
+        if (player.gameCard.markNumbers(colourToMark, num)) {
           // Only returning the event data.
           // Might need to refactor later if should send back a complete state of a player's scoreboard.
           return { playerName, row, num };
