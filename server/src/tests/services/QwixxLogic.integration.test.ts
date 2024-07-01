@@ -1,19 +1,18 @@
 import QwixxLogic from "../../services/QwixxLogic";
-import GameBoard from "../../models/GameBoardTemp";
+import qwixxBaseGameCard from "../../models/QwixxBaseGameCard";
 import Player from "../../models/PlayerClass";
 import SixSidedDie from "../../models/SixSidedDieClass";
 import Dice from "../../models/DiceClass";
-import { rowColour } from "../../enums/rowColours";
 
 let mockPlayersArray: Player[];
 let mockDice: Dice;
 
 describe("Qwixx Logic integration tests:", () => {
   beforeEach(() => {
-    const mockgameCard1 = new GameBoard();
+    const mockgameCard1 = new qwixxBaseGameCard();
     const mockPlayer1 = new Player("test-player1", mockgameCard1);
 
-    const mockgameCard2 = new GameBoard();
+    const mockgameCard2 = new qwixxBaseGameCard();
     const mockPlayer2 = new Player("test-player2", mockgameCard2);
 
     mockDice = new Dice(SixSidedDie);
@@ -25,7 +24,7 @@ describe("Qwixx Logic integration tests:", () => {
 
     expect(testGame.players.length).toBe(2);
     testGame.players.forEach((player) => {
-      expect(player.gameCard instanceof GameBoard).toBe(true);
+      expect(player.gameCard instanceof qwixxBaseGameCard).toBe(true);
     });
   });
 

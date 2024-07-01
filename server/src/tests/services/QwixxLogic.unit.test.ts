@@ -1,21 +1,21 @@
 import QwixxLogic from "../../services/QwixxLogic";
 import Player from "../../models/PlayerClass";
-import GameBoard from "../../models/GameBoardTemp";
+import qwixxBaseGameCard from "../../models/QwixxBaseGameCard";
 import Dice from "../../models/DiceClass";
 //QwixxLogic.makeMove(playerName, rowColour, num) returns {playerName:string, rowColour:string, num:int}
 
-const gameCardMock: Partial<GameBoard> = {
+const gameCardMock: Partial<qwixxBaseGameCard> = {
   markNumbers: jest.fn(),
 };
 
 const player1Mock: Partial<Player> = {
   name: "player1",
-  gameCard: gameCardMock as GameBoard,
+  gameCard: gameCardMock as qwixxBaseGameCard,
 };
 
 const player2Mock: Partial<Player> = {
   name: "player2",
-  gameCard: gameCardMock as GameBoard,
+  gameCard: gameCardMock as qwixxBaseGameCard,
 };
 
 const diceMock: Partial<Dice> = {};

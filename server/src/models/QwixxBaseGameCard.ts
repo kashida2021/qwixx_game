@@ -1,6 +1,6 @@
 import { rowColour } from "../enums/rowColours";
 
-export default class GameBoard {
+export default class qwixxBaseGameCard {
   private _rows: { [key in rowColour]: number[] };
   private _numbers: number[];
   private _lockedRows: string[];
@@ -23,20 +23,20 @@ export default class GameBoard {
 
   serialize() {
     return {
-      gameBoard: this._rows,
+      gameCard: this._rows,
       numbers: this._numbers,
       lockedRows: this._lockedRows,
       penalties: this._penalties,
     };
   }
 
-  static from(data: any): GameBoard {
-    const gameBoard = new GameBoard();
-    gameBoard._rows = data.gameBoard;
-    gameBoard._numbers = data.numbers;
-    gameBoard._lockedRows = data.lockedRows;
-    gameBoard._penalties = data.penalties;
-    return gameBoard;
+  static from(data: any): qwixxBaseGameCard {
+    const gameCard = new qwixxBaseGameCard();
+    gameCard._rows = data.gameCard;
+    gameCard._numbers = data.numbers;
+    gameCard._lockedRows = data.lockedRows;
+    gameCard._penalties = data.penalties;
+    return gameCard;
   }
 
   get MarkedNumbers() {
