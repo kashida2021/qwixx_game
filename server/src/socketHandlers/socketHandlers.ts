@@ -1,7 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { generateUniqueRoomId } from "../utils/roomUtils";
-import GameBoard from "../../../shared/GameBoard";
-
+// import GameBoard from "../../../shared/GameBoard";
+// import GameBoard from "../models/GameBoardTemp";
 import QwixxLogic from "../services/QwixxLogic";
 import { initializePlayers } from "../models/InitializePlayer";
 import { initializeScoreBoards } from "../models/InitializeScoreBoard";
@@ -58,13 +58,14 @@ export default function initializeSocketHandler(io: Server) {
   // Object that maps each socket.id to corresponding userId - can access this when disconnects
   const userIdList: { [key: string]: string } = {};
   
-  interface LobbyGameBoards {
-    [lobbyId: string]: {
-      [clientId: string]: GameBoard;
-    };
-  }
+  // interface LobbyGameBoards {
+  //   [lobbyId: string]: {
+  //     [clientId: string]: GameBoard;
+  //   };
+  // }
 
-  const lobbyGameBoards: LobbyGameBoards = {};
+  // const lobbyGameBoards: LobbyGameBoards = {};
+
   io.on("connection", (socket) => {
     console.log(`A user connected: ${socket.id}`);
 

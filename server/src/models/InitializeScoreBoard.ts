@@ -1,26 +1,20 @@
-class MockScoreBoard {
-  private _rowArray: number[] = [];
-
-  get row(): number[] {
-    return this._rowArray;
-  }
-}
+import GameBoard from "./GameBoardTemp";
 
 export const initializeScoreBoards = (
   playerNames: string[]
-): MockScoreBoard[] => {
+): GameBoard[] => {
   if (playerNames.length < 2) {
     throw new Error(
       "There must be at least 2 players to generate score boards"
     );
   }
 
-  const scoreBoards: MockScoreBoard[] = [];
+  const gameBoards: GameBoard[] = [];
 
   playerNames.forEach(() => {
-    const scoreBoard = new MockScoreBoard();
-    scoreBoards.push(scoreBoard);
+    const gameBoard = new GameBoard(); 
+    gameBoards.push(gameBoard);
   });
 
-  return scoreBoards;
+  return gameBoards;
 };

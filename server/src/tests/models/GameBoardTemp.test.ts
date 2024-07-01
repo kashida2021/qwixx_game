@@ -1,5 +1,5 @@
-import GameBoard from "../../services/GameBoardTemp";
-import GameBoardTemp from "../../services/GameBoardTemp";
+import GameBoard from "../../models/GameBoardTemp";
+import GameBoardTemp from "../../models/GameBoardTemp";
 import { rowColour } from "../../enums/rowColours";
 
 let testGameBoard: GameBoard;
