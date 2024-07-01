@@ -10,11 +10,11 @@ let mockDice: Dice;
 
 describe("Qwixx Logic integration tests:", () => {
   beforeEach(() => {
-    const mockScoreCard1 = new GameBoard();
-    const mockPlayer1 = new Player("test-player1", mockScoreCard1);
+    const mockgameCard1 = new GameBoard();
+    const mockPlayer1 = new Player("test-player1", mockgameCard1);
 
-    const mockScoreCard2 = new GameBoard();
-    const mockPlayer2 = new Player("test-player2", mockScoreCard2);
+    const mockgameCard2 = new GameBoard();
+    const mockPlayer2 = new Player("test-player2", mockgameCard2);
 
     mockDice = new Dice(SixSidedDie);
 
@@ -25,7 +25,7 @@ describe("Qwixx Logic integration tests:", () => {
 
     expect(testGame.players.length).toBe(2);
     testGame.players.forEach((player) => {
-      expect(player.scoreCard instanceof GameBoard).toBe(true);
+      expect(player.gameCard instanceof GameBoard).toBe(true);
     });
   });
 

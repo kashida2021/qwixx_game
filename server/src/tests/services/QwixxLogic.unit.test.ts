@@ -4,18 +4,18 @@ import GameBoard from "../../models/GameBoardTemp";
 import Dice from "../../models/DiceClass";
 //QwixxLogic.makeMove(playerName, rowColour, num) returns {playerName:string, rowColour:string, num:int}
 
-const scoreCardMock: Partial<GameBoard> = {
+const gameCardMock: Partial<GameBoard> = {
   markNumbers: jest.fn(),
 };
 
 const player1Mock: Partial<Player> = {
   name: "player1",
-  scoreCard: scoreCardMock as GameBoard,
+  gameCard: gameCardMock as GameBoard,
 };
 
 const player2Mock: Partial<Player> = {
   name: "player2",
-  scoreCard: scoreCardMock as GameBoard,
+  gameCard: gameCardMock as GameBoard,
 };
 
 const diceMock: Partial<Dice> = {};
@@ -27,7 +27,7 @@ const playersArrayMock: Player[] = [
 
 describe("Qwixx Logic tests", () => {
   it("should make a move and return the correct result", () => {
-    (scoreCardMock.markNumbers! as jest.Mock).mockReturnValue(true);
+    (gameCardMock.markNumbers! as jest.Mock).mockReturnValue(true);
 
     const testGame = new QwixxLogic(playersArrayMock, diceMock as Dice);
 
@@ -37,7 +37,7 @@ describe("Qwixx Logic tests", () => {
       row: "red",
       num: 1,
     });
-    expect(scoreCardMock.markNumbers).toHaveBeenCalledWith("red", 1); 
+    expect(gameCardMock.markNumbers).toHaveBeenCalledWith("red", 1); 
 
     const player2result = testGame.makeMove("player2", "blue", 1);
     expect(player2result).toEqual({
@@ -45,7 +45,7 @@ describe("Qwixx Logic tests", () => {
       row: "blue",
       num: 1,
     });
-    expect(scoreCardMock.markNumbers).toHaveBeenCalledWith("blue", 1); 
+    expect(gameCardMock.markNumbers).toHaveBeenCalledWith("blue", 1); 
   });
 
   it("should return a message if the player isn't found", () => {

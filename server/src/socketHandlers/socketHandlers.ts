@@ -4,7 +4,7 @@ import { generateUniqueRoomId } from "../utils/roomUtils";
 // import GameBoard from "../models/GameBoardTemp";
 import QwixxLogic from "../services/QwixxLogic";
 import { initializePlayers } from "../models/InitializePlayer";
-import { initializeScoreBoards } from "../models/InitializeScoreBoard";
+import { initializeGameCards } from "../models/InitializeScoreBoard";
 import Dice from "../models/DiceClass";
 import SixSidedDie from "../models/SixSidedDieClass";
 
@@ -57,7 +57,7 @@ export default function initializeSocketHandler(io: Server) {
   const lobbies: { [key: string]: string[] } = {};
   // Object that maps each socket.id to corresponding userId - can access this when disconnects
   const userIdList: { [key: string]: string } = {};
-  
+
   // interface LobbyGameBoards {
   //   [lobbyId: string]: {
   //     [clientId: string]: GameBoard;
@@ -187,8 +187,8 @@ export default function initializeSocketHandler(io: Server) {
 
       // socket.emit("gameBoard_created", gameBoard.serialize());
       // callback({ success: true });
-      const scoreBoards = initializeScoreBoards(playerNames);
-      const playerObjects = initializePlayers(playerNames, scoreBoards);
+      const gameCards = initializeGameCards(playerNames);
+      const playerObjects = initializePlayers(playerNames, gameCards);
       const dice = new Dice(SixSidedDie);
       game = new QwixxLogic(playerObjects, dice);
       const players = game.players;

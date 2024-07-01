@@ -1,9 +1,9 @@
-import { initializeScoreBoards } from "../../models/InitializeScoreBoard";
+import { initializeGameCards } from "../../models/InitializeScoreBoard";
 import GameBoard from "../../models/GameBoardTemp";
 
-describe("initializeScoreBoards tests", () => {
+describe("initializeGameCards tests", () => {
   test("given 2 player names, it returns an array of 2 ScoreBoard objects", () => {
-    const scoreBoardsArray = initializeScoreBoards(["player1", "player2"]);
+    const scoreBoardsArray = initializeGameCards(["player1", "player2"]);
     scoreBoardsArray.forEach((scoreBoard) => {
       expect(scoreBoard instanceof GameBoard).toBe(true); 
     })
@@ -11,13 +11,13 @@ describe("initializeScoreBoards tests", () => {
   });
 
   test("given 1 player name, it throws an error", () => {
-    expect(() => initializeScoreBoards(["player1"])).toThrow(
+    expect(() => initializeGameCards(["player1"])).toThrow(
       "There must be at least 2 players to generate score boards"
     );
   });
 
   test("given 0 player name, it throws an error", () => {
-    expect(() => initializeScoreBoards([])).toThrow(
+    expect(() => initializeGameCards([])).toThrow(
       "There must be at least 2 players to generate score boards"
     );
   });

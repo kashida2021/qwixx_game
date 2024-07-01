@@ -1,6 +1,6 @@
 import GameBoard from "./GameBoardTemp";
 
-export const initializeScoreBoards = (
+export const initializeGameCards = (
   playerNames: string[]
 ): GameBoard[] => {
   if (playerNames.length < 2) {

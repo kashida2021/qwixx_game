@@ -203,8 +203,8 @@ describe("socket event handler test", () => {
           "game_started"
         );
         expect(gameStartedData[0]._name).toBe("clientSocket1");
-        expect(gameStartedData[0]._scoreCard).toBeTruthy();
-        expect(gameStartedData[0]._scoreCard._rows).toEqual({
+        expect(gameStartedData[0]._gameCard).toBeTruthy();
+        expect(gameStartedData[0]._gameCard._rows).toEqual({
           red: [],
           yellow: [],
           green: [],
@@ -212,8 +212,8 @@ describe("socket event handler test", () => {
         });
         
         expect(gameStartedData[1]._name).toBe("clientSocket2");
-        expect(gameStartedData[1]._scoreCard).toBeTruthy();
-        expect(gameStartedData[1]._scoreCard._rows).toEqual({
+        expect(gameStartedData[1]._gameCard).toBeTruthy();
+        expect(gameStartedData[1]._gameCard._rows).toEqual({
           red: [],
           yellow: [],
           green: [],
