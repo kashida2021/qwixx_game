@@ -175,17 +175,17 @@ export default function initializeSocketHandler(io: Server) {
       }
     });
 
-    socket.on("start_game", ({ lobbyId, playerNames }, callback) => {
-      const gameBoard = new GameBoard();
+    socket.on("start_game", ({ lobbyId, playerNames }) => {
+      // const gameBoard = new GameBoard();
 
-      if (!lobbyGameBoards[lobbyId]) {
-        lobbyGameBoards[lobbyId] = {};
-      }
+      // if (!lobbyGameBoards[lobbyId]) {
+      //   lobbyGameBoards[lobbyId] = {};
+      // }
 
-      lobbyGameBoards[lobbyId][userId] = gameBoard;
+      // lobbyGameBoards[lobbyId][userId] = gameBoard;
 
-      socket.emit("gameBoard_created", gameBoard.serialize());
-      callback({ success: true });
+      // socket.emit("gameBoard_created", gameBoard.serialize());
+      // callback({ success: true });
       const scoreBoards = initializeScoreBoards(playerNames);
       const playerObjects = initializePlayers(playerNames, scoreBoards);
       const dice = new Dice(SixSidedDie);
