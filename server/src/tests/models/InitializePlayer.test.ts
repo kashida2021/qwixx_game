@@ -1,9 +1,9 @@
 import { initializePlayers } from "../../models/InitializePlayer";
-
-const mockScoreBoard1 = {};
-const mockScoreBoard2 = {};
-const mockScoreBoard3 = {};
-const mockScoreBoard4 = {};
+import GameBoard from "../../models/GameBoardTemp";
+const mockScoreBoard1 = new GameBoard;
+const mockScoreBoard2 = new GameBoard;;
+const mockScoreBoard3 = new GameBoard;;
+const mockScoreBoard4 = new GameBoard;;
 
 describe("initializePlayers tests", () => {
   test("given 1 player name, it returns an error", () => {
@@ -45,7 +45,7 @@ describe("initializePlayers tests", () => {
       const playerName = result[i];
       expect(playerName).toBeDefined();
       expect(playerName.name).toBe(`player${i + 1}`);
-      expect(playerName.scoreCard).toEqual({});
+      expect(playerName.scoreCard instanceof GameBoard).toBe(true);
     }
   });
 });

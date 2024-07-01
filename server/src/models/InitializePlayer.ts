@@ -1,8 +1,9 @@
 import Player from "./PlayerClass";
+import GameBoard from "./GameBoardTemp";
 
 export const initializePlayers = (
   playerNames: string[],
-  scoreBoards: any
+  scoreBoards: GameBoard[],
 ): Player[] => {
   if (playerNames.length < 2) {
     throw new Error("There must be atleast 2 players in the room");
