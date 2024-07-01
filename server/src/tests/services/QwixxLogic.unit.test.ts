@@ -1,0 +1,56 @@
+import QwixxLogic from "../../services/QwixxLogic";
+import Player from "../../models/PlayerClass";
+import GameBoard from "../../models/GameBoardTemp";
+import Dice from "../../models/DiceClass";
+//QwixxLogic.makeMove(playerName, rowColour, num) returns {playerName:string, rowColour:string, num:int}
+
+const scoreCardMock: Partial<GameBoard> = {
+  markNumbers: jest.fn(),
+};
+
+const player1Mock: Partial<Player> = {
+  name: "player1",
+  scoreCard: scoreCardMock as GameBoard,
+};
+
+const player2Mock: Partial<Player> = {
+  name: "player2",
+  scoreCard: scoreCardMock as GameBoard,
+};
+
+const diceMock: Partial<Dice> = {};
+
+const playersArrayMock: Player[] = [
+  player1Mock as Player,
+  player2Mock as Player,
+];
+
+describe("Qwixx Logic tests", () => {
+  it("should make a move and return the correct result", () => {
+    (scoreCardMock.markNumbers! as jest.Mock).mockReturnValue(true);
+
+    const testGame = new QwixxLogic(playersArrayMock, diceMock as Dice);
+
+    const player1result = testGame.makeMove("player1", "red", 1);
+    expect(player1result).toEqual({
+      playerName: "player1",
+      row: "red",
+      num: 1,
+    });
+    expect(scoreCardMock.markNumbers).toHaveBeenCalledWith("red", 1); 
+
+    const player2result = testGame.makeMove("player2", "blue", 1);
+    expect(player2result).toEqual({
+      playerName: "player2",
+      row: "blue",
+      num: 1,
+    });
+    expect(scoreCardMock.markNumbers).toHaveBeenCalledWith("blue", 1); 
+  });
+
+  it("should return a message if the player isn't found", () => {
+    const testGame = new QwixxLogic(playersArrayMock, diceMock as Dice);
+    const result = testGame.makeMove("", "red", 1);
+    expect(result).toBe("Player not found");
+  });
+});
