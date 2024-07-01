@@ -6,6 +6,8 @@ import { io as ioc, type Socket as ClientSocket } from "socket.io-client";
 import { Server, type Socket as ServerSocket } from "socket.io";
 import initializeSocketHandler from "../../socketHandlers/socketHandlers";
 import { generateUniqueRoomId } from "../../utils/roomUtils";
+import Player from "../../models/PlayerClass";
+import GameBoard from "../../models/GameBoardTemp";
 
 const generateUniqueRoomIdMock = generateUniqueRoomId as jest.MockedFunction<
   typeof generateUniqueRoomId
@@ -201,7 +203,22 @@ describe("socket event handler test", () => {
           "game_started"
         );
         expect(gameStartedData[0]._name).toBe("clientSocket1");
+        expect(gameStartedData[0]._scoreCard).toBeTruthy();
+        expect(gameStartedData[0]._scoreCard._rows).toEqual({
+          red: [],
+          yellow: [],
+          green: [],
+          blue: [],
+        });
+        
         expect(gameStartedData[1]._name).toBe("clientSocket2");
+        expect(gameStartedData[1]._scoreCard).toBeTruthy();
+        expect(gameStartedData[1]._scoreCard._rows).toEqual({
+          red: [],
+          yellow: [],
+          green: [],
+          blue: [],
+        });
       });
     });
   });
