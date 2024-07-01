@@ -1,20 +1,20 @@
-import GameBoard from "./GameBoardTemp";
+import qwixxBaseGameCard from "./QwixxBaseGameCard";
 
 export const initializeGameCards = (
   playerNames: string[]
-): GameBoard[] => {
+): qwixxBaseGameCard[] => {
   if (playerNames.length < 2) {
     throw new Error(
       "There must be at least 2 players to generate score boards"
     );
   }
 
-  const gameBoards: GameBoard[] = [];
+  const gameCards: qwixxBaseGameCard[] = [];
 
   playerNames.forEach(() => {
-    const gameBoard = new GameBoard(); 
-    gameBoards.push(gameBoard);
+    const gameCard = new qwixxBaseGameCard(); 
+    gameCards.push(gameCard);
   });
 
-  return gameBoards;
+  return gameCards;
 };

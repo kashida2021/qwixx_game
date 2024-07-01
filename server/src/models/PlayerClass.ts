@@ -1,9 +1,9 @@
-import GameBoard from "./GameBoardTemp";
+import qwixxBaseGameCard from "./QwixxBaseGameCard";
 export default class Player{
     private _name; 
-    private _gameCard: GameBoard; 
+    private _gameCard: qwixxBaseGameCard; 
 
-    constructor(name: string, gameCard: GameBoard){
+    constructor(name: string, gameCard: qwixxBaseGameCard){
         this._name = name; 
         this._gameCard = gameCard; 
     }
@@ -14,7 +14,7 @@ export default class Player{
 
     //Using a getter for gameCard for now to allow quicker protoyping
     //Likely needs refactoring in the future for looser coupling with the gameCard class
-    get gameCard(): GameBoard{
+    get gameCard(): qwixxBaseGameCard{
         return this._gameCard
     }
 }

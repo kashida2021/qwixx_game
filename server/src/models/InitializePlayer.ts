@@ -1,9 +1,9 @@
 import Player from "./PlayerClass";
-import GameBoard from "./GameBoardTemp";
+import qwixxBaseGameCard from "./QwixxBaseGameCard";
 
 export const initializePlayers = (
   playerNames: string[],
-  gameCards: GameBoard[],
+  gameCards: qwixxBaseGameCard[],
 ): Player[] => {
   if (playerNames.length < 2) {
     throw new Error("There must be atleast 2 players in the room");

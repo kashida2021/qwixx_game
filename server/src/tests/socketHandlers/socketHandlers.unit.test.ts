@@ -7,7 +7,7 @@ import { Server, type Socket as ServerSocket } from "socket.io";
 import initializeSocketHandler from "../../socketHandlers/socketHandlers";
 import { generateUniqueRoomId } from "../../utils/roomUtils";
 import Player from "../../models/PlayerClass";
-import GameBoard from "../../models/GameBoardTemp";
+import GameBoard from "../../models/QwixxBaseGameCard";
 
 const generateUniqueRoomIdMock = generateUniqueRoomId as jest.MockedFunction<
   typeof generateUniqueRoomId

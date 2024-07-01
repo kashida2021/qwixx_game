@@ -1,21 +1,20 @@
-import GameBoard from "../../models/GameBoardTemp";
-import GameBoardTemp from "../../models/GameBoardTemp";
 import { rowColour } from "../../enums/rowColours";
+import qwixxBaseGameCard from "../../models/QwixxBaseGameCard";
 
-let testGameBoard: GameBoard;
+let testGameCard: qwixxBaseGameCard;
 
 describe("gameboard temp test", () => {
   beforeEach(() => {
-    testGameBoard = new GameBoard();
+    testGameCard = new qwixxBaseGameCard();
   });
   test("get back rows", () => {
-    const rows = testGameBoard.MarkedNumbers;
+    const rows = testGameCard.MarkedNumbers;
     console.log(rows);
     expect(rows).toEqual({ red: [], yellow: [], green: [], blue: [] });
   });
 
   test("get back numbers", () => {
-    const numbers = testGameBoard.Numbers;
+    const numbers = testGameCard.Numbers;
     console.log(numbers);
     expect(numbers).toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
   });
@@ -26,15 +25,15 @@ describe("gameboard temp test", () => {
     [rowColour.Green, 8, { red: [], yellow: [], green: [8], blue: [] }],
     [rowColour.Yellow, 6, { red: [], yellow: [6], green: [], blue: [] }],
   ])("mark %s %d on board", (a, b, expected) => {
-    testGameBoard.markNumbers(a, b);
-    const rows = testGameBoard.MarkedNumbers;
+    testGameCard.markNumbers(a, b);
+    const rows = testGameCard.MarkedNumbers;
     expect(rows).toEqual(expected);
   });
 
   test("mark numbers already on board", () => {
-    testGameBoard.markNumbers(rowColour.Red, 5);
-    testGameBoard.markNumbers(rowColour.Red, 5);
-    const rows = testGameBoard.MarkedNumbers;
+    testGameCard.markNumbers(rowColour.Red, 5);
+    testGameCard.markNumbers(rowColour.Red, 5);
+    const rows = testGameCard.MarkedNumbers;
     expect(rows).toEqual({ red: [5], yellow: [], green: [], blue: [] });
   });
 });

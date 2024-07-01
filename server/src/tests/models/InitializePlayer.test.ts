@@ -1,9 +1,10 @@
 import { initializePlayers } from "../../models/InitializePlayer";
-import GameBoard from "../../models/GameBoardTemp";
-const mockGameCard1 = new GameBoard;
-const mockGameCard2 = new GameBoard;;
-const mockGameCard3 = new GameBoard;;
-const mockGameCard4 = new GameBoard;;
+import qwixxBaseGameCard from "../../models/QwixxBaseGameCard";
+
+const mockGameCard1 = new qwixxBaseGameCard;
+const mockGameCard2 = new qwixxBaseGameCard;;
+const mockGameCard3 = new qwixxBaseGameCard;;
+const mockGameCard4 = new qwixxBaseGameCard;;
 
 describe("initializePlayers tests", () => {
   test("given 1 player name, it returns an error", () => {
@@ -45,7 +46,7 @@ describe("initializePlayers tests", () => {
       const playerName = result[i];
       expect(playerName).toBeDefined();
       expect(playerName.name).toBe(`player${i + 1}`);
-      expect(playerName.gameCard instanceof GameBoard).toBe(true);
+      expect(playerName.gameCard instanceof qwixxBaseGameCard).toBe(true);
     }
   });
 });
