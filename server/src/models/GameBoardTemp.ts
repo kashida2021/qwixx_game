@@ -50,6 +50,9 @@ export default class GameBoard {
   markNumbers(row: rowColour, number: number) {
     if (!this._rows[row].includes(number)) {
       this._rows[row].push(number);
+      return true
+    }else{
+      return false
     }
   }
 
