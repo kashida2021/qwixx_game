@@ -1,4 +1,4 @@
-import { initializeGameCards } from "../../models/InitializeScoreBoard";
+import { initializeGameCards } from "../../models/InitializeGameCards";
 import qwixxBaseGameCard from "../../models/QwixxBaseGameCard";
 
 describe("initializeGameCards tests", () => {

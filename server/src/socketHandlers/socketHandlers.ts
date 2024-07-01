@@ -4,7 +4,7 @@ import { generateUniqueRoomId } from "../utils/roomUtils";
 // import GameBoard from "../models/GameBoardTemp";
 import QwixxLogic from "../services/QwixxLogic";
 import { initializePlayers } from "../models/InitializePlayer";
-import { initializeGameCards } from "../models/InitializeScoreBoard";
+import { initializeGameCards } from "../models/InitializeGameCards";
 import Dice from "../models/DiceClass";
 import SixSidedDie from "../models/SixSidedDieClass";
 
