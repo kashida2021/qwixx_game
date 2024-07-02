@@ -1,16 +1,23 @@
 # How to use git and github as a team
+You can type ⌘K V to view preview of this file in VSCode.
 
 ## Commands
 Here are some useful commands you can use in the terminal. 
 
-List of git commands: 
+List of commands: 
 |prefix    |description      |
 |----------|-----------------|
 | git checkout -b | Create a new branch and checkout into it|
 | git pull --rebase origin <branch name>     | Pull latest from branch and rebase on top of it        |
-| git push -f | Use this command if you rebased but already pushed your branch before|
 | git fetch    | fetch latest changes but doesn't merge/rebase your branch|
-| npm   | Installs dependencies |
+| git status | List files that aren't staged for commit |
+| git add file-name | Adds changed file to staging area |
+| git add . | Adds all changed files to staging area |
+| git restore --staged file-name | Unstage a specific file in staging area and keep changes |
+| git commit -m "Commit message"| Create a commit |
+| git push | Push commits to remote branch |
+| git push -f | Use this command if you rebased but already pushed your branch before|
+| npm or npm -i   | Installs dependencies |
 
 ## Workflow
 All feature branches should be based off of **develop** branch.\
