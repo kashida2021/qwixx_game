@@ -41,7 +41,7 @@ export const Lobby: React.FC<ILobbyProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  const leaveRoom = (e: MouseEvent<HTMLButtonElement>): void => {
+  const handleLeaveRoom = (e: MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
     if (lobbyId && userId) {
       socket.emit(
@@ -58,36 +58,12 @@ export const Lobby: React.FC<ILobbyProps> = ({
     }
   };
 
-  const startGame = (e: MouseEvent<HTMLButtonElement>): void => {
+  const handleStartGame = (e: MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
-    if (lobbyId && userId) {
-      socket.emit(
-        "start_game",
-        { lobbyId, userId },
-        (response: { success: boolean }) => {
-          if (response.success) {
-            navigate(`/game/${lobbyId}`);
-          }
-        }
-      );
+    if (lobbyId && members.length >= 2 && members.length <= 5) {
+      socket.emit("start_game", { lobbyId, members });
     }
   };
-
-  //useEffect(() => {
-  // should these be stored in handler functions
-  //socket.on("user_left", (lobbyMembers, user) => {
-  // setMembers(lobbyMembers);
-  //setNotifications((prevNotifications) => [...prevNotifications, `${user} has left`])
-  //})
-
-  //socket.on("user_disconnected", (lobbyMembers, user) => {
-  //setMembers(lobbyMembers);
-  //setNotifications((prevNotifications) => [...prevNotifications, `${user} has disconnected`])
-  //})
-
-  //socket.on("current_members", (lobbyMembers) => {
-  //setMembers(lobbyMembers);
-  //})
 
   return (
     <div className="Lobby-container">
@@ -113,8 +89,8 @@ export const Lobby: React.FC<ILobbyProps> = ({
           ))}
         </ul>
         <form>
-          <button onClick={startGame}>Start Game</button>
-          <button onClick={leaveRoom}>Leave Lobby</button>
+          <button onClick={handleStartGame}>Start Game</button>
+          <button onClick={handleLeaveRoom}>Leave Lobby</button>
         </form>
       </div>
     </div>

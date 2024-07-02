@@ -1,4 +1,4 @@
-import { describe, test, it, expect, vi } from "vitest";
+import { describe, test, expect, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import React from "react";
