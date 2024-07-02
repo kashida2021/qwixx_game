@@ -60,6 +60,14 @@ export const Lobby: React.FC<ILobbyProps> = ({
 
   const handleStartGame = (e: MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
+    if(members.length < 2){
+      setNotifications(["Not enough players to start game."])
+    }
+
+    if(members.length > 5){
+      setNotifications(["There are too many players to start the game."])
+    }
+
     if (lobbyId && members.length >= 2 && members.length <= 5) {
       socket.emit("start_game", { lobbyId, members });
     }

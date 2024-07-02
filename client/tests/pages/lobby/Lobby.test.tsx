@@ -32,7 +32,7 @@ vi.mock(
   }
 );
 
-describe("Lobby:", () => {
+describe("Lobby Unit Tests:", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -60,84 +60,92 @@ describe("Lobby:", () => {
     expect(memberItem[0]).toHaveTextContent(membersArrayMock[0]);
     expect(memberItem[1]).toHaveTextContent(membersArrayMock[1]);
   });
+  describe("When clicking on 'Start Game' button and:", () => {
+    test("there are the right amount of players, emit 'start_game' event", async () => {
+      render(
+        <MemoryRouter>
+          <Lobby
+            socket={socket}
+            lobbyId={lobbyIdMock}
+            userId={"testUser1"}
+            members={membersArrayMock}
+            setMembers={setMembersMock}
+            notifications={[""]}
+            setNotifications={setNotificationsMock}
+          />
+        </MemoryRouter>
+      );
 
-  test("clicking on 'start game' should emit 'start_game' event if there are more than 1 player", async () => {
-    render(
-      <MemoryRouter>
-        <Lobby
-          socket={socket}
-          lobbyId={lobbyIdMock}
-          userId={"testUser1"}
-          members={membersArrayMock}
-          setMembers={setMembersMock}
-          notifications={[""]}
-          setNotifications={setNotificationsMock}
-        />
-      </MemoryRouter>
-    );
+      const startGameBtn = screen.getByRole("button", { name: "Start Game" });
+      expect(startGameBtn).toBeVisible();
 
-    const startGameBtn = screen.getByRole("button", { name: "Start Game" });
-    expect(startGameBtn).toBeVisible();
+      await user.click(startGameBtn);
 
-    await user.click(startGameBtn);
-
-    expect(socket.emit).toHaveBeenCalledWith("start_game", {
-      lobbyId: lobbyIdMock,
-      members: [membersArrayMock[0], membersArrayMock[1]],
+      expect(socket.emit).toHaveBeenCalledWith("start_game", {
+        lobbyId: lobbyIdMock,
+        members: [membersArrayMock[0], membersArrayMock[1]],
+      });
     });
-  });
 
-  test("clicking on 'Start Game' shouldn't emit 'start_game' if there are less than 2 players and show an error notification", async () => {
-    render(
-      <MemoryRouter>
-        <Lobby
-          socket={socket}
-          lobbyId={lobbyIdMock}
-          userId={"testUser1"}
-          members={["testUser1"]}
-          setMembers={setMembersMock}
-          notifications={[""]}
-          setNotifications={setNotificationsMock}
-        />
-      </MemoryRouter>
-    );
+    test("there are less than 2 players, don't emit 'start_game' and show an error", async () => {
+      render(
+        <MemoryRouter>
+          <Lobby
+            socket={socket}
+            lobbyId={lobbyIdMock}
+            userId={"testUser1"}
+            members={["testUser1"]}
+            setMembers={setMembersMock}
+            notifications={[""]}
+            setNotifications={setNotificationsMock}
+          />
+        </MemoryRouter>
+      );
 
-    const startGameBtn = screen.getByRole("button", { name: "Start Game" });
-    expect(startGameBtn).toBeVisible();
+      const startGameBtn = screen.getByRole("button", { name: "Start Game" });
+      expect(startGameBtn).toBeVisible();
+
+      await user.click(startGameBtn);
+
+      expect(setNotificationsMock).toHaveBeenCalledWith([
+        "Not enough players to start game.",
+      ]);
+      expect(socket.emit).not.toHaveBeenCalled();
+    });
+
+    test("there are more than 5 players, don't emit 'start_game' and show an error", async () => {
+      render(
+        <MemoryRouter>
+          <Lobby
+            socket={socket}
+            lobbyId={lobbyIdMock}
+            userId={"testUser1"}
+            members={[
+              "testUser1",
+              "testUser2",
+              "testUser3",
+              "testUser4",
+              "testUser5",
+              "testUser6",
+            ]}
+            setMembers={setMembersMock}
+            notifications={[""]}
+            setNotifications={setNotificationsMock}
+          />
+        </MemoryRouter>
+      );
+
+      const startGameBtn = screen.getByRole("button", { name: "Start Game" });
+      expect(startGameBtn).toBeVisible();
+
+      await user.click(startGameBtn);
+
+      expect(setNotificationsMock).toHaveBeenCalledWith([
+        "There are too many players to start the game.",
+      ]);
+      expect(socket.emit).not.toHaveBeenCalled();
+    });
     
-    await user.click(startGameBtn);
-
-    expect(socket.emit).not.toHaveBeenCalled();
+    test.todo("clicking on 'Leave Lobby' should navigate back to home page");
   });
-
-  test("clicking on 'Start Game', shouldn't emit 'start_game' if there are more than 5 players", async () => {
-    render(
-      <MemoryRouter>
-        <Lobby
-          socket={socket}
-          lobbyId={lobbyIdMock}
-          userId={"testUser1"}
-          members={[
-            "testUser1",
-            "testUser2",
-            "testUser3",
-            "testUser4",
-            "testUser5",
-            "testUser6",
-          ]}
-          setMembers={setMembersMock}
-          notifications={[""]}
-          setNotifications={setNotificationsMock}
-        />
-      </MemoryRouter>
-    );
-
-    const startGameBtn = screen.getByRole("button", { name: "Start Game" });
-    expect(startGameBtn).toBeVisible();
-
-    await user.click(startGameBtn);
-
-    expect(socket.emit).not.toHaveBeenCalled();
-  });
-  test.todo("clicking on 'Leave Lobby' should navigate back to home page");
 });
