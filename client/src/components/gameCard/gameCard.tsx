@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import Row from './row';
 
 const rowColours: string[] = ["red", "yellow", "green", "blue"];
 const ascendingNumbers:{number:number; crossed: boolean}[] = Array.from({ length: 11 }, (_, i) => ({ number: i + 2, crossed: false }));
@@ -21,6 +22,14 @@ const initialState: Row[] = rowColours.map((color, index) => ({
 
 const GameCard = () => {
     const [rows, setRows] = useState<Row[]>(initialState);
+
+    return (
+        <div className="gameCard">
+            {rows.map((row, rowIndex) => (
+                <Row key={rowIndex} row={row}  />
+            ))}
+        </div>
+    )
 }
 
 export default GameCard;
