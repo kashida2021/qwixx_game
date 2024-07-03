@@ -176,7 +176,7 @@ export default function initializeSocketHandler(io: Server) {
       }
     });
 
-    socket.on("start_game", ({ lobbyId, playerNames }) => {
+    socket.on("start_game", ({ lobbyId, members }) => {
       // const gameBoard = new GameBoard();
 
       // if (!lobbyGameBoards[lobbyId]) {
@@ -187,12 +187,19 @@ export default function initializeSocketHandler(io: Server) {
 
       // socket.emit("gameBoard_created", gameBoard.serialize());
       // callback({ success: true });
-      const gameCards = initializeGameCards(playerNames);
-      const playerObjects = initializePlayers(playerNames, gameCards);
+      
+      // Instantiate relevant classes
+      const gameCards = initializeGameCards(members);
+      const playerObjects = initializePlayers(members, gameCards);
       const dice = new Dice(SixSidedDie);
       game = new QwixxLogic(playerObjects, dice);
-      const players = game.players;
-      io.to(lobbyId).emit("game_started", players);
+      
+      // Create path data and players' gameboard states to send back to client
+      const initialPlayersState = game.players;
+      const path = `/game/${lobbyId}`;
+      const responseData = {path: path, players: initialPlayersState};
+
+      io.to(lobbyId).emit("game_initialised", responseData);
     });
   });
 }

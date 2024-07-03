@@ -1,9 +1,9 @@
-import { describe, test, it, expect, vi } from "vitest";
+import { describe, test, expect, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import React from "react";
 import Home from "../../../src/pages/HomePage/HomePage";
-import Lobby from "../../../src/pages/Lobby/Lobby";
+import Lobby from "../../../src/pages/LobbyPage/LobbyPage";
 import "@testing-library/jest-dom";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { socket } from "../../../src/services/socketServices";
@@ -68,6 +68,7 @@ describe("HomePage Intergation tests:", () => {
                 setMembers={setMembersMock}
                 notifications={[]}
                 setNotifications={setNotificationsMock}
+                gamePath={""}
               />
             }
           />
@@ -143,6 +144,7 @@ describe("HomePage Intergation tests:", () => {
                 setMembers={setMembersMock}
                 notifications={[]}
                 setNotifications={setNotificationsMock}
+                gamePath={""}
               />
             }
           />

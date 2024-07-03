@@ -190,7 +190,7 @@ describe("socket event handler test", () => {
               () => {
                 clientSocket1.emit("start_game", {
                   lobbyId: "1234",
-                  playerNames: ["clientSocket1", "clientSocket2"],
+                  members: ["clientSocket1", "clientSocket2"],
                 });
                 resolve();
               }
@@ -200,20 +200,23 @@ describe("socket event handler test", () => {
 
         const gameStartedData: any = await waitFor(
           clientSocket1,
-          "game_started"
+          "game_initialised"
         );
-        expect(gameStartedData[0]._name).toBe("clientSocket1");
-        expect(gameStartedData[0]._gameCard).toBeTruthy();
-        expect(gameStartedData[0]._gameCard._rows).toEqual({
+ 
+        expect(gameStartedData.path).toBe("/game/1234"); 
+
+        expect(gameStartedData.players[0]._name).toBe("clientSocket1");
+        expect(gameStartedData.players[0]._gameCard).toBeTruthy(); 
+        expect(gameStartedData.players[0]._gameCard._rows).toEqual({
           red: [],
           yellow: [],
           green: [],
           blue: [],
         });
         
-        expect(gameStartedData[1]._name).toBe("clientSocket2");
-        expect(gameStartedData[1]._gameCard).toBeTruthy();
-        expect(gameStartedData[1]._gameCard._rows).toEqual({
+        expect(gameStartedData.players[1]._name).toBe("clientSocket2");
+        expect(gameStartedData.players[1]._gameCard).toBeTruthy();
+        expect(gameStartedData.players[1]._gameCard._rows).toEqual({
           red: [],
           yellow: [],
           green: [],

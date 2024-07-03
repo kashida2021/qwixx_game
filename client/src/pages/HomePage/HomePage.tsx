@@ -50,7 +50,7 @@ export const Home: React.FC<IHomeProps> = ({
 
   return (
     <>
-      <h1> Qwixx</h1>
+      <h1>Qwixx</h1>
       <form>
         <input
           id="input"
