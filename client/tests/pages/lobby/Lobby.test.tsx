@@ -1,4 +1,4 @@
-import Lobby from "../../../src/pages/Lobby/Lobby";
+import Lobby from "../../../src/pages/LobbyPage/LobbyPage";
 import { describe, it, expect, vi, test, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";

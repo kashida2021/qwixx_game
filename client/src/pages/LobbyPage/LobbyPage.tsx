@@ -1,4 +1,4 @@
-import "./Lobby.css";
+import "./LobbyPage.css";
 import { Socket } from "socket.io-client";
 import { SetStateAction, Dispatch, MouseEvent, useEffect } from "react";
 import { useNavigate } from "react-router-dom";

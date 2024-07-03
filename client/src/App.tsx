@@ -2,10 +2,10 @@ import "./App.css";
 import { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/HomePage/HomePage";
-import Lobby from "./pages/Lobby/Lobby";
+import Lobby from "./pages/LobbyPage/LobbyPage";
 import { socket } from "./services/socketServices";
 // import GameBoard from "../../shared/GameBoard";
-import Game from "./pages/Game/Game";
+import Game from "./pages/GamePage/GamePage";
 
 function App() {
   const [isConnected, setIsConnected] = useState(socket.connected);
