@@ -93,7 +93,8 @@ function App() {
       socket.off("user_left");
       socket.off("user_disconnected");
       socket.off("current_members");
-      socket.off("gameBoard_created");
+      // socket.off("gameBoard_created");
+      socket.off("game_initialised"); 
     };
   }, []);
 
