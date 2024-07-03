@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import Row from './row';
+import "./GameCard.css";
 
 const rowColours: string[] = ["red", "yellow", "green", "blue"];
 const ascendingNumbers:{number:number; crossed: boolean}[] = Array.from({ length: 11 }, (_, i) => ({ number: i + 2, crossed: false }));
@@ -28,6 +29,13 @@ const GameCard = () => {
             {rows.map((row, rowIndex) => (
                 <Row key={rowIndex} rowIndex={rowIndex} row={row}  />
             ))}
+            <div>
+                <h3>Penalities</h3>
+                <button className="penalties-btn"></button>
+                <button className="penalties-btn"></button>
+                <button className="penalties-btn"></button>
+                <button className="penalties-btn"></button>
+            </div>
         </div>
     )
 }
