@@ -26,7 +26,7 @@ const GameCard = () => {
     return (
         <div className="gameCard">
             {rows.map((row, rowIndex) => (
-                <Row key={rowIndex} row={row}  />
+                <Row key={rowIndex} rowIndex={rowIndex} row={row}  />
             ))}
         </div>
     )

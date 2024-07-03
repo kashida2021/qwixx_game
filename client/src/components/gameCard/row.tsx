@@ -1,4 +1,5 @@
 import React from 'react';
+import RowCell from './rowCell';
 
 interface RowNumber {
     number: number;
@@ -18,7 +19,7 @@ const Row:React.FC<RowProps> = ({row, rowIndex}) => {
     return (
         <div className={`Row ${row.color}`}>
             {row.numbers.map((num, numIndex) => (
-                <Button key={numIndex} num={num} rowIndex={rowIndex} />
+                <RowCell key={numIndex} numIndex={numIndex} num={num} rowIndex={rowIndex} />
             ))}
         </div>
     )
