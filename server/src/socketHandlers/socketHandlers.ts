@@ -187,13 +187,19 @@ export default function initializeSocketHandler(io: Server) {
 
       // socket.emit("gameBoard_created", gameBoard.serialize());
       // callback({ success: true });
+      
+      // Instantiate relevant classes
       const gameCards = initializeGameCards(members);
       const playerObjects = initializePlayers(members, gameCards);
       const dice = new Dice(SixSidedDie);
       game = new QwixxLogic(playerObjects, dice);
-      const players = game.players;
-      const path = `/game/${lobbyId}`
-      io.to(lobbyId).emit("game_initialised", path);
+      
+      // Create path data and players' gameboard states to send back to client
+      const initialPlayersState = game.players;
+      const path = `/game/${lobbyId}`;
+      const responseData = {path: path, players: initialPlayersState};
+
+      io.to(lobbyId).emit("game_initialised", responseData);
     });
   });
 }
