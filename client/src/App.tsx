@@ -15,7 +15,7 @@ function App() {
   const [members, setMembers] = useState<string[]>([]);
   const [notifications, setNotifications] = useState<string[]>([]);
   // const [gameBoardState, setGameBoardState] = useState<GameBoard | null>(null);
-  const [gamePath, setGamePath] = useState(""); 
+  const [gamePath, setGamePath] = useState("");
 
   //Need to consier if this is overkill for our app as it's only being used in one place.
   //  const handleInputChange =
@@ -24,7 +24,6 @@ function App() {
   //    e.preventDefault();
   //    setter(e.target.value);
   //   };
-
 
   useEffect(() => {
     const onConnect = () => {
@@ -70,10 +69,13 @@ function App() {
     //   setGameBoardState(gameBoard);
     // };
 
-    const onGameInitialised = (data:string) => {
-      console.log(data); 
-      setGamePath(data); 
-    }
+    const onGameInitialised = (data: { path: string; players: [] }) => {
+      // The received data object has a path property and players.
+      // Players is an array of player objects that contain initial game card state.
+      // We might need to use it for setting up the game cards on the front end. 
+      // If not, we can refactor the data object to not include it. 
+      setGamePath(data.path);
+    };
 
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
@@ -82,7 +84,7 @@ function App() {
     socket.on("user_disconnected", handleUserDisconnected);
     socket.on("current_members", currentMembers);
     // socket.on("gameBoard_created", createGameBoard);
-    socket.on("game_initialised", onGameInitialised)
+    socket.on("game_initialised", onGameInitialised);
 
     return () => {
       socket.off("connect");
