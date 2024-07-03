@@ -19,8 +19,9 @@ const Row:React.FC<RowProps> = ({row, rowIndex}) => {
     return (
         <div className={`Row ${row.color}`}>
             {row.numbers.map((num, numIndex) => (
-                <RowCell key={numIndex} numIndex={numIndex} num={num} rowIndex={rowIndex} />
+                <RowCell key={numIndex} type="number" numIndex={numIndex} num={num} rowIndex={rowIndex} />
             ))}
+        <RowCell type="lock"/>
         </div>
     )
 

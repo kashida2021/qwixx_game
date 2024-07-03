@@ -1,6 +1,7 @@
 import React from 'react';
 
-interface RowCellProps{
+interface NumberCellProps{
+    type:'number';
     num: {
         number: number;
         crossed: boolean;
@@ -9,11 +10,20 @@ interface RowCellProps{
     rowIndex: number;
 }
 
-const RowCell:React.FC<RowCellProps> = ({num, numIndex, rowIndex}) => {
-    return (
-        <div className = {`${num.crossed ? `crossed` : ``}`}> 
-            {num.number}
-        </div>
+interface LockedCellProps{
+    type: 'lock';
+}
+
+type CellProps = NumberCellProps | LockedCellProps;
+
+const RowCell:React.FC<CellProps> = (props) => {
+    if(props.type === "lock"){
+            return <button>🔒</button>
+        }
+    
+    return (<button className = {`${props.num.crossed ? `crossed` : ``}`}> 
+            {props.num.number}
+        </button>
     )
 }
 
