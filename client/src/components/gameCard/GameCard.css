@@ -1,0 +1,29 @@
+.Row{
+    display: flex;
+    max-width: 800px;
+}
+
+.Row.red{
+    background-color: #ffdddd;
+}
+
+.Row.yellow{
+    background-color:#ffffdd;
+}
+
+.Row.green{
+    background-color:#ddffdd;
+}
+
+.Row.blue{
+    background-color:#ddddff;
+}
+
+.cell-btn{
+    font-size: 2rem;
+    width: 4rem;
+}
+
+.cell-btn.red{
+    background-color: #ffdddd
+}

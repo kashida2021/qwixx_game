@@ -1,4 +1,5 @@
 import { Socket } from "socket.io-client";
+import GameCard from "../../components/gameCard/gameCard";
 // import GameBoard from "../../../../shared/GameBoard";
 // import { SetStateAction, Dispatch } from "react";
 // import { rowColour} from "../../../../shared/types";
@@ -50,6 +51,9 @@ export const Game: React.FC<IGameProps> = ({lobbyId, userId, members}) => {
                     ))}
                 </div>
             ))} */}
+            <div className="active_players_board">
+                <GameCard/>
+            </div>
         </div>
         
     );
