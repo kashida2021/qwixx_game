@@ -25,18 +25,6 @@ function App() {
   //    setter(e.target.value);
   //   };
 
-  // At the moment, the socketService class gets instantiated when the .connect() method is called.
-  // Can consider refactoring to use a custom hook or useContext() api.
-
-  // The better way with error handling:
-  //  const connectSocket = async () => {
-  //   try {
-  //    await socketService.connect("http://localhost:3001");
-  //    setIsLoading(true);
-  //   } catch (err) {
-  //    console.error("Failed to connect to server", err);
-  //   }
-  //  };
 
   useEffect(() => {
     const onConnect = () => {
