@@ -13,7 +13,8 @@ const setMembersMock = vi.fn();
 const setNotificationsMock = vi.fn();
 const membersArrayMock = ["testUser1", "testUser2"];
 const user = userEvent.setup();
-
+let gamePath: string = ""; 
+ 
 type SocketServiceModule = {
   socket: Socket;
 };
@@ -26,7 +27,9 @@ vi.mock(
       ...actual,
       socket: {
         ...actual.socket,
-        emit: vi.fn(),
+        emit: vi.fn(() => {
+          gamePath = "/game/1234"
+        }),
       },
     };
   }
@@ -48,6 +51,7 @@ describe("Lobby Unit Tests:", () => {
           setMembers={setMembersMock}
           notifications={[""]}
           setNotifications={setNotificationsMock}
+          gamePath={""}
         />
       </MemoryRouter>
     );
@@ -72,6 +76,7 @@ describe("Lobby Unit Tests:", () => {
             setMembers={setMembersMock}
             notifications={[""]}
             setNotifications={setNotificationsMock}
+            gamePath={gamePath}
           />
         </MemoryRouter>
       );
@@ -98,6 +103,7 @@ describe("Lobby Unit Tests:", () => {
             setMembers={setMembersMock}
             notifications={[""]}
             setNotifications={setNotificationsMock}
+            gamePath={""}
           />
         </MemoryRouter>
       );
@@ -131,6 +137,7 @@ describe("Lobby Unit Tests:", () => {
             setMembers={setMembersMock}
             notifications={[""]}
             setNotifications={setNotificationsMock}
+            gamePath={""}
           />
         </MemoryRouter>
       );
@@ -145,7 +152,7 @@ describe("Lobby Unit Tests:", () => {
       ]);
       expect(socket.emit).not.toHaveBeenCalled();
     });
-    
+
     test.todo("clicking on 'Leave Lobby' should navigate back to home page");
   });
 });

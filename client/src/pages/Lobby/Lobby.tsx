@@ -1,6 +1,6 @@
 import "./Lobby.css";
 import { Socket } from "socket.io-client";
-import { SetStateAction, Dispatch, MouseEvent } from "react";
+import { SetStateAction, Dispatch, MouseEvent, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface ILobbyProps {
@@ -11,6 +11,7 @@ interface ILobbyProps {
   setMembers: Dispatch<SetStateAction<string[]>>;
   notifications: string[];
   setNotifications: Dispatch<SetStateAction<string[]>>;
+  gamePath: string;
 }
 
 //The lobby page should:
@@ -38,6 +39,7 @@ export const Lobby: React.FC<ILobbyProps> = ({
   notifications,
   setMembers,
   setNotifications,
+  gamePath,
 }) => {
   const navigate = useNavigate();
 
@@ -60,18 +62,25 @@ export const Lobby: React.FC<ILobbyProps> = ({
 
   const handleStartGame = (e: MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
-    if(members.length < 2){
-      setNotifications(["Not enough players to start game."])
+    if (members.length < 2) {
+      setNotifications(["Not enough players to start game."]);
+      return;
     }
 
-    if(members.length > 5){
-      setNotifications(["There are too many players to start the game."])
+    if (members.length > 5) {
+      setNotifications(["There are too many players to start the game."]);
+      return;
     }
 
     if (lobbyId && members.length >= 2 && members.length <= 5) {
       socket.emit("start_game", { lobbyId, members });
+      return; 
     }
   };
+
+  useEffect(() => {
+    navigate(gamePath);
+  }, [navigate, gamePath]);
 
   return (
     <div className="Lobby-container">

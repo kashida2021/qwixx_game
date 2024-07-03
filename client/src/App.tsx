@@ -15,6 +15,7 @@ function App() {
   const [members, setMembers] = useState<string[]>([]);
   const [notifications, setNotifications] = useState<string[]>([]);
   const [gameBoardState, setGameBoardState] = useState<GameBoard | null>(null);
+  const [gamePath, setGamePath] = useState(""); 
 
   //Need to consier if this is overkill for our app as it's only being used in one place.
   //  const handleInputChange =
@@ -81,6 +82,10 @@ function App() {
       setGameBoardState(gameBoard);
     };
 
+    const onGameInitialised = (data:string) => {
+      setGamePath(data); 
+    }
+
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
     socket.on("player_joined", handlePlayerJoined);
@@ -88,6 +93,7 @@ function App() {
     socket.on("user_disconnected", handleUserDisconnected);
     socket.on("current_members", currentMembers);
     socket.on("gameBoard_created", createGameBoard);
+    socket.on("game_initialised", onGameInitialised)
 
     return () => {
       socket.off("connect");
@@ -127,6 +133,7 @@ function App() {
               setMembers={setMembers}
               notifications={notifications}
               setNotifications={setNotifications}
+              gamePath={gamePath}
             />
           }
         />
