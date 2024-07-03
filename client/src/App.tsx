@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/HomePage/HomePage";
 import Lobby from "./pages/Lobby/Lobby";
 import { socket } from "./services/socketServices";
-import GameBoard from "../../shared/GameBoard";
+// import GameBoard from "../../shared/GameBoard";
 import Game from "./pages/Game/Game";
 
 function App() {
@@ -14,7 +14,7 @@ function App() {
   //const [globalError, setGlobalError] = useState("");
   const [members, setMembers] = useState<string[]>([]);
   const [notifications, setNotifications] = useState<string[]>([]);
-  const [gameBoardState, setGameBoardState] = useState<GameBoard | null>(null);
+  // const [gameBoardState, setGameBoardState] = useState<GameBoard | null>(null);
   const [gamePath, setGamePath] = useState(""); 
 
   //Need to consier if this is overkill for our app as it's only being used in one place.
@@ -77,12 +77,13 @@ function App() {
       setMembers(lobbyMembers);
     };
 
-    const createGameBoard = (data: GameBoard) => {
-      const gameBoard = GameBoard.from(data);
-      setGameBoardState(gameBoard);
-    };
+    // const createGameBoard = (data: GameBoard) => {
+    //   const gameBoard = GameBoard.from(data);
+    //   setGameBoardState(gameBoard);
+    // };
 
     const onGameInitialised = (data:string) => {
+      console.log(data); 
       setGamePath(data); 
     }
 
@@ -92,7 +93,7 @@ function App() {
     socket.on("user_left", handleUserLeft);
     socket.on("user_disconnected", handleUserDisconnected);
     socket.on("current_members", currentMembers);
-    socket.on("gameBoard_created", createGameBoard);
+    // socket.on("gameBoard_created", createGameBoard);
     socket.on("game_initialised", onGameInitialised)
 
     return () => {
@@ -141,12 +142,12 @@ function App() {
           path={`/game/${lobbyId}`}
           element={
             <Game
-              gameBoardState={gameBoardState}
               socket={socket}
               lobbyId={lobbyId}
               userId={userId}
               members={members}
-              setGameBoardState={setGameBoardState}
+              // gameBoardState={gameBoardState}
+              // setGameBoardState={setGameBoardState}
             />
           }
         />
