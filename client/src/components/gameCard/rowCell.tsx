@@ -20,7 +20,7 @@ type CellProps = NumberCellProps | LockedCellProps;
 
 const RowCell:React.FC<CellProps> = (props) => {
     if(props.type === "lock"){
-            return <button className={props.color}>🔒</button>
+            return <button className={`lock-btn ${props.color}`}>🔒</button>
         }
     
     return (<button className = {`${props.num.crossed ? `crossed cell-btn ${props.color}` : `cell-btn ${props.color}`}`}> 

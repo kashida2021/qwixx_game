@@ -1,29 +1,65 @@
+.gameCard{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
 .Row{
     display: flex;
+    justify-content: space-around;
     max-width: 800px;
+    padding: 5px;
+    gap: 0.5rem;
 }
 
 .Row.red{
-    background-color: #ffdddd;
+    background-color: #f1330a;
 }
 
 .Row.yellow{
-    background-color:#ffffdd;
+    background-color: #f8f113;
 }
 
 .Row.green{
-    background-color:#ddffdd;
+    background-color: #2fda7a;
 }
 
 .Row.blue{
-    background-color:#ddddff;
+    background-color: #0b35f0;
 }
 
-.cell-btn{
-    font-size: 2rem;
+.cell-btn, .lock-btn{
+    font-size: 1.5rem;
     width: 4rem;
+    border: none;
+    border-radius: 0.5rem;
 }
 
-.cell-btn.red{
+.cell-btn.red, .lock-button.red{
     background-color: #ffdddd
 }
+
+.cell-btn.yellow, .lock-btn.yellow{
+    background-color: #ffffdd;
+}
+
+.cell-btn.blue, .lock-btn.blue{
+    background-color: #ddddff;
+}
+
+.cell-btn.green, .lock-btn.green{
+    background-color: #ddffdd;
+}
+
+.cell-btn:hover, .lock-btn:hover{
+    box-shadow: 0.25rem 0.25rem 0.25rem 0 rgba(0,0,0,0.24);
+    cursor: pointer;
+}
+
+.penalties-btn{
+    height: 1.5rem;
+    width: 1.5rem;
+    margin: 0.5rem;
+}
+
