@@ -2,10 +2,7 @@ import React from 'react';
 
 interface NumberCellProps{
     type:'number';
-    num: {
-        number: number;
-        crossed: boolean;
-    };
+    num: number;
     numIndex: number;
     rowIndex: number;
     color: string;
@@ -23,8 +20,8 @@ const RowCell:React.FC<CellProps> = (props) => {
             return <button className={`lock-btn ${props.color}`}>🔒</button>
         }
     
-    return (<button className = {`${props.num.crossed ? `crossed cell-btn ${props.color}` : `cell-btn ${props.color}`}`}> 
-            {props.num.number}
+    return (<button className = {`cell-btn ${props.color}`}> 
+            {props.num}
         </button>
     )
 }

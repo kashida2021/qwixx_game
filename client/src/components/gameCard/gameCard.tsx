@@ -1,40 +1,23 @@
-import {useState} from 'react';
 import Row from './row';
 import "./GameCard.css";
 
 const rowColours: string[] = ["red", "yellow", "green", "blue"];
-const ascendingNumbers:{number:number; crossed: boolean}[] = Array.from({ length: 11 }, (_, i) => ({ number: i + 2, crossed: false }));
-const descendingNumbers:{number:number; crossed: boolean}[] = Array.from({ length: 11 }, (_, i) => ({ number: 12 - i, crossed: false }));
+const numbers: number = 11;
 
-interface RowNumber {
-    number: number;
-    crossed: boolean;
-  }
-  
-  interface Row {
-    color: string;
-    numbers: RowNumber[];
-  }
-
-const initialState: Row[] = rowColours.map((color, index) => ({
-    color,
-    numbers: index < 2 ? ascendingNumbers: descendingNumbers
-}));
 
 const GameCard = () => {
-    const [rows, setRows] = useState<Row[]>(initialState);
 
     return (
         <div className="gameCard">
-            {rows.map((row, rowIndex) => (
-                <Row key={rowIndex} rowIndex={rowIndex} row={row}  />
+            {rowColours.map((rowColour, rowIndex) => (
+                <Row key={rowIndex} rowIndex={rowIndex} rowColour={rowColour} numbers={numbers}  />
             ))}
-            <div>
-                <h3>Penalities</h3>
-                <button className="penalties-btn"></button>
-                <button className="penalties-btn"></button>
-                <button className="penalties-btn"></button>
-                <button className="penalties-btn"></button>
+            <div className="penalties">
+                <h3>Penalties</h3>
+                <button></button>
+                <button></button>
+                <button></button>
+                <button></button>
             </div>
         </div>
     )
