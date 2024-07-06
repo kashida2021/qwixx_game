@@ -14,12 +14,12 @@ const Row:React.FC<RowProps> = ({rowColour, rowIndex, numbers}) => {
     : Array.from({ length: numbers }, (_, i) => numbers + 1 - i);
 
     return (
-        <div className={`Row ${rowColour}`}>
+        <ol className={`Row ${rowColour}`} aria-label={`row-${rowColour}`}>
             {buttonNumbers.map((num, numIndex) => (
                 <RowCell key={numIndex} type="number" color={rowColour} numIndex={numIndex} num={num} rowIndex={rowIndex} />
             ))}
         <RowCell type="lock" color={rowColour}/>
-        </div>
+        </ol>
     )
 
 }

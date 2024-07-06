@@ -13,6 +13,12 @@
     gap: 0.5rem;
 }
 
+.Row > li{
+    width: 4rem;
+    border: none;
+    border-radius: 0.5rem;
+}
+
 .Row.red{
     background-color: #f1330a;
 }
@@ -31,7 +37,7 @@
 
 .cell-btn, .lock-btn{
     font-size: 1.5rem;
-    width: 4rem;
+    width: 100%;
     border: none;
     border-radius: 0.5rem;
 }
