@@ -32,7 +32,7 @@ describe("Game Page Unit Test:", () => {
 
 
   expect(h1).toHaveTextContent(`Lobby: ${lobbyIdMock}`);
-  expect(redRow).toBeInTheDocument();
+  expect(redRow).toBeVisible();
   expect(buttons).toHaveLength(12);
     });
 });
