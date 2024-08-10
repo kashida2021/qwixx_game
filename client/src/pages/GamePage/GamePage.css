@@ -1,0 +1,9 @@
+.opponent-zone {
+	display: flex;
+	justify-content: space-evenly;
+	gap: 5%;
+	flex-wrap: wrap;
+	flex-direction: row;
+	align-content: center;
+	align-items: center;
+}
