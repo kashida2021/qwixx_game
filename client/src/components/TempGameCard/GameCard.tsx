@@ -1,4 +1,4 @@
-import Row from "./row";
+import Row from "./Row";
 import "./GameCard.css";
 import { useState, ChangeEvent } from "react";
 

@@ -1,6 +1,6 @@
 import "./GamePage.css";
 import { Socket } from "socket.io-client";
-import GameCard from "../../components/gameCard/GameCard";
+import GameCard from "../../components/GameCard/GameCard";
 // import GameBoard from "../../../../shared/GameBoard";
 // import { SetStateAction, Dispatch } from "react";
 // import { rowColour} from "../../../../shared/types";
