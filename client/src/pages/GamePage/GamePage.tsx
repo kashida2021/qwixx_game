@@ -48,12 +48,12 @@ export const Game: React.FC<IGameProps> = ({ lobbyId, userId, members }) => {
           aria-label="opponent-zone"
         >
           {filteredMembers.map((member, index) => (
-            <GameCard key={index} member={member} />
+            <GameCard key={index} member={member} isOpponent={true}/>
           ))}
         </div>
 				{/* Player's game card */}
         <div className="player-zone" id="playerZone" aria-label="player-zone">
-          <GameCard member={userId} />
+          <GameCard member={userId} isOpponent={false}/>
         </div>
       </div>
     </div>

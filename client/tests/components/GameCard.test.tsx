@@ -2,9 +2,9 @@ import { describe, it, expect } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 //import { userEvent } from "@testing-library/user-event";
 import React from "react";
-import GameCard from "../../../../src/components/gameCard/GameCard";
+import GameCard from "../../src/components/gameCard/GameCard";
 import "@testing-library/jest-dom";
-import { socket } from "../../../../src/services/socketServices";
+import { socket } from "../../src/services/socketServices";
 
 //const user = userEvent.setup();
 // const gameState = {
