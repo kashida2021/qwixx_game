@@ -63,12 +63,12 @@
     cursor: pointer;
 }
 
-.penalties > ul{
+.penalties-container > ul{
     display: flex;
     gap: 1rem;
 }
 
-.penalties > ul > li{
+.penalties-container > ul > li{
     display: flex;
     flex-direction: column-reverse;
 }

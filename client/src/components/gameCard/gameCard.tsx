@@ -7,6 +7,7 @@ const numbers: number = 11;
 
 interface IGameCard {
   member: string;
+  // gameCardData: any;
 }
 
 const GameCard: React.FC<IGameCard> = ({ member }) => {
@@ -20,6 +21,20 @@ const GameCard: React.FC<IGameCard> = ({ member }) => {
     event.target.disabled = true;
   };
 
+  const renderPenaltyCheckbox = (number: number) => {
+    return (
+      <li>
+        <input
+          type="checkbox"
+          id={`penalty${number}`}
+          value={`Penalty_${number}`}
+          onChange={handlePenaltyChange}
+        />
+        <label htmlFor="">{number}</label>
+      </li>
+    );
+  };
+
   return (
     <div className="game-card" aria-label={`${member} card`}>
       <p>{member}</p>
@@ -31,45 +46,14 @@ const GameCard: React.FC<IGameCard> = ({ member }) => {
           numbers={numbers}
         />
       ))}
-      <div className="penalties">
+
+      <div className="penalties-container">
         <h3>Penalties</h3>
-        <ul>
-          <li>
-            <input
-              type="checkbox"
-              id="penalty1"
-              value="Penalty_1"
-              onChange={handlePenaltyChange}
-            />
-            <label htmlFor="penalty1">1</label>
-          </li>
-          <li>
-            <input
-              type="checkbox"
-              id="penalty2"
-              value="Penalty_2"
-              onChange={handlePenaltyChange}
-            />
-            <label htmlFor="penalty2">2</label>
-          </li>
-          <li>
-            <input
-              type="checkbox"
-              id="penalty3"
-              value="Penalty_3"
-              onChange={handlePenaltyChange}
-            />
-            <label htmlFor="penalty3">3</label>
-          </li>
-          <li>
-            <input
-              type="checkbox"
-              id="penalty4"
-              value="Penalty_4"
-              onChange={handlePenaltyChange}
-            />
-            <label htmlFor="penalty1">4</label>
-          </li>
+        <ul className="penalties-list" aria-label="penalties-list">
+          {renderPenaltyCheckbox(1)}
+          {renderPenaltyCheckbox(2)}
+          {renderPenaltyCheckbox(3)}
+          {renderPenaltyCheckbox(4)}
         </ul>
       </div>
     </div>
