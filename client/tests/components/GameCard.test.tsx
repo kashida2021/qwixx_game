@@ -27,17 +27,26 @@ import { socket } from "../../src/services/socketServices";
 //   },
 // };
 
-// const gameCardData = {
-//   red: [2, 5, 8],
-//   yellow: [],
-//   green: [],
-//   blue: [],
-// };
+const gameCardData = {
+  red: [],
+  yellow: [],
+  green: [],
+  blue: [],
+  penalties: []
+};
+
+const gameCardDataWithNumbers = {
+  red: [],
+  yellow: [],
+  green: [],
+  blue: [],
+  penalties: []
+};
 
 describe("Game Card Test:", () => {
   it("renders the game card component for player", () => {
-    render(<GameCard member={"testUser1"} isOpponent={false}/>);
-
+    render(<GameCard member={"testUser1"} isOpponent={false} gameCardData={gameCardData}/>);
+    screen.debug(); 
     const redRow = screen.getByRole("list", { name: "row-red" });
     const yellowRow = screen.getByRole("list", { name: "row-yellow" });
     const blueRow = screen.getByRole("list", { name: "row-blue" });
@@ -67,20 +76,20 @@ describe("Game Card Test:", () => {
   });
 
   it("renders the game card component for opponents", () => {
-    render(<GameCard member={"testUser1"} isOpponent={true}/>);
-    screen.debug(); 
+    render(<GameCard member={"testUser1"} isOpponent={true} gameCardData={gameCardData}/>);
+
     const redRow = screen.getByRole("list", { name: "row-red" });
     const yellowRow = screen.getByRole("list", { name: "row-yellow" });
     const blueRow = screen.getByRole("list", { name: "row-blue" });
     const greenRow = screen.getByRole("list", { name: "row-green" });
 
-    const redRowButtons = within(redRow).getAllByLabelText("fake-button");
-    const yellowRowButtons = within(yellowRow).getAllByLabelText("fake-button");
-    const blueRowButtons = within(blueRow).getAllByLabelText("fake-button");
-    const greenRowButtons = within(greenRow).getAllByLabelText("fake-button");
+    const redRowButtons = within(redRow).getAllByLabelText("non-interactive-button");
+    const yellowRowButtons = within(yellowRow).getAllByLabelText("non-interactive-button");
+    const blueRowButtons = within(blueRow).getAllByLabelText("non-interactive-button");
+    const greenRowButtons = within(greenRow).getAllByLabelText("non-interactive-button");
 
-    // const penalties = screen.getByRole("list", {name: "penalties-list"}); 
-    // const penaltiesCheckBox = within(penalties).getAllByLabelText("fake-checkbox"); 
+    const penalties = screen.getByRole("list", {name: "penalties-list"}); 
+    const penaltiesCheckBox = within(penalties).getAllByLabelText("fake-checkbox"); 
    
     expect(redRow).toBeVisible();
     expect(yellowRow).toBeVisible();
@@ -92,7 +101,7 @@ describe("Game Card Test:", () => {
     expect(blueRowButtons).toHaveLength(12);
     expect(greenRowButtons).toHaveLength(12);
 
-    // expect(penalties).toBeVisible; 
-    // expect(penaltiesCheckBox).toHaveLength(4); 
+    expect(penalties).toBeVisible; 
+    expect(penaltiesCheckBox).toHaveLength(4); 
   });
 });

@@ -18,35 +18,34 @@ const Row: React.FC<RowProps> = ({
       ? Array.from({ length: numbers }, (_, i) => i + 2)
       : Array.from({ length: numbers }, (_, i) => numbers + 1 - i);
 
-  const renderRows = () => {
-    return isOpponent ? (
+  const renderRows = (Component: keyof JSX.IntrinsicElements) => {
+    const ariaLabel = Component === "span" ? "non-interactive-button" : "button";
+  
+    return (
       <ol className={`row ${rowColour}`} aria-label={`row-${rowColour}`}>
         {buttonNumbers.map((num, numIndex) => (
           <li key={numIndex}>
-            <span className={`cell-btn ${rowColour}`} aria-label="fake-button">{num}</span>
+            <Component
+              className={`cell-btn ${rowColour}`}
+              aria-label={ariaLabel}
+            >
+              {num}
+            </Component>
           </li>
         ))}
         <li>
-          <span className={`lock-btn ${rowColour}`} aria-label="fake-button">🔒</span>
-        </li>
-      </ol>
-    ) : (
-      <ol className={`row ${rowColour}`} aria-label={`row-${rowColour}`}>
-        {buttonNumbers.map((num, numIndex) => (
-          <li key={numIndex}>
-            <button className={`cell-btn ${rowColour}`}>{num}</button>
-          </li>
-        ))}
-        <li>
-          <button className={`lock-btn ${rowColour}`}>🔒</button>
+          <Component
+            className={`lock-btn ${rowColour}`}
+            aria-label={ariaLabel}
+          >
+            🔒
+          </Component>
         </li>
       </ol>
     );
   };
 
-  return (
-   <>{renderRows()}</>
-  );
+  return <>{isOpponent ? renderRows("span") : renderRows("button")}</>;
 };
 
 export default Row;

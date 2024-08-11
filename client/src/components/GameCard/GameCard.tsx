@@ -8,10 +8,10 @@ const numbers: number = 11;
 interface IGameCard {
   member: string;
   isOpponent: boolean;
-  // gameCardData: any;
+  gameCardData: any;
 }
 
-const GameCard: React.FC<IGameCard> = ({ member, isOpponent }) => {
+const GameCard: React.FC<IGameCard> = ({ member, isOpponent, gameCardData }) => {
   //PLAYER ID ASSOCIATED TO EACH GAME CARD
   //That can be used along with row colour + number to send to server
   const [penalties, setPenalties] = useState<string[]>([]);
@@ -23,13 +23,22 @@ const GameCard: React.FC<IGameCard> = ({ member, isOpponent }) => {
   };
 
   const renderPenaltyCheckbox = (number: number) => {
-    return (
+    return isOpponent ? (
+      <li>
+        <span
+          className={`penalty-checkbox ${gameCardData.penalties ? "checked" : ""}`}
+          aria-label="fake-checkbox"
+        ></span>
+        <label htmlFor="">{number}</label>
+      </li>
+    ) : (
       <li>
         <input
           type="checkbox"
           id={`penalty${number}`}
           value={`Penalty_${number}`}
           onChange={handlePenaltyChange}
+          aria-label="penalty-checkbox"
         />
         <label htmlFor="">{number}</label>
       </li>
