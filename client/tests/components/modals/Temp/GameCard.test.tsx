@@ -2,42 +2,37 @@ import { describe, it, expect } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 //import { userEvent } from "@testing-library/user-event";
 import React from "react";
-import GamePage from "../../src/pages/GamePage/GamePage";
-import GameCard from "../../src/components/gameCard/GameCard";
+import GameCard from "../../../../src/components/gameCard/GameCard";
 import "@testing-library/jest-dom";
-import { MemoryRouter } from "react-router-dom";
-import { socket } from "../../src/services/socketServices";
+import { socket } from "../../../../src/services/socketServices";
 
 //const user = userEvent.setup();
-const gameState = {
-  players: {
-    playerId1: {
-      red: [2, 5, 8],
-      yellow: [3],
-    },
-    playerId2: {
-      red: [1, 4],
-      yellow: [],
-    },
-  },
-};
+// const gameState = {
+//   players: {
+//     playerId1: {
+//       red: [2, 5, 8],
+//       yellow: [3],
+//     },
+//     playerId2: {
+//       red: [1, 4],
+//       yellow: [],
+//     },
+//   },
+// };
 
-const thisPlayer = {
-  playerId1: {
-    red: [2, 5, 8],
-    yellow: [3],
-  },
-};
+// const thisPlayer = {
+//   playerId1: {
+//     red: [2, 5, 8],
+//     yellow: [3],
+//   },
+// };
 
-const gameCardData = {
-  red: [2, 5, 8],
-  // yellow: [],
-  // green: [],
-  // blue: [],
-};
-
-const lobbyIdMock = "1234";
-const membersArrayMock = ["testUser1", "testUser2"];
+// const gameCardData = {
+//   red: [2, 5, 8],
+//   yellow: [],
+//   green: [],
+//   blue: [],
+// };
 
 describe("Game Card Test:", () => {
   it("renders the game card component for player", () => {
