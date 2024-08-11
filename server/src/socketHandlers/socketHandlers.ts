@@ -7,6 +7,7 @@ import { initializePlayers } from "../models/InitializePlayer";
 import { initializeGameCards } from "../models/InitializeGameCards";
 import Dice from "../models/DiceClass";
 import SixSidedDie from "../models/SixSidedDieClass";
+import Lobby from "../models/LobbyClass";
 
 //Useful methods for getting visibilty on rooms
 
@@ -32,21 +33,23 @@ const removeSocketFromRooms = (socket: Socket): void => {
 };
 
 //function to filter room within lobby object to remove target Id
-const filterLobbyIds = (lobby: string[], userId: string): string[] => {
-  return lobby.filter((id) => id !== userId);
-};
+//this can probably be deleted now we are using LobbyClass and methods
+//const filterLobbyIds = (lobby: string[], userId: string): string[] => {
+//return lobby.filter((id) => id !== userId);
+//};
 
 // Loops through each lobby in lobbies object and then callback filter function
-const updateLobbies = (
-  lobbies: { [key: string]: string[] },
-  userId: string
-): void => {
-  for (const roomId in lobbies) {
-    if (lobbies.hasOwnProperty(roomId)) {
-      lobbies[roomId] = filterLobbyIds(lobbies[roomId], userId);
-    }
-  }
-};
+//this can probably be deleted now we are using LobbyClass and methods
+//const updateLobbies = (
+//lobbies: { [key: string]: string[] },
+//userId: string
+//): void => {
+//for (const roomId in lobbies) {
+//if (lobbies.hasOwnProperty(roomId)) {
+//lobbies[roomId] = filterLobbyIds(lobbies[roomId], userId);
+//}
+//}
+//};
 
 let game;
 
@@ -54,7 +57,11 @@ export default function initializeSocketHandler(io: Server) {
   //Object tracks current Lobby for each socketId. Key is SocketId and value is roomId
   const roomSockets: { [key: string]: string } = {};
   //Object tracks all lobbies and connected users in an array of strings
-  const lobbies: { [key: string]: string[] } = {};
+  //const lobbies: { [key: string]: string[] } = {};
+
+  //Object tracks all lobbies using lobby class
+  const lobbiesMap: { [key: string]: Lobby } = {};
+
   // Object that maps each socket.id to corresponding userId - can access this when disconnects
   const userIdList: { [key: string]: string } = {};
 
@@ -73,12 +80,14 @@ export default function initializeSocketHandler(io: Server) {
       const rooms = Array.from(io.sockets.adapter.rooms.keys());
       let room = generateUniqueRoomId(rooms);
 
-      lobbies[room] = [userId];
+      //lobbies[room] = [userId];
+      lobbiesMap[room] = new Lobby(room);
 
       removeSocketFromRooms(socket);
 
       socket.join(room);
       roomSockets[socket.id] = room;
+      lobbiesMap[room].addPlayer(userId);
       callback(room);
       console.log(
         `Server: create_lobby_success: Client "${userId}" created ${room}`
@@ -90,7 +99,8 @@ export default function initializeSocketHandler(io: Server) {
       userIdList[socket.id] = userId;
 
       //If the lobby doesn't exist, return error
-      if (!lobbies[localLobbyId]) {
+      //if (!lobbies[localLobbyId]) {
+      if (!lobbiesMap[localLobbyId]) {
         callback({
           success: false,
           confirmedLobbyId: "",
@@ -102,8 +112,10 @@ export default function initializeSocketHandler(io: Server) {
 
       //Checks if lobby is full
       if (
-        Array.isArray(lobbies[localLobbyId]) &&
-        lobbies[localLobbyId].length === 4
+        //Array.isArray(lobbies[localLobbyId]) &&
+        //lobbies[localLobbyId].length === 4
+        Array.isArray(lobbiesMap[localLobbyId].players) &&
+        lobbiesMap[localLobbyId].players.length === 4
       ) {
         callback({
           success: false,
@@ -114,7 +126,7 @@ export default function initializeSocketHandler(io: Server) {
         return;
       }
 
-      //If the socket is in a room, leave it
+      //If the socket is in a room, leave it - do we need this. Can we just call removeSocket function?
       if (roomSockets[socket.id]) {
         const currentLobby = roomSockets[socket.id];
         socket.leave(currentLobby);
@@ -123,18 +135,26 @@ export default function initializeSocketHandler(io: Server) {
       }
 
       //Join lobby
-      lobbies[localLobbyId].push(userId);
+      //lobbies[localLobbyId].push(userId);
+      lobbiesMap[localLobbyId].addPlayer(userId);
       roomSockets[socket.id] = localLobbyId;
 
       socket.join(localLobbyId);
-      io.to(localLobbyId).emit("player_joined", lobbies[localLobbyId], userId);
+      //io.to(localLobbyId).emit("player_joined", lobbies[localLobbyId], userId);
+      io.to(localLobbyId).emit(
+        "player_joined",
+        lobbiesMap[localLobbyId].players,
+        userId
+      );
       callback({
         success: true,
         confirmedLobbyId: localLobbyId,
         error: "",
-        lobbyMembers: lobbies[localLobbyId],
+        //lobbyMembers: lobbies[localLobbyId],
+        lobbyMembers: lobbiesMap[localLobbyId].players,
       });
       console.log(`Client "${userId}" joined: ${roomSockets[socket.id]}`);
+      console.log(lobbiesMap[localLobbyId].players);
     });
 
     // When a player explicity leaves a room - checks if roomId is already in roomSockets object. Then it will leave the currentRoom and also remove from roomSockets object.
@@ -146,33 +166,49 @@ export default function initializeSocketHandler(io: Server) {
         delete userIdList[socket.id];
       }
 
-      updateLobbies(lobbies, userId);
+      //updateLobbies(lobbies, userId);
+      lobbiesMap[lobbyId].removePlayer(userId);
 
-      io.to(lobbyId).emit("user_left", lobbies[lobbyId], userId);
+      //io.to(lobbyId).emit("user_left", lobbies[lobbyId], userId);
+      io.to(lobbyId).emit("user_left", lobbiesMap[lobbyId].players, userId);
 
-      if (lobbies[lobbyId] && lobbies[lobbyId].length <= 0) {
-        delete lobbies[lobbyId];
+      //if (lobbies[lobbyId] && lobbies[lobbyId].length <= 0) {
+      //delete lobbies[lobbyId];
+      //}
+      if (lobbiesMap[lobbyId] && lobbiesMap[lobbyId].players.length <= 0) {
+        delete lobbiesMap[lobbyId];
       }
     });
 
     // Handles disconnect. If disconnected check to see if socketId is connected to a room. Will remove the socket from an existing room and delete from roomSockets object.
     socket.on("disconnect", () => {
       const currentLobby = roomSockets[socket.id];
-      updateLobbies(lobbies, userIdList[socket.id]);
+      //updateLobbies(lobbies, userIdList[socket.id]);
+
+      if (lobbiesMap[currentLobby]) {
+        lobbiesMap[currentLobby].removePlayer(userIdList[socket.id]);
+      }
 
       if (currentLobby) {
         socket.leave(currentLobby);
         io.to(currentLobby).emit(
           "user_disconnected",
-          lobbies[currentLobby],
+          //lobbies[currentLobby],
+          lobbiesMap[currentLobby].players,
           userIdList[socket.id]
         );
         delete roomSockets[socket.id];
         delete userIdList[socket.id];
       }
 
-      if (lobbies[currentLobby] && lobbies[currentLobby].length <= 0) {
-        delete lobbies[currentLobby];
+      //if (lobbies[currentLobby] && lobbies[currentLobby].length <= 0) {
+      //delete lobbies[currentLobby];
+      //}
+      if (
+        lobbiesMap[currentLobby] &&
+        lobbiesMap[currentLobby].players.length <= 0
+      ) {
+        delete lobbiesMap[currentLobby];
       }
     });
 
@@ -187,17 +223,17 @@ export default function initializeSocketHandler(io: Server) {
 
       // socket.emit("gameBoard_created", gameBoard.serialize());
       // callback({ success: true });
-      
+
       // Instantiate relevant classes
       const gameCards = initializeGameCards(members);
       const playerObjects = initializePlayers(members, gameCards);
       const dice = new Dice(SixSidedDie);
       game = new QwixxLogic(playerObjects, dice);
-      
+
       // Create path data and players' gameboard states to send back to client
       const initialPlayersState = game.players;
       const path = `/game/${lobbyId}`;
-      const responseData = {path: path, players: initialPlayersState};
+      const responseData = { path: path, players: initialPlayersState };
 
       io.to(lobbyId).emit("game_initialised", responseData);
     });
