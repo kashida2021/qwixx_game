@@ -7,10 +7,11 @@ const numbers: number = 11;
 
 interface IGameCard {
   member: string;
+	isOpponent: boolean; 
   // gameCardData: any;
 }
 
-const GameCard: React.FC<IGameCard> = ({ member }) => {
+const GameCard: React.FC<IGameCard> = ({ member, isOpponent }) => {
   //PLAYER ID ASSOCIATED TO EACH GAME CARD
   //That can be used along with row colour + number to send to server
   const [penalties, setPenalties] = useState<string[]>([]);
@@ -44,9 +45,9 @@ const GameCard: React.FC<IGameCard> = ({ member }) => {
           rowIndex={rowIndex}
           rowColour={rowColour}
           numbers={numbers}
+					isOpponent={isOpponent}
         />
       ))}
-
       <div className="penalties-container">
         <h3>Penalties</h3>
         <ul className="penalties-list" aria-label="penalties-list">

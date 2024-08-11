@@ -39,9 +39,9 @@ const gameCardData = {
 const lobbyIdMock = "1234";
 const membersArrayMock = ["testUser1", "testUser2"];
 
-describe("Game Card Unit Test:", () => {
-  it("renders the game card components", () => {
-    render(<GameCard member={"testUser1"} />);
+describe("Game Card Test:", () => {
+  it("renders the game card component for player", () => {
+    render(<GameCard member={"testUser1"} isOpponent={false}/>);
 
     const redRow = screen.getByRole("list", { name: "row-red" });
     const yellowRow = screen.getByRole("list", { name: "row-yellow" });
@@ -70,7 +70,34 @@ describe("Game Card Unit Test:", () => {
     expect(penaltiesCheckBox).toHaveLength(4); 
     
   });
-  it("renders the game card", () => {
-    render(<GameCard member={"testUser1"} />);
+
+  it("renders the game card component for opponents", () => {
+    render(<GameCard member={"testUser1"} isOpponent={true}/>);
+    screen.debug(); 
+    const redRow = screen.getByRole("list", { name: "row-red" });
+    const yellowRow = screen.getByRole("list", { name: "row-yellow" });
+    const blueRow = screen.getByRole("list", { name: "row-blue" });
+    const greenRow = screen.getByRole("list", { name: "row-green" });
+
+    const redRowButtons = within(redRow).getAllByLabelText("fake-button");
+    const yellowRowButtons = within(yellowRow).getAllByLabelText("fake-button");
+    const blueRowButtons = within(blueRow).getAllByLabelText("fake-button");
+    const greenRowButtons = within(greenRow).getAllByLabelText("fake-button");
+
+    // const penalties = screen.getByRole("list", {name: "penalties-list"}); 
+    // const penaltiesCheckBox = within(penalties).getAllByLabelText("fake-checkbox"); 
+   
+    expect(redRow).toBeVisible();
+    expect(yellowRow).toBeVisible();
+    expect(blueRow).toBeVisible();
+    expect(greenRow).toBeVisible();
+
+    expect(redRowButtons).toHaveLength(12);
+    expect(yellowRowButtons).toHaveLength(12);
+    expect(blueRowButtons).toHaveLength(12);
+    expect(greenRowButtons).toHaveLength(12);
+
+    // expect(penalties).toBeVisible; 
+    // expect(penaltiesCheckBox).toHaveLength(4); 
   });
 });
