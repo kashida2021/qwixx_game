@@ -55,6 +55,7 @@ const GameCard: React.FC<IGameCard> = ({ member, isOpponent, gameCardData }) => 
           rowColour={rowColour}
           numbers={numbers}
           isOpponent={isOpponent}
+          gameCardData={gameCardData}
         />
       ))}
       <div className="penalties-container">
