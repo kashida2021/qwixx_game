@@ -1,16 +1,43 @@
 import { describe, it, expect } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 //import { userEvent } from "@testing-library/user-event";
 import React from "react";
 import GamePage from "../../../src/pages/GamePage/GamePage";
 import "@testing-library/jest-dom";
 // import { MemoryRouter } from "react-router-dom";
 import { socket } from "../../../src/services/socketServices";
-
 //const user = userEvent.setup();
 
 const lobbyIdMock = "1234";
 const membersArrayMock = ["testUser1", "testUser2", "testUser3"];
+const gameState = {
+  players: {
+    testUser1: {
+      red: [],
+      yellow: [],
+      green: [],
+      blue: [],
+      lockedRows: [],
+      penalties: 0,
+    },
+    testUser2: {
+      red: [],
+      yellow: [],
+      green: [],
+      blue: [],
+      lockedRows: [],
+      penalties: 0,
+    },
+    testUser3: {
+      red: [],
+      yellow: [],
+      green: [],
+      blue: [],
+      lockedRows: [],
+      penalties: 0,
+    },
+  },
+};
 
 describe("Game Page Unit Test:", () => {
   it("renders the page", () => {
@@ -20,6 +47,7 @@ describe("Game Page Unit Test:", () => {
         userId={"testUser1"}
         members={membersArrayMock}
         lobbyId={lobbyIdMock}
+        gameState={gameState}
       />
     );
 

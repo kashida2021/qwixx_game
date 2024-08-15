@@ -1,20 +1,27 @@
 import "./GamePage.css";
 import { Socket } from "socket.io-client";
 import GameCard from "../../components/GameCard/GameCard";
+import { GameCardData } from "../../types/GameCardData";
 // import GameBoard from "../../../../shared/GameBoard";
 // import { SetStateAction, Dispatch } from "react";
 // import { rowColour} from "../../../../shared/types";
+
+interface GameState {
+  players: {
+    [playerId: string]: GameCardData 
+  }
+}
 
 interface IGameProps {
   socket: Socket;
   lobbyId: string;
   userId: string;
   members: string[];
-  // gameBoardState: GameBoard | null;
+  gameState: GameState;
   // setGameBoardState: Dispatch<SetStateAction<GameBoard | null>>;
 }
 
-export const Game: React.FC<IGameProps> = ({ lobbyId, userId, members }) => {
+export const Game: React.FC<IGameProps> = ({ lobbyId, userId, members, gameState }) => {
   // console.log('Rendering Game component', { lobbyId, userId, members });
   // if(!gameBoardState){
   //     return <div>Loading...</div>;
@@ -48,12 +55,12 @@ export const Game: React.FC<IGameProps> = ({ lobbyId, userId, members }) => {
           aria-label="opponent-zone"
         >
           {filteredMembers.map((member, index) => (
-            <GameCard key={index} member={member} isOpponent={true}/>
+            <GameCard key={index} member={member} isOpponent={true} gameCardData={gameState.players[member]}/>
           ))}
         </div>
 				{/* Player's game card */}
         <div className="player-zone" id="playerZone" aria-label="player-zone">
-          <GameCard member={userId} isOpponent={false}/>
+          <GameCard member={userId} isOpponent={false} gameCardData={gameState.players[userId]}/>
         </div>
       </div>
     </div>
