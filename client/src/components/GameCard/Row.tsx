@@ -1,11 +1,13 @@
 import React from "react";
+import { GameCardData } from "../../types/GameCardData";
+import { RowColour } from "../../types/enums";
 
 interface RowProps {
-  rowColour: string;
+  rowColour: RowColour;
   rowIndex: number;
   numbers: number;
   isOpponent: boolean;
-  gameCardData: any;
+  gameCardData: GameCardData;
 }
 
 const Row: React.FC<RowProps> = ({
@@ -21,12 +23,13 @@ const Row: React.FC<RowProps> = ({
       : Array.from({ length: numbers }, (_, i) => numbers + 1 - i); // 11 -> [12,11,10,9,8,7,6,5,4,3,2]
 
   const renderLockButton = () => {
-    const isLocked = gameCardData.isLocked ? "locked" : "";
+    // const isLocked = gameCardData.isLocked ? "locked" : "";
+    const isLocked = gameCardData.lockedRows.includes(rowColour)
 
     return isOpponent ? (
       <li>
         <span
-          className={`lock-btn ${rowColour} ${isLocked}`}
+          className={`lock-btn ${rowColour} ${isLocked ?  "locked" : ""}`}
           aria-label={"non-interactive-button"}
         >
           🔒
@@ -37,7 +40,7 @@ const Row: React.FC<RowProps> = ({
         <button
           className={`lock-btn ${rowColour}`}
           aria-label={"button"}
-          disabled={gameCardData.isLocked}
+          disabled={isLocked}
         >
           🔒
         </button>

@@ -5,6 +5,7 @@ import React from "react";
 import GameCard from "../../src/components/GameCard/GameCard";
 import "@testing-library/jest-dom";
 import { socket } from "../../src/services/socketServices";
+import { GameCardData } from "../../src/types/GameCardData";
 
 //const user = userEvent.setup();
 // const gameState = {
@@ -27,20 +28,22 @@ import { socket } from "../../src/services/socketServices";
 //   },
 // };
 
-const emptyGameCardData = {
+const emptyGameCardData: GameCardData = {
   red: [],
   yellow: [],
   green: [],
   blue: [],
-  penalties: [],
+  lockedRows: [],
+  penalties: 0,
 };
 
-const gameCardDataWithNumbers = {
+const gameCardDataWithNumbers: GameCardData = {
   red: [2, 3, 4, 5],
   yellow: [2],
   green: [11],
   blue: [11],
-  penalties: [],
+  lockedRows: [],
+  penalties: 0,
 };
 
 const classAttributeRowRed = "row-red";
