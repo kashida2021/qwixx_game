@@ -33,7 +33,12 @@ const emptyGameCardData: GameCardData = {
   yellow: [],
   green: [],
   blue: [],
-  lockedRows: [],
+  isLocked: {
+    red: false,
+    yellow: false,
+    green: false,
+    blue: false,
+  },
   penalties: 0,
 };
 
@@ -42,7 +47,26 @@ const gameCardDataWithNumbers: GameCardData = {
   yellow: [2],
   green: [11],
   blue: [11],
-  lockedRows: [],
+  isLocked: {
+    red: false,
+    yellow: false,
+    green: false,
+    blue: false,
+  },
+  penalties: 0,
+};
+
+const gameCardWithLockedRow: GameCardData = {
+  red: [2, 3, 4, 5, 12],
+  yellow: [],
+  green: [],
+  blue: [],
+  isLocked: {
+    red: true,
+    yellow: false,
+    green: false,
+    blue: false,
+  },
   penalties: 0,
 };
 
@@ -256,6 +280,24 @@ describe("Game Card Test:", () => {
       await user.click(redButtons[0]);
 
       expect(redButtons[0]).toBeDisabled();
-    })
-  }); 
+    });
+  });
+
+  describe("When a row is locked", () => {
+    test("all buttons of that row should be disabled", async () => {
+      render(
+        <GameCard
+          member={"testUser1"}
+          isOpponent={false}
+          gameCardData={gameCardWithLockedRow}
+        />
+      );
+
+      const redRow = screen.getByRole("list", { name: classAttributeRowRed });
+      const redButtons = within(redRow).getAllByRole("button");
+      redButtons.forEach((button) => {
+        expect(button).toBeDisabled();
+      });
+    });
+  });
 });
