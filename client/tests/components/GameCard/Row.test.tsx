@@ -60,7 +60,7 @@ const user = userEvent.setup();
 
 describe("Row component test:", () => {
   describe("Opponents Card", () => {
-    test.only("it renders 'buttons' with a 'clicked' css class", () => {
+    test("it renders 'buttons' with a 'clicked' css class", () => {
       render(
         <Row
           rowColour={RowColour.Red}
