@@ -17,7 +17,12 @@ const gameState = {
       yellow: [],
       green: [],
       blue: [],
-      lockedRows: [],
+      isLocked: {
+        red: false,
+        yellow: false,
+        green: false,
+        blue: false,
+      },
       penalties: 0,
     },
     testUser2: {
@@ -25,7 +30,12 @@ const gameState = {
       yellow: [],
       green: [],
       blue: [],
-      lockedRows: [],
+      isLocked: {
+        red: false,
+        yellow: false,
+        green: false,
+        blue: false,
+      },
       penalties: 0,
     },
     testUser3: {
@@ -33,10 +43,16 @@ const gameState = {
       yellow: [],
       green: [],
       blue: [],
-      lockedRows: [],
+      isLocked: {
+        red: false,
+        yellow: false,
+        green: false,
+        blue: false,
+      },
       penalties: 0,
     },
   },
+  lockedRows:[]
 };
 
 describe("Game Page Unit Test:", () => {
