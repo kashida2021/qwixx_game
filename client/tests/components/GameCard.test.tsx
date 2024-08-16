@@ -1,13 +1,13 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, test } from "vitest";
 import { render, screen, within } from "@testing-library/react";
-//import { userEvent } from "@testing-library/user-event";
+import { userEvent } from "@testing-library/user-event";
 import React from "react";
 import GameCard from "../../src/components/GameCard/GameCard";
 import "@testing-library/jest-dom";
 import { socket } from "../../src/services/socketServices";
 import { GameCardData } from "../../src/types/GameCardData";
 
-//const user = userEvent.setup();
+const user = userEvent.setup();
 // const gameState = {
 //   players: {
 //     playerId1: {
@@ -240,4 +240,22 @@ describe("Game Card Test:", () => {
       expect(greenButtons[2]).not.toHaveClass(classAttributeClicked);
     });
   });
+
+  describe("When a user clicks on a number button", () => {
+    test("the button is disabled", async () => {
+      render(
+        <GameCard
+          member={"testUser1"}
+          isOpponent={false}
+          gameCardData={emptyGameCardData}
+        />
+      );
+
+      const redRow = screen.getByRole("list", { name: classAttributeRowRed });
+      const redButtons = within(redRow).getAllByRole("button");
+      await user.click(redButtons[0]);
+
+      expect(redButtons[0]).toBeDisabled();
+    })
+  }); 
 });
