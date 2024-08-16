@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface ICellLockButton {
   locked: boolean;
@@ -16,6 +16,11 @@ export const LockButton: React.FC<ICellLockButton> = ({
   const handleClick = () => {
     setIsLocked(!isLocked);
   };
+
+  useEffect(() => {
+    setIsLocked(locked);
+  }, [locked]);
+
   return (
     <li>
       {isOpponent ? (
