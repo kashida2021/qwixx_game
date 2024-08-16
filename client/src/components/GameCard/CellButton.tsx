@@ -16,16 +16,15 @@ const CellButton: React.FC<ICellButton> = ({
   isClicked,
 }) => {
   const [isDisabled, setIsDisabled] = useState(isClicked);
-  // console.log(isClicked);
+
   const handleClick = () => {
     setIsDisabled(!isDisabled);
   };
 
   useEffect(() => {
     setIsDisabled(isClicked);
-  }, [isClicked]); 
-  
-  console.log(isDisabled, num);
+  }, [isClicked]);
+
   return (
     <li>
       {isOpponent ? (
