@@ -24,26 +24,15 @@ const Row: React.FC<RowProps> = ({
       ? Array.from({ length: numbers }, (_, i) => i + 2) // 12 -> [2,3,4,5,6,7,8,9,10,11,12]
       : Array.from({ length: numbers }, (_, i) => numbers + 1 - i); // 11 -> [12,11,10,9,8,7,6,5,4,3,2]
 
-  const renderLockButton = () => {
-    // const isLocked = gameCardData.isLocked ? "locked" : "";
-    const isLocked = gameCardData.lockedRows.includes(rowColour);
-
-    return (
-      <LockButton
-        locked={isLocked}
-        colour={rowColour}
-        isOpponent={isOpponent}
-      />
-    );
-  };
+  const isLocked = gameCardData.isLocked[rowColour];
 
   const renderRow = () => {
     return (
       <ol className={`row ${rowColour}`} aria-label={`row-${rowColour}`}>
         {buttonNumbers.map((num, numIndex) => {
-          const isClicked = gameCardData[rowColour].includes(num);
+          const isDiabled = gameCardData[rowColour].includes(num) || isLocked;
 
-          const classAttributes = isClicked ? "clicked" : "";
+          const classAttributes = isDiabled ? "clicked" : "";
 
           return (
             <CellButton
@@ -52,11 +41,15 @@ const Row: React.FC<RowProps> = ({
               clickAttributes={classAttributes}
               isOpponent={isOpponent}
               num={num}
-              isClicked={isClicked}
+              isClicked={isDiabled}
             />
           );
         })}
-        {renderLockButton()}
+        <LockButton
+          locked={isLocked}
+          colour={rowColour}
+          isOpponent={isOpponent}
+        />
       </ol>
     );
   };
