@@ -21,9 +21,9 @@ interface IGameProps {
   // setGameBoardState: Dispatch<SetStateAction<GameBoard | null>>;
 }
 
-export const Game: React.FC<IGameProps> = ({ lobbyId, userId, members, gameState }) => {
-  // console.log('Rendering Game component', { lobbyId, userId, members });
-  // if(!gameBoardState){
+export const Game: React.FC<IGameProps> = ({ lobbyId, userId, members, gameState, socket }) => {
+  
+  // if(!gameState){
   //     return <div>Loading...</div>;
   // }
 
@@ -44,6 +44,10 @@ export const Game: React.FC<IGameProps> = ({ lobbyId, userId, members, gameState
 
   const filteredMembers = members.filter((member) => member !== userId);
 
+  const handleNumberSelection = () => {
+    socket.emit("mark_numbers")
+  }
+
   return (
     <div>
       <h1>Lobby: {lobbyId}</h1>
@@ -61,6 +65,9 @@ export const Game: React.FC<IGameProps> = ({ lobbyId, userId, members, gameState
 				{/* Player's game card */}
         <div className="player-zone" id="playerZone" aria-label="player-zone">
           <GameCard member={userId} isOpponent={false} gameCardData={gameState.players[userId]}/>
+          <button
+          onClick={handleNumberSelection}
+          >Confirm</button>
         </div>
       </div>
     </div>
