@@ -18,12 +18,13 @@ const CellButton: React.FC<ICellButton> = ({
   const [isDisabled, setIsDisabled] = useState(isClicked);
 
   const handleClick = () => {
-    setIsDisabled(!isDisabled);
+  console.log("clicked")
+    //   setIsDisabled(!isDisabled);
   };
 
-  useEffect(() => {
-    setIsDisabled(isClicked);
-  }, [isClicked]);
+  // useEffect(() => {
+  //   setIsDisabled(isClicked);
+  // }, [isClicked]);
 
   return (
     <li>

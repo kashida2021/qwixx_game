@@ -29,7 +29,7 @@ const Row: React.FC<RowProps> = ({
   isOpponent,
   gameCardData,
 }) => {
-  const [locked, setLocked] = useState(false);
+  // const [locked, setLocked] = useState(false);
 
   const buttonNumbers =
     rowIndex < 2
@@ -37,18 +37,18 @@ const Row: React.FC<RowProps> = ({
       : Array.from({ length: numbers }, (_, i) => numbers + 1 - i); // 11 -> [12,11,10,9,8,7,6,5,4,3,2]
 
   //If game state dictates that the row is locked
-  useEffect(() => {
-    if (gameCardData.isLocked[rowColour]) {
-      setLocked(true);
-    }
-  }, [gameCardData, rowColour]);
+  // useEffect(() => {
+  //   if (gameCardData.isLocked[rowColour]) {
+  //     setLocked(true);
+  //   }
+  // }, [gameCardData, rowColour]);
 
   const renderRow = () => {
     return (
       <ol className={`row ${rowColour}`} aria-label={`row-${rowColour}`}>
         {buttonNumbers.map((num, numIndex) => {
-          const isDisabled = gameCardData[rowColour].includes(num) || locked;
-
+          // const isDisabled = gameCardData[rowColour].includes(num) || locked;
+          const isDisabled = gameCardData[rowColour].includes(num);
           const classAttributes = isDisabled ? "clicked" : "";
 
           return (
@@ -63,10 +63,10 @@ const Row: React.FC<RowProps> = ({
           );
         })}
         <LockButton
-          locked={locked}
+          // locked={locked}
           colour={rowColour}
           isOpponent={isOpponent}
-          lockRow={setLocked}
+          // lockRow={setLocked}
         />
       </ol>
     );
