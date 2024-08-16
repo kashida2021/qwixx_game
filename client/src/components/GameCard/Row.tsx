@@ -30,11 +30,10 @@ const Row: React.FC<RowProps> = ({
   gameCardData,
 }) => {
   const [locked, setLocked] = useState(false);
-  // const [locked, setLocked] = useState(false);
 
   const buttonNumbers =
     rowIndex < 2
-      ? Array.from({ length: numbers }, (_, i) => i + 2) // 11 -> [2,3,4,5,6,7,8,9,10,11,12]
+      ? Array.from({ length: numbers }, (_, i) => i + 2) // 11 -> [2,3,4,5,6,7,8,9,10,11,12][lock btn]
       : Array.from({ length: numbers }, (_, i) => numbers + 1 - i); // 11 -> [12,11,10,9,8,7,6,5,4,3,2]
 
   //If game state dictates that the row is locked
@@ -49,9 +48,9 @@ const Row: React.FC<RowProps> = ({
       <ol className={`row ${rowColour}`} aria-label={`row-${rowColour}`}>
         {buttonNumbers.map((num, numIndex) => {
           const isDisabled = gameCardData[rowColour].includes(num) || locked;
-          // console.log(num, numIndex);
+
           const classAttributes = isDisabled ? "clicked" : "";
-          console.log(isDisabled, num)
+
           return (
             <CellButton
               key={numIndex}
@@ -67,6 +66,7 @@ const Row: React.FC<RowProps> = ({
           locked={locked}
           colour={rowColour}
           isOpponent={isOpponent}
+          lockRow={setLocked}
         />
       </ol>
     );
@@ -76,18 +76,3 @@ const Row: React.FC<RowProps> = ({
 };
 
 export default Row;
-
-// const renderButtons = (color: string) => {
-//   return Array.from({ length: numbers }, (_, index) => {
-//     const isClicked = gameCardData[color].includes(index + 2); // Check if button is clicked
-//     return (
-//       <button
-//         key={index}
-//         className={`button ${isClicked ? "clicked" : ""}`}
-//         disabled={isClicked} // Disable the button if already clicked
-//       >
-//         {index + 2}
-//       </button>
-//     );
-//   });
-// };
