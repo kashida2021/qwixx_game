@@ -1,11 +1,11 @@
-.gameCard{
+.game-card{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
-.Row{
+.row{
     display: flex;
     justify-content: space-around;
     max-width: 800px;
@@ -13,25 +13,25 @@
     gap: 0.5rem;
 }
 
-.Row > li{
+.row > li{
     width: 4rem;
     border: none;
     border-radius: 0.5rem;
 }
 
-.Row.red{
+.row.red{
     background-color: #f1330a;
 }
 
-.Row.yellow{
+.row.yellow{
     background-color: #f8f113;
 }
 
-.Row.green{
+.row.green{
     background-color: #2fda7a;
 }
 
-.Row.blue{
+.row.blue{
     background-color: #0b35f0;
 }
 
@@ -63,12 +63,12 @@
     cursor: pointer;
 }
 
-.penalties > ul{
+.penalties-container > ul{
     display: flex;
     gap: 1rem;
 }
 
-.penalties > ul > li{
+.penalties-container > ul > li{
     display: flex;
     flex-direction: column-reverse;
 }

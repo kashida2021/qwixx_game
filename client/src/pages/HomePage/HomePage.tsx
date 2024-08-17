@@ -1,6 +1,6 @@
 import "./HomePage.css";
 import { useState, MouseEvent, SetStateAction, Dispatch } from "react";
-import { Modal } from "../../components/modal/modal";
+import { Modal } from "../../components/Modal/modal";
 import { useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
 
