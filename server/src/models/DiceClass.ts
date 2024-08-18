@@ -49,4 +49,16 @@ export default class Dice {
       throw new Error(`Die colour ${colour} does not exist`);
     }
   }
+
+  serialize() {
+    return {
+      dice: this._diceValues,
+    };
+  }
+
+  static from(data: any): Dice {
+    const dice = new Dice(SixSidedDie);
+    dice._diceValues = data.diceValues;
+    return dice;
+  }
 }

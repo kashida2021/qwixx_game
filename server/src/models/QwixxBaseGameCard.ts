@@ -3,7 +3,7 @@ import { rowColour } from "../enums/rowColours";
 export default class qwixxBaseGameCard {
   private _rows: { [key in rowColour]: number[] };
   private _numbers: number[];
-  private _lockedRows: string[];
+  private _isLocked: { [key in rowColour]: boolean };
   private _penalties: number[];
 
   constructor() {
@@ -16,26 +16,31 @@ export default class qwixxBaseGameCard {
 
     this._numbers = Array.from({ length: 12 }, (_, i) => i + 2);
 
-    this._lockedRows = [];
+    this._isLocked = {
+      [rowColour.Red]: false,
+      [rowColour.Yellow]: false,
+      [rowColour.Green]: false,
+      [rowColour.Blue]: false,
+    };
 
     this._penalties = [];
   }
 
   serialize() {
     return {
-      gameCard: this._rows,
+      rows: this._rows,
       numbers: this._numbers,
-      lockedRows: this._lockedRows,
-      penalties: this._penalties,
+      isLocked: this._isLocked,
+      penalties: this._penalties.length,
     };
   }
 
   static from(data: any): qwixxBaseGameCard {
     const gameCard = new qwixxBaseGameCard();
-    gameCard._rows = data.gameCard;
+    gameCard._rows = data.rows;
     gameCard._numbers = data.numbers;
-    gameCard._lockedRows = data.lockedRows;
-    gameCard._penalties = data.penalties;
+    gameCard._isLocked = data.isLocked;
+    gameCard._penalties = new Array(data.penalties).fill(1);
     return gameCard;
   }
 
@@ -50,17 +55,17 @@ export default class qwixxBaseGameCard {
   markNumbers(row: rowColour, number: number) {
     if (!this._rows[row].includes(number)) {
       this._rows[row].push(number);
-      return true
-    }else{
-      return false
+      return true;
+    } else {
+      return false;
     }
   }
 
-  getLockedRows() {
-    return this._lockedRows;
+  get isLocked() {
+    return this._isLocked;
   }
 
-  getPenalties() {
+  get penalties() {
     return this._penalties;
   }
 }

@@ -28,7 +28,7 @@ export default class QwixxLogic {
         colourToMark = rowColour.Blue;
         break;
       default:
-        throw new Error("Invalid colour")
+        throw new Error("Invalid colour");
     }
 
     for (const player of this._playersArray) {
@@ -46,5 +46,20 @@ export default class QwixxLogic {
 
   get players() {
     return this._playersArray;
+  }
+
+  serialize() {
+    return {
+      players: this._playersArray.map((player) => player.serialize()),
+      dice: this._dice,
+    };
+  }
+
+  static from(data: any): QwixxLogic {
+    const players = data.players.map((playerData: any) =>
+      Player.from(playerData)
+    );
+    const dice = Dice.from(data.dice);
+    return new QwixxLogic(players, dice);
   }
 }
