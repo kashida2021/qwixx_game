@@ -19,10 +19,7 @@ export default class Player {
   }
 
   serialize() {
-    return {
-      name: this._name,
-      gameCard: this._gameCard.serialize(),
-    };
+    return this._gameCard.serialize();
   }
 
   static from(data: any): Player {

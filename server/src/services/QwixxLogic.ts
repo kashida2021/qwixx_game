@@ -49,15 +49,20 @@ export default class QwixxLogic {
   }
 
   serialize() {
+    const serializedPlayers = this._playersArray.reduce((acc, player) => {
+      acc[player.name] = player.serialize();
+      return acc;
+    }, {} as Record<string, any>);
+
     return {
-      players: this._playersArray.map((player) => player.serialize()),
-      dice: this._dice,
+      players: serializedPlayers,
+      dice: this._dice.serialize(),
     };
   }
 
   static from(data: any): QwixxLogic {
     const players = data.players.map((playerData: any) =>
-      Player.from(playerData)
+      Player.from({ name: playerData.name, gamecard: playerData })
     );
     const dice = Dice.from(data.dice);
     return new QwixxLogic(players, dice);

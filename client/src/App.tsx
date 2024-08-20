@@ -6,6 +6,7 @@ import Lobby from "./pages/LobbyPage/LobbyPage";
 import { socket } from "./services/socketServices";
 // import GameBoard from "../../shared/GameBoard";
 import Game from "./pages/GamePage/GamePage";
+import { QwixxLogic } from "./types/qwixxLogic";
 
 function App() {
   const [isConnected, setIsConnected] = useState(socket.connected);
@@ -14,7 +15,7 @@ function App() {
   //const [globalError, setGlobalError] = useState("");
   const [members, setMembers] = useState<string[]>([]);
   const [notifications, setNotifications] = useState<string[]>([]);
-  // const [gameBoardState, setGameBoardState] = useState<GameBoard | null>(null);
+  const [gameState, setGameState] = useState<QwixxLogic | null>(null);
   const [gamePath, setGamePath] = useState("");
 
   //Need to consier if this is overkill for our app as it's only being used in one place.
@@ -69,12 +70,14 @@ function App() {
     //   setGameBoardState(gameBoard);
     // };
 
-    const onGameInitialised = (data: { path: string; players: [] }) => {
+    const onGameInitialised = (data: { path: string; gameState: QwixxLogic }) => {
       // The received data object has a path property and players.
       // Players is an array of player objects that contain initial game card state.
       // We might need to use it for setting up the game cards on the front end. 
       // If not, we can refactor the data object to not include it. 
       setGamePath(data.path);
+      setGameState(data.gameState);
+      console.log(data.gameState);
     };
 
     socket.on("connect", onConnect);
@@ -137,7 +140,7 @@ function App() {
               lobbyId={lobbyId}
               userId={userId}
               members={members}
-              // gameBoardState={gameBoardState}
+              gameState={gameState}
               // setGameBoardState={setGameBoardState}
             />
           }
