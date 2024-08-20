@@ -1,23 +1,24 @@
 import "./GamePage.css";
 import { Socket } from "socket.io-client";
 import GameCard from "../../components/GameCard/GameCard";
-import { GameCardData } from "../../types/GameCardData";
+//import { GameCardData } from "../../types/GameCardData";
+import { QwixxLogic } from "../../types/qwixxLogic";
 // import GameBoard from "../../../../shared/GameBoard";
 // import { SetStateAction, Dispatch } from "react";
 // import { rowColour} from "../../../../shared/types";
 
-interface GameState {
-  players: {
-    [playerId: string]: GameCardData 
-  }
-}
+//interface GameState {
+  //players: {
+    //[playerId: string]: GameCardData 
+  //}
+//}
 
 interface IGameProps {
   socket: Socket;
   lobbyId: string;
   userId: string;
   members: string[];
-  gameState: GameState;
+  gameState: QwixxLogic;
   // setGameBoardState: Dispatch<SetStateAction<GameBoard | null>>;
 }
 

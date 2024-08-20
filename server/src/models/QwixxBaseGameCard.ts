@@ -29,7 +29,6 @@ export default class qwixxBaseGameCard {
   serialize() {
     return {
       rows: this._rows,
-      numbers: this._numbers,
       isLocked: this._isLocked,
       penalties: this._penalties.length,
     };
@@ -38,7 +37,6 @@ export default class qwixxBaseGameCard {
   static from(data: any): qwixxBaseGameCard {
     const gameCard = new qwixxBaseGameCard();
     gameCard._rows = data.rows;
-    gameCard._numbers = data.numbers;
     gameCard._isLocked = data.isLocked;
     gameCard._penalties = new Array(data.penalties).fill(1);
     return gameCard;

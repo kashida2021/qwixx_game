@@ -186,6 +186,7 @@ export default function initializeSocketHandler(io: Server) {
       const responseData = { path: path, gameState: serializedGameLogic };
 
       io.to(lobbyId).emit("game_initialised", responseData);
+      console.log(serializedGameLogic);
     });
   });
 }
