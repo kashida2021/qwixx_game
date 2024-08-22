@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react"; //re-add useEffect here later
 
 interface ICellButton {
   rowColour: string;
@@ -6,6 +6,7 @@ interface ICellButton {
   isOpponent: boolean;
   num: number;
   isClicked: boolean;
+  cellClick: (rowColour: string, num: number) => void;
 }
 
 const CellButton: React.FC<ICellButton> = ({
@@ -13,12 +14,14 @@ const CellButton: React.FC<ICellButton> = ({
   clickAttributes,
   isOpponent,
   num,
+  cellClick,
   isClicked,
 }) => {
   const [isDisabled, setIsDisabled] = useState(isClicked);
 
   const handleClick = () => {
   console.log("clicked")
+  cellClick(rowColour, num);
     //   setIsDisabled(!isDisabled);
   };
 

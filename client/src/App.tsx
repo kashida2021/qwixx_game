@@ -135,6 +135,7 @@ function App() {
         <Route
           path={`/game/${lobbyId}`}
           element={
+            gameState ? (
             <Game
               socket={socket}
               lobbyId={lobbyId}
@@ -143,6 +144,9 @@ function App() {
               gameState={gameState}
               // setGameBoardState={setGameBoardState}
             />
+            ) : (
+              <div>Loading...</div>
+            )
           }
         />
       </Routes>
