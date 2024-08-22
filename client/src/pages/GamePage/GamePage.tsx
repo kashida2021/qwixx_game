@@ -1,4 +1,5 @@
 import "./GamePage.css";
+import { useState } from "react";
 import { Socket } from "socket.io-client";
 import GameCard from "../../components/GameCard/GameCard";
 //import { GameCardData } from "../../types/GameCardData";
@@ -24,6 +25,10 @@ interface IGameProps {
 
 export const Game: React.FC<IGameProps> = ({ lobbyId, userId, members, gameState, socket }) => {
   
+  const [playerChoice, setPlayerChoice] = useState<{row: string; num:number} | null>(null);
+  const handleCellClick = (rowColour: string, num: number) => {
+    setPlayerChoice({row: rowColour, num});
+  }
   // if(!gameState){
   //     return <div>Loading...</div>;
   // }
@@ -46,7 +51,8 @@ export const Game: React.FC<IGameProps> = ({ lobbyId, userId, members, gameState
   const filteredMembers = members.filter((member) => member !== userId);
 
   const handleNumberSelection = () => {
-    socket.emit("mark_numbers")
+    socket.emit("mark_numbers", {lobbyId, userId, playerChoice});
+    console.log(playerChoice);
   }
 
   return (
@@ -60,12 +66,12 @@ export const Game: React.FC<IGameProps> = ({ lobbyId, userId, members, gameState
           aria-label="opponent-zone"
         >
           {filteredMembers.map((member, index) => (
-            <GameCard key={index} member={member} isOpponent={true} gameCardData={gameState.players[member]}/>
+            <GameCard key={index} member={member} isOpponent={true} gameCardData={gameState.players[member]} cellClick={handleCellClick}/>
           ))}
         </div>
 				{/* Player's game card */}
         <div className="player-zone" id="playerZone" aria-label="player-zone">
-          <GameCard member={userId} isOpponent={false} gameCardData={gameState.players[userId]}/>
+          <GameCard member={userId} isOpponent={false} gameCardData={gameState.players[userId]} cellClick={handleCellClick}/>
           <button
           onClick={handleNumberSelection}
           >Confirm</button>

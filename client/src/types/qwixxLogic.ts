@@ -2,26 +2,26 @@ export interface QwixxLogic {
   players: {
     [name: string]: {
       rows: {
-        Red: number[];
-        Yellow: number[];
-        Green: number[];
-        Blue: number[];
+        red: number[];
+        yellow: number[];
+        green: number[];
+        blue: number[];
       };
       isLocked: {
-        Red: boolean;
-        Yellow: boolean;
-        Green: boolean;
-        Blue: boolean;
+        red: boolean;
+        yellow: boolean;
+        green: boolean;
+        blue: boolean;
       };
       penalties: number;
     };
   };
   dice: {
-    White1: number;
-    White2: number;
-    Red: number;
-    Yellow: number;
-    Green: number;
-    Blue: number;
+    white1: number;
+    white2: number;
+    red: number;
+    yellow: number;
+    green: number;
+    blue: number;
   };
 }

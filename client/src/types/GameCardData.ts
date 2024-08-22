@@ -1,8 +1,10 @@
 export interface GameCardData {
-  red: number[];
-  yellow: number[];
-  green: number[];
-  blue: number[];
+  rows: {
+    red: number[];
+    yellow: number[];
+    green: number[];
+    blue: number[];
+  };
   isLocked: {
     red: boolean;
     yellow: boolean;

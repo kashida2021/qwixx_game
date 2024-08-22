@@ -188,5 +188,20 @@ export default function initializeSocketHandler(io: Server) {
       io.to(lobbyId).emit("game_initialised", responseData);
       console.log(serializedGameLogic);
     });
+
+    socket.on("mark_numbers", ({ lobbyId, userId, playerChoice }) => {
+      const gameLogic = lobbiesMap[lobbyId].gameLogic;
+      const { row: rowColour, num } = playerChoice;
+      if (gameLogic && gameLogic.players[userId]) {
+        gameLogic.players[userId].gameCard.markNumbers(rowColour, num);
+      }
+
+      const serializedGameLogic = gameLogic ? gameLogic.serialize() : null;
+      const path = `/game/${lobbyId}`;
+      const responseData = { path: path, gameState: serializedGameLogic };
+
+      io.to(lobbyId).emit("updated_markedNumbers", responseData);
+      console.log(serializedGameLogic);
+    });
   });
 }
