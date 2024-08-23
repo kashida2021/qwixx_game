@@ -80,6 +80,11 @@ function App() {
       console.log(data.gameState);
     };
 
+    const updateMarkedNumbers = (data: {path: string; gameState: QwixxLogic }) => {
+      setGameState(data.gameState);
+      console.log("data received from backend", data);
+    }
+
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
     socket.on("player_joined", handlePlayerJoined);
@@ -88,6 +93,7 @@ function App() {
     socket.on("current_members", currentMembers);
     // socket.on("gameBoard_created", createGameBoard);
     socket.on("game_initialised", onGameInitialised);
+    socket.on("update_markedNumbers", updateMarkedNumbers);
 
     return () => {
       socket.off("connect");
@@ -98,6 +104,7 @@ function App() {
       socket.off("current_members");
       // socket.off("gameBoard_created");
       socket.off("game_initialised"); 
+      socket.off("update_markedNumbers");
     };
   }, []);
 
