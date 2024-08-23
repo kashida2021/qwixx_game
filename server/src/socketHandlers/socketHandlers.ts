@@ -191,17 +191,30 @@ export default function initializeSocketHandler(io: Server) {
 
     socket.on("mark_numbers", ({ lobbyId, userId, playerChoice }) => {
       const gameLogic = lobbiesMap[lobbyId].gameLogic;
-      const { row: rowColour, num } = playerChoice;
-      if (gameLogic && gameLogic.players[userId]) {
-        gameLogic.players[userId].gameCard.markNumbers(rowColour, num);
+
+      if (!gameLogic) {
+        console.log(`Game logic not found for lobby ${lobbyId}`);
+        return;
       }
+
+      const player = gameLogic.players.find((player) => player.name === userId);
+
+      if (!player) {
+        console.log(`Player ${userId} not found in lobby`);
+        return;
+      }
+
+      console.log(playerChoice);
+
+      const { row: rowColour, num } = playerChoice;
+      player.gameCard.markNumbers(rowColour, num);
+      console.log(player.gameCard.MarkedNumbers);
 
       const serializedGameLogic = gameLogic ? gameLogic.serialize() : null;
       const path = `/game/${lobbyId}`;
       const responseData = { path: path, gameState: serializedGameLogic };
 
-      io.to(lobbyId).emit("updated_markedNumbers", responseData);
-      console.log(serializedGameLogic);
+      io.to(lobbyId).emit("update_markedNumbers", responseData);
     });
   });
 }
