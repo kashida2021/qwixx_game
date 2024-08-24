@@ -13,10 +13,12 @@ const membersArrayMock = ["testUser1", "testUser2", "testUser3"];
 const gameState = {
   players: {
     testUser1: {
-      red: [],
-      yellow: [],
-      green: [],
-      blue: [],
+      rows: {
+        red: [],
+        yellow: [],
+        green: [],
+        blue: [],
+      },
       isLocked: {
         red: false,
         yellow: false,
@@ -26,10 +28,12 @@ const gameState = {
       penalties: 0,
     },
     testUser2: {
-      red: [],
-      yellow: [],
-      green: [],
-      blue: [],
+      rows: {
+        red: [],
+        yellow: [],
+        green: [],
+        blue: [],
+      },
       isLocked: {
         red: false,
         yellow: false,
@@ -39,10 +43,12 @@ const gameState = {
       penalties: 0,
     },
     testUser3: {
-      red: [],
-      yellow: [],
-      green: [],
-      blue: [],
+      rows: {
+        red: [],
+        yellow: [],
+        green: [],
+        blue: [],
+      },
       isLocked: {
         red: false,
         yellow: false,
@@ -52,7 +58,14 @@ const gameState = {
       penalties: 0,
     },
   },
-  lockedRows:[]
+  dice:{
+    white1: 1,
+    white2: 2,
+    red: 3,
+    yellow: 4,
+    green: 5,
+    blue: 6,
+  },
 };
 
 describe("Game Page Unit Test:", () => {

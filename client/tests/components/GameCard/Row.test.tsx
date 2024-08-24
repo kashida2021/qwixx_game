@@ -1,17 +1,35 @@
-import { describe, it, expect, test } from "vitest";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { describe, expect, test, vi} from "vitest"; // it - add later
+import { render, screen } from "@testing-library/react"; // waitFor, within add later
 import { userEvent } from "@testing-library/user-event";
 import React from "react";
 import Row from "../../../src/components/GameCard/Row";
 import "@testing-library/jest-dom";
-import { GameCardData } from "../../../src/types/GameCardData";
+import { QwixxLogic } from "../../../src/types/qwixxLogic";
 import { RowColour } from "../../../src/types/enums";
 
-const emptyGameCardData: GameCardData = {
-  red: [],
-  yellow: [],
-  green: [],
-  blue: [],
+//const emptyGameCardData: QwixxLogic['players'][string] = {
+  //rows: {
+    //red: [],
+    //yellow: [],
+    //green: [],
+    //blue: [],
+ // },
+ // isLocked: {
+   // red: false,
+   // yellow: false,
+   // green: false,
+   // blue: false,
+  //},
+ // penalties: 0,
+//};
+
+const gameCardDataWithNumbers: QwixxLogic['players'][string] = {
+  rows: {
+    red: [],
+    yellow: [],
+    green: [],
+    blue: [],
+  },
   isLocked: {
     red: false,
     yellow: false,
@@ -21,11 +39,13 @@ const emptyGameCardData: GameCardData = {
   penalties: 0,
 };
 
-const gameCardDataWithNumbers: GameCardData = {
-  red: [2, 3, 4, 5],
-  yellow: [],
-  green: [],
-  blue: [],
+const gameCardWithLockedRow: QwixxLogic['players'][string] = {
+  rows: {
+    red: [],
+    yellow: [],
+    green: [],
+    blue: [],
+  },
   isLocked: {
     red: false,
     yellow: false,
@@ -35,22 +55,10 @@ const gameCardDataWithNumbers: GameCardData = {
   penalties: 0,
 };
 
-const gameCardWithLockedRow: GameCardData = {
-  red: [2, 3, 4, 5, 12],
-  yellow: [],
-  green: [],
-  blue: [],
-  isLocked: {
-    red: true,
-    yellow: false,
-    green: false,
-    blue: false,
-  },
-  penalties: 0,
-};
+const mockCellClick = vi.fn();
 
 const numbers = 11;
-const classAttributeRowRed = "row-red";
+//const classAttributeRowRed = "row-red";
 const classAttributeClicked = "clicked";
 
 const classAttributeNonInteractiveButton = "non-interactive-button";
@@ -68,6 +76,7 @@ describe("Row component test:", () => {
           isOpponent={true}
           rowIndex={0}
           gameCardData={gameCardDataWithNumbers}
+          cellClick={mockCellClick}
         />
       );
 
@@ -93,6 +102,7 @@ describe("Row component test:", () => {
           isOpponent={false}
           rowIndex={0}
           gameCardData={gameCardDataWithNumbers}
+          cellClick={mockCellClick}
         />
       );
 
@@ -110,6 +120,7 @@ describe("Row component test:", () => {
           isOpponent={false}
           rowIndex={0}
           gameCardData={gameCardDataWithNumbers}
+          cellClick={mockCellClick}
         />
       );
 
@@ -127,6 +138,7 @@ describe("Row component test:", () => {
           isOpponent={false}
           rowIndex={0}
           gameCardData={gameCardWithLockedRow}
+          cellClick={mockCellClick}
         />
       );
 
@@ -142,6 +154,7 @@ describe("Row component test:", () => {
           isOpponent={false}
           rowIndex={0}
           gameCardData={gameCardDataWithNumbers}
+          cellClick={mockCellClick}
         />
       );
 
