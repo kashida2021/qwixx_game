@@ -1,5 +1,5 @@
 import "./GamePage.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Socket } from "socket.io-client";
 import GameCard from "../../components/GameCard/GameCard";
 //import { GameCardData } from "../../types/GameCardData";
@@ -29,6 +29,10 @@ export const Game: React.FC<IGameProps> = ({ lobbyId, userId, members, gameState
   const handleCellClick = (rowColour: string, num: number) => {
     setPlayerChoice({row: rowColour, num});
   }
+
+  useEffect(() => {
+    console.log(playerChoice);
+  }, [playerChoice]);
   // if(!gameState){
   //     return <div>Loading...</div>;
   // }

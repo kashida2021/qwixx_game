@@ -1,19 +1,21 @@
-import { describe, it, expect, test } from "vitest";
+import { describe, it, expect, test, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import React from "react";
 import GameCard from "../../../src/components/GameCard/GameCard";
 import "@testing-library/jest-dom";
 import { socket } from "../../../src/services/socketServices";
-import { GameCardData } from "../../../src/types/GameCardData";
+import { QwixxLogic } from "../../../src/types/qwixxLogic";
 
 const user = userEvent.setup();
 
-const emptyGameCardData: GameCardData = {
-  red: [],
-  yellow: [],
-  green: [],
-  blue: [],
+const emptyGameCardData: QwixxLogic['players'][string] = {
+  rows: {
+    red: [],
+    yellow: [],
+    green: [],
+    blue: [],
+  },
   isLocked: {
     red: false,
     yellow: false,
@@ -23,11 +25,13 @@ const emptyGameCardData: GameCardData = {
   penalties: 0,
 };
 
-const gameCardDataWithNumbers: GameCardData = {
-  red: [2, 3, 4, 5],
-  yellow: [2],
-  green: [11],
-  blue: [11],
+const gameCardDataWithNumbers: QwixxLogic['players'][string] = {
+  rows: {
+    red: [2, 3, 4, 5],
+    yellow: [2],
+    green: [11],
+    blue: [11],
+  },
   isLocked: {
     red: false,
     yellow: false,
@@ -37,11 +41,13 @@ const gameCardDataWithNumbers: GameCardData = {
   penalties: 0,
 };
 
-const gameCardWithLockedRow: GameCardData = {
-  red: [2, 3, 4, 5, 12],
-  yellow: [],
-  green: [],
-  blue: [],
+const gameCardWithLockedRow: QwixxLogic['players'][string] = {
+  rows: {
+    red: [2, 3, 4, 5, 12],
+    yellow: [],
+    green: [],
+    blue: [],
+  },
   isLocked: {
     red: true,
     yellow: false,
@@ -60,6 +66,8 @@ const cssPenalties = "penalties-list";
 
 const ariaNonInteractiveBtn = "non-interactive-button";
 
+const mockCellClick = vi.fn();
+
 describe("Game Card Test:", () => {
   describe("Opponents Card:", () => {
     it("it renders the GameCard for the opponent", () => {
@@ -68,6 +76,7 @@ describe("Game Card Test:", () => {
           member={"testUser1"}
           isOpponent={true}
           gameCardData={emptyGameCardData}
+          cellClick={mockCellClick}
         />
       );
 
@@ -104,6 +113,7 @@ describe("Game Card Test:", () => {
           member={"testUser1"}
           isOpponent={true}
           gameCardData={gameCardDataWithNumbers}
+          cellClick={mockCellClick}
         />
       );
 
@@ -143,6 +153,7 @@ describe("Game Card Test:", () => {
           member={"testUser1"}
           isOpponent={false}
           gameCardData={emptyGameCardData}
+          cellClick={mockCellClick}
         />
       );
 
@@ -178,6 +189,7 @@ describe("Game Card Test:", () => {
           member={"testUser1"}
           isOpponent={false}
           gameCardData={gameCardDataWithNumbers}
+          cellClick={mockCellClick}
         />
       );
 
@@ -222,6 +234,7 @@ describe("Game Card Test:", () => {
           member={"testUser1"}
           isOpponent={false}
           gameCardData={emptyGameCardData}
+          cellClick={mockCellClick}
         />
       );
 
@@ -238,6 +251,7 @@ describe("Game Card Test:", () => {
           member={"testUser1"}
           isOpponent={false}
           gameCardData={gameCardDataWithNumbers}
+          cellClick={mockCellClick}
         />
       );
 
@@ -249,6 +263,26 @@ describe("Game Card Test:", () => {
         expect(button).toBeDisabled();
       });
     });
+
+    test("the player choice state is updated", async () => {
+      const mockSetPlayerChoice = vi.fn();
+
+      render(
+        <GameCard
+          member={"testUser1"}
+          isOpponent={false}
+          gameCardData={emptyGameCardData}
+          cellClick={mockCellClick}
+        />
+      );
+
+      const redRow = screen.getByRole("list", { name: cssRowRed });
+      const redButtons = within(redRow).getAllByRole("button");
+      await user.click(redButtons[0]);
+
+      expect(mockSetPlayerChoice).toHaveBeenCalledWith("red", 2);   
+    });
+
   });
 
   describe.skip("When a row is locked", () => {
@@ -258,6 +292,7 @@ describe("Game Card Test:", () => {
           member={"testUser1"}
           isOpponent={false}
           gameCardData={gameCardWithLockedRow}
+          cellClick={mockCellClick}
         />
       );
 
