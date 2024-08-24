@@ -73,4 +73,11 @@
     flex-direction: column-reverse;
 }
 
+.cell-btn.clicked {
+    background-color: black;
+    color: white;
+  }
+
+  
+
 
