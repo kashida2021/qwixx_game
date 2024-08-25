@@ -8,6 +8,7 @@ import initializeSocketHandler from "../../socketHandlers/socketHandlers";
 import { generateUniqueRoomId } from "../../utils/roomUtils";
 import Player from "../../models/PlayerClass";
 import GameBoard from "../../models/QwixxBaseGameCard";
+import QwixxLogic from "../../services/QwixxLogic";
 
 const generateUniqueRoomIdMock = generateUniqueRoomId as jest.MockedFunction<
   typeof generateUniqueRoomId
@@ -202,26 +203,38 @@ describe("socket event handler test", () => {
           clientSocket1,
           "game_initialised"
         );
- 
-        expect(gameStartedData.path).toBe("/game/1234"); 
 
-        expect(gameStartedData.players[0]._name).toBe("clientSocket1");
-        expect(gameStartedData.players[0]._gameCard).toBeTruthy(); 
-        expect(gameStartedData.players[0]._gameCard._rows).toEqual({
-          red: [],
-          yellow: [],
-          green: [],
-          blue: [],
-        });
-        
-        expect(gameStartedData.players[1]._name).toBe("clientSocket2");
-        expect(gameStartedData.players[1]._gameCard).toBeTruthy();
-        expect(gameStartedData.players[1]._gameCard._rows).toEqual({
-          red: [],
-          yellow: [],
-          green: [],
-          blue: [],
-        });
+        expect(gameStartedData.path).toBe("/game/1234");
+
+        expect(
+          gameStartedData.gameState.players["clientSocket1"]
+        ).toBeDefined();
+        expect(
+          gameStartedData.gameState.players["clientSocket1"].rows
+        ).toBeTruthy();
+        expect(gameStartedData.gameState.players["clientSocket1"].rows).toEqual(
+          {
+            red: [],
+            yellow: [],
+            green: [],
+            blue: [],
+          }
+        );
+
+        expect(
+          gameStartedData.gameState.players["clientSocket2"]
+        ).toBeDefined();
+        expect(
+          gameStartedData.gameState.players["clientSocket2"].rows
+        ).toBeTruthy();
+        expect(gameStartedData.gameState.players["clientSocket2"].rows).toEqual(
+          {
+            red: [],
+            yellow: [],
+            green: [],
+            blue: [],
+          }
+        );
       });
     });
   });
