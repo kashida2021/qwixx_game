@@ -1,13 +1,107 @@
-import { describe, it, expect, test, vi } from "vitest";
+import { describe, it, expect, test, vi, beforeEach } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import React from "react";
 import GameCard from "../../../src/components/GameCard/GameCard";
 import "@testing-library/jest-dom";
 import { socket } from "../../../src/services/socketServices";
+import {Socket} from "socket.io-client";
 import { QwixxLogic } from "../../../src/types/qwixxLogic";
+import { MemoryRouter } from "react-router-dom";
+import GamePage from "../../../src/pages/GamePage/GamePage";
 
 const user = userEvent.setup();
+
+type SocketServiceModule = {
+  socket: Socket;
+};
+
+interface PlayerChoice {
+  row: string;
+  number: number;
+}
+
+const membersArrayMock = ["testUser1", "testUser2", "testUser3"];
+const gameState = {
+  players: {
+    testUser1: {
+      rows: {
+        red: [],
+        yellow: [],
+        green: [],
+        blue: [],
+      },
+      isLocked: {
+        red: false,
+        yellow: false,
+        green: false,
+        blue: false,
+      },
+      penalties: 0,
+    },
+    testUser2: {
+      rows: {
+        red: [],
+        yellow: [],
+        green: [],
+        blue: [],
+      },
+      isLocked: {
+        red: false,
+        yellow: false,
+        green: false,
+        blue: false,
+      },
+      penalties: 0,
+    },
+    testUser3: {
+      rows: {
+        red: [],
+        yellow: [],
+        green: [],
+        blue: [],
+      },
+      isLocked: {
+        red: false,
+        yellow: false,
+        green: false,
+        blue: false,
+      },
+      penalties: 0,
+    },
+  },
+  dice:{
+    white1: 1,
+    white2: 2,
+    red: 3,
+    yellow: 4,
+    green: 5,
+    blue: 6,
+  },
+};
+
+let lobbyIdMock: string = "1234";
+let userIdMock: string = "";
+let playerChoiceMock: PlayerChoice| null = null;
+
+vi.mock(
+  "../../../src/services/socketServices",
+  async (importOriginal: () => Promise<SocketServiceModule>) => {
+    const actual = await importOriginal();
+    return {
+      ...actual,
+      socket: {
+        ...actual.socket,
+        emit: vi.fn(() => {
+            lobbyIdMock = "1234",
+            userIdMock = "test_user"
+            playerChoiceMock = {row: "red", number: 2}
+           }),
+          },
+        };
+      }
+    );
+    
 
 const emptyGameCardData: QwixxLogic['players'][string] = {
   rows: {
@@ -303,3 +397,40 @@ describe("Game Card Test:", () => {
       });
     });
   });
+
+  describe.skip("When confirm button is clicked", () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it("should emit a mark numbers event which is sent to backend", async ()=> {
+      render(
+          <MemoryRouter>
+              <GamePage
+                socket={socket}
+                userId={"testUser1"}
+                members={membersArrayMock}
+                lobbyId={lobbyIdMock}
+                gameState={gameState}
+              />
+          </MemoryRouter>
+      )
+
+      const confirmBtn = screen.getByRole("button", {name: "Confirm"});
+      expect(confirmBtn).toBeVisible();
+      await user.click(confirmBtn);
+
+      expect(socket.emit).toHaveBeenCalledWith("mark_numbers", {
+        lobbyId: lobbyIdMock,
+        userId: userIdMock,
+        playerChoice: playerChoiceMock
+      })
+
+      expect(lobbyIdMock).toBe("1234");
+      expect(userIdMock).toBe("test_user");
+      expect(playerChoiceMock).toEqual({ row: "red", number: 2 });
+    })
+
+  });
+
+

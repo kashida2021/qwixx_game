@@ -215,6 +215,7 @@ export default function initializeSocketHandler(io: Server) {
       const responseData = { path: path, gameState: serializedGameLogic };
 
       io.to(lobbyId).emit("update_markedNumbers", responseData);
+      console.log(serializedGameLogic);
     });
   });
 }
