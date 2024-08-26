@@ -80,7 +80,7 @@ function App() {
       console.log(data.gameState);
     };
 
-    const updateMarkedNumbers = (data: {path: string; gameState: QwixxLogic }) => {
+    const updateMarkedNumbers = (data: {gameState: QwixxLogic }) => {
       setGameState(data.gameState);
       console.log("data received from backend", data);
     }

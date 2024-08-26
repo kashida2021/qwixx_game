@@ -211,8 +211,7 @@ export default function initializeSocketHandler(io: Server) {
       console.log(player.gameCard.MarkedNumbers);
 
       const serializedGameLogic = gameLogic ? gameLogic.serialize() : null;
-      const path = `/game/${lobbyId}`;
-      const responseData = { path: path, gameState: serializedGameLogic };
+      const responseData = { gameState: serializedGameLogic };
 
       io.to(lobbyId).emit("update_markedNumbers", responseData);
       console.log(serializedGameLogic);
