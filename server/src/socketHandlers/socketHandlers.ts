@@ -197,18 +197,19 @@ export default function initializeSocketHandler(io: Server) {
         return;
       }
 
-      const player = gameLogic.players.find((player) => player.name === userId);
+      //const player = gameLogic.players.find((player) => player.name === userId);
 
-      if (!player) {
-        console.log(`Player ${userId} not found in lobby`);
-        return;
-      }
+      //if (!player) {
+      //console.log(`Player ${userId} not found in lobby`);
+      //return;
+      //}
 
-      console.log(playerChoice);
+      //console.log(playerChoice);
 
       const { row: rowColour, num } = playerChoice;
-      player.gameCard.markNumbers(rowColour, num);
-      console.log(player.gameCard.MarkedNumbers);
+      //player.gameCard.markNumbers(rowColour, num);
+      //console.log(player.gameCard.MarkedNumbers);
+      gameLogic.makeMove(userId, rowColour, num);
 
       const serializedGameLogic = gameLogic ? gameLogic.serialize() : null;
       const responseData = { gameState: serializedGameLogic };
