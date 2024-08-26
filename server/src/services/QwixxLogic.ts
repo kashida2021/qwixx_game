@@ -60,11 +60,11 @@ export default class QwixxLogic {
     };
   }
 
-  static from(data: any): QwixxLogic {
-    const players = data.players.map((playerData: any) =>
-      Player.from({ name: playerData.name, gamecard: playerData })
-    );
-    const dice = Dice.from(data.dice);
-    return new QwixxLogic(players, dice);
-  }
+  //static from(data: any): QwixxLogic {
+  //const players = data.players.map((playerData: any) =>
+  //Player.from({ name: playerData.name, gamecard: playerData })
+  //);
+  //const dice = Dice.from(data.dice);
+  //return new QwixxLogic(players, dice);
+  //}
 }

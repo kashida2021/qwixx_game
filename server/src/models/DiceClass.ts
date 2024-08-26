@@ -56,9 +56,9 @@ export default class Dice {
     };
   }
 
-  static from(data: any): Dice {
-    const dice = new Dice(SixSidedDie);
-    dice._diceValues = data.diceValues;
-    return dice;
-  }
+  //static from(data: any): Dice {
+  //const dice = new Dice(SixSidedDie);
+  //dice._diceValues = data.diceValues;
+  //return dice;
+  //}
 }
