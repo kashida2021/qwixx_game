@@ -59,12 +59,4 @@ export default class QwixxLogic {
       dice: this._dice.serialize(),
     };
   }
-
-  //static from(data: any): QwixxLogic {
-  //const players = data.players.map((playerData: any) =>
-  //Player.from({ name: playerData.name, gamecard: playerData })
-  //);
-  //const dice = Dice.from(data.dice);
-  //return new QwixxLogic(players, dice);
-  //}
 }

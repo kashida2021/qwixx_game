@@ -34,14 +34,6 @@ export default class qwixxBaseGameCard {
     };
   }
 
-  //static from(data: any): qwixxBaseGameCard {
-  //const gameCard = new qwixxBaseGameCard();
-  //gameCard._rows = data.rows;
-  //gameCard._isLocked = data.isLocked;
-  //gameCard._penalties = new Array(data.penalties).fill(1);
-  //return gameCard;
-  //}
-
   get MarkedNumbers() {
     return this._rows;
   }

@@ -21,9 +21,4 @@ export default class Player {
   serialize() {
     return this._gameCard.serialize();
   }
-
-  //static from(data: any): Player {
-  //const gameCard = qwixxBaseGameCard.from(data.gameCard);
-  //return new Player(data.name, gameCard);
-  //}
 }
