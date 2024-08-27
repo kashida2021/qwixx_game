@@ -44,14 +44,6 @@ export default function initializeSocketHandler(io: Server) {
   // Object that maps each socket.id to corresponding userId - can access this when disconnects
   const userIdList: { [key: string]: string } = {};
 
-  // interface LobbyGameBoards {
-  //   [lobbyId: string]: {
-  //     [clientId: string]: GameBoard;
-  //   };
-  // }
-
-  // const lobbyGameBoards: LobbyGameBoards = {};
-
   io.on("connection", (socket) => {
     console.log(`A user connected: ${socket.id}`);
 
@@ -77,8 +69,6 @@ export default function initializeSocketHandler(io: Server) {
       //adds socket.id userId pair to userIdList object
       userIdList[socket.id] = userId;
 
-      //If the lobby doesn't exist, return error
-      //if (!lobbies[localLobbyId]) {
       if (!lobbiesMap[localLobbyId]) {
         callback({
           success: false,
@@ -177,45 +167,36 @@ export default function initializeSocketHandler(io: Server) {
     });
 
     socket.on("start_game", ({ lobbyId, members }) => {
-      lobbiesMap[lobbyId].startGame();
-
       // Create path data and serialized gamelogic object to the front end
-      const gameLogic = lobbiesMap[lobbyId].gameLogic;
-      const serializedGameLogic = gameLogic ? gameLogic.serialize() : null;
-      const path = `/game/${lobbyId}`;
-      const responseData = { path: path, gameState: serializedGameLogic };
 
-      io.to(lobbyId).emit("game_initialised", responseData);
-      console.log(serializedGameLogic);
+      const initialGameState = lobbiesMap[lobbyId].startGame();
+
+      if (initialGameState) {
+        const serializedInitialGameState = initialGameState.serialize();
+        const path = `/game/${lobbyId}`;
+        const responseData = {
+          path: path,
+          gameState: serializedInitialGameState,
+        };
+
+        io.to(lobbyId).emit("game_initialised", responseData);
+        console.log(serializedInitialGameState);
+      }
     });
 
     socket.on("mark_numbers", ({ lobbyId, userId, playerChoice }) => {
-      const gameLogic = lobbiesMap[lobbyId].gameLogic;
+      const gameState = lobbiesMap[lobbyId].gameLogic;
 
-      if (!gameLogic) {
-        console.log(`Game logic not found for lobby ${lobbyId}`);
-        return;
+      if (gameState) {
+        const { row: rowColour, num } = playerChoice;
+        gameState.makeMove(userId, rowColour, num);
+
+        const updatedGameState = gameState.serialize();
+        const responseData = { gameState: updatedGameState };
+
+        io.to(lobbyId).emit("update_markedNumbers", responseData);
+        console.log(updatedGameState);
       }
-
-      //const player = gameLogic.players.find((player) => player.name === userId);
-
-      //if (!player) {
-      //console.log(`Player ${userId} not found in lobby`);
-      //return;
-      //}
-
-      //console.log(playerChoice);
-
-      const { row: rowColour, num } = playerChoice;
-      //player.gameCard.markNumbers(rowColour, num);
-      //console.log(player.gameCard.MarkedNumbers);
-      gameLogic.makeMove(userId, rowColour, num);
-
-      const serializedGameLogic = gameLogic ? gameLogic.serialize() : null;
-      const responseData = { gameState: serializedGameLogic };
-
-      io.to(lobbyId).emit("update_markedNumbers", responseData);
-      console.log(serializedGameLogic);
     });
   });
 }

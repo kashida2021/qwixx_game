@@ -52,6 +52,8 @@ export default class Lobby {
     this._playerObjects = initializePlayers(this._players, gameCards);
     const dice = new Dice(SixSidedDie);
     this._gameLogic = new QwixxLogic(this._playerObjects, dice);
+
+    return this._gameLogic;
   }
 
   isFull(): boolean {

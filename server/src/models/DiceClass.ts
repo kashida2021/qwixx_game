@@ -55,10 +55,4 @@ export default class Dice {
       dice: this._diceValues,
     };
   }
-
-  //static from(data: any): Dice {
-  //const dice = new Dice(SixSidedDie);
-  //dice._diceValues = data.diceValues;
-  //return dice;
-  //}
 }
