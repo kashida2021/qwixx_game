@@ -236,6 +236,49 @@ describe("socket event handler test", () => {
           }
         );
       });
+
+      test("can mark a number", async () => {
+        generateUniqueRoomIdMock.mockReturnValueOnce("1234");
+
+        await new Promise<void>((resolve) => {
+          clientSocket1.emit("create_lobby", "clientSocket1", () => {
+            clientSocket2.emit(
+              "join_lobby",
+              {
+                localLobbyId: "1234",
+                userId: "clientSocket2",
+              },
+              () => {
+                clientSocket1.emit("start_game", { lobbyId: "1234" });
+                resolve();
+              }
+            );
+          });
+        });
+
+        await new Promise<void>((resolve) => {
+          clientSocket2.on("game_initialised", () => {
+            clientSocket2.emit("mark_numbers", {
+              lobbyId: "1234",
+              userId: "clientSocket2",
+              playerChoice: { row: "red", num: 5 },
+            });
+            resolve();
+          });
+        });
+
+        const updatedGameState: any = await waitFor(
+          clientSocket2,
+          "update_markedNumbers"
+        );
+
+        const player2 = updatedGameState.gameState.players.clientSocket2;
+        expect(player2).toEqual({
+          rows: { red: [5], yellow: [], green: [], blue: [] },
+          isLocked: { red: false, yellow: false, green: false, blue: false },
+          penalties: 0,
+        });
+      });
     });
   });
 });

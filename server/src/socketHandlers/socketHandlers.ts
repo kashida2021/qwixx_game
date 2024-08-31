@@ -178,22 +178,21 @@ export default function initializeSocketHandler(io: Server) {
         };
 
         io.to(lobbyId).emit("game_initialised", responseData);
-        console.log(initialGameState);
+        console.log("initialGameState:", initialGameState);
       }
     });
 
     socket.on("mark_numbers", ({ lobbyId, userId, playerChoice }) => {
-      const gameState = lobbiesMap[lobbyId].gameLogic;
-
-      if (gameState) {
+      const gameLogic = lobbiesMap[lobbyId].gameLogic;
+      
+      if (gameLogic) {
         const { row: rowColour, num } = playerChoice;
-        gameState.makeMove(userId, rowColour, num);
+        const updatedGameState = gameLogic.makeMove(userId, rowColour, num);
 
-        const updatedGameState = gameState.serialize();
         const responseData = { gameState: updatedGameState };
 
         io.to(lobbyId).emit("update_markedNumbers", responseData);
-        console.log(updatedGameState);
+        console.log("Updated game state:", updatedGameState);
       }
     });
   });
