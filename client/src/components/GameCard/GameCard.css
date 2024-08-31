@@ -43,7 +43,7 @@
     border-radius: 0.5rem;
 }
 
-.cell-btn.red, .lock-button.red{
+.cell-btn.red, .lock-btn.red{
     background-color: #ffdddd;
     color:#c44123;
 }
