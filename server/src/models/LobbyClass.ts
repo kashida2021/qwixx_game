@@ -53,7 +53,7 @@ export default class Lobby {
     const dice = new Dice(SixSidedDie);
     this._gameLogic = new QwixxLogic(this._playerObjects, dice);
 
-    return this._gameLogic;
+    return this._gameLogic.serialize();
   }
 
   isFull(): boolean {

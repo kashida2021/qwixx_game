@@ -166,21 +166,19 @@ export default function initializeSocketHandler(io: Server) {
       }
     });
 
-    socket.on("start_game", ({ lobbyId, members }) => {
-      // Create path data and serialized gamelogic object to the front end
-
-      const initialGameState = lobbiesMap[lobbyId].startGame();
-
+    socket.on("start_game", ({ lobbyId }) => {
+      const initialGameState = lobbiesMap[lobbyId]?.startGame();
+      //We haven't actually researched how error handling works with sockets.
+      //We will need to figure that out down the line.
       if (initialGameState) {
-        const serializedInitialGameState = initialGameState.serialize();
         const path = `/game/${lobbyId}`;
         const responseData = {
           path: path,
-          gameState: serializedInitialGameState,
+          gameState: initialGameState,
         };
 
         io.to(lobbyId).emit("game_initialised", responseData);
-        console.log(serializedInitialGameState);
+        console.log(initialGameState);
       }
     });
 
