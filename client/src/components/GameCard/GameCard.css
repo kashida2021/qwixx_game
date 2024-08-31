@@ -20,22 +20,23 @@
 }
 
 .row.red{
-    background-color: #f1330a;
+    background-color: #c44123;
 }
 
 .row.yellow{
-    background-color: #f8f113;
+    background-color: #fecf4d;
 }
 
 .row.green{
-    background-color: #2fda7a;
+    background-color: #458d59;
 }
 
 .row.blue{
-    background-color: #0b35f0;
+    background-color: #1e3184;
 }
 
 .cell-btn, .lock-btn{
+    display: inline-block;
     font-size: 1.5rem;
     width: 100%;
     border: none;
@@ -43,19 +44,24 @@
 }
 
 .cell-btn.red, .lock-button.red{
-    background-color: #ffdddd
+    background-color: #ffdddd;
+    color:#c44123;
 }
 
 .cell-btn.yellow, .lock-btn.yellow{
-    background-color: #ffffdd;
+    background-color: #fbfbf4;
+    color:#fecf4d;
 }
 
 .cell-btn.blue, .lock-btn.blue{
     background-color: #ddddff;
+    color:#1e3184;
 }
 
 .cell-btn.green, .lock-btn.green{
     background-color: #ddffdd;
+    color:#458d59;
+
 }
 
 .cell-btn:hover, .lock-btn:hover{
