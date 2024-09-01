@@ -13,7 +13,6 @@ export default class QwixxLogic {
 
   makeMove(playerName: string, row: string, num: number) {
     let colourToMark: rowColour;
-
     switch (row.toLowerCase()) {
       case "red":
         colourToMark = rowColour.Red;
