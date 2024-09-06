@@ -25,8 +25,8 @@ export default class Dice {
     };
   }
 
-  rollAllDice() {
-    let diceColours = Object.keys(this._dice);
+  rollAllDice(): Record<DiceColour, number> {
+    let diceColours = Object.keys(this._dice) as DiceColour[];
     diceColours.forEach((colour) => {
       const dieColour = colour as DiceColour;
       if (this._dice[dieColour].active === false) {

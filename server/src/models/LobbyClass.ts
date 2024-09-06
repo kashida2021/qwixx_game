@@ -4,6 +4,7 @@ import QwixxLogic from "../services/QwixxLogic";
 import { initializeGameCards } from "./InitializeGameCards";
 import { initializePlayers } from "./InitializePlayer";
 import SixSidedDie from "./SixSidedDieClass";
+import { DiceColour } from "../enums/DiceColours";
 
 export default class Lobby {
   private _lobbyId: string;
@@ -54,6 +55,10 @@ export default class Lobby {
     this._gameLogic = new QwixxLogic(this._playerObjects, dice);
 
     return this._gameLogic;
+  }
+
+  rollDice(): Record<DiceColour, number> | undefined {
+    return this._gameLogic?.rollDice();
   }
 
   isFull(): boolean {
