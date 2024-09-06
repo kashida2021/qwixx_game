@@ -5,8 +5,9 @@ import { Socket } from "socket.io-client";
 const DiceContainer: React.FC<{ diceState: Record<string, number>, socket: Socket, lobbyId: string, }> = ({
   diceState, socket, lobbyId,
 }) => {
+	console.log(diceState)
 	//TODO: When the other PR gets merged, we won't need to use ".dice"
-  const diceEntries = Object.entries(diceState.dice);
+  const diceEntries = Object.entries(diceState);
   
 	const colourMap: Record<string, string> = {
     white1: DiceColours.White,

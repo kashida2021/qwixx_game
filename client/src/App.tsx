@@ -99,10 +99,7 @@ function App() {
 
         return {
           ...prevState,
-          dice: {
-            ...prevState,
-            ...data.dice,
-          },
+          dice: data.dice,
         };
       });
     };

@@ -51,7 +51,7 @@ export const Game: React.FC<IGameProps> = ({ lobbyId, userId, members, gameState
 
   //     setGameBoardState(gameBoardState);
   // }
-
+  console.log(gameState)
   const filteredMembers = members.filter((member) => member !== userId);
 
   const handleNumberSelection = () => {
