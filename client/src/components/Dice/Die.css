@@ -1,0 +1,67 @@
+.dice {
+    padding: 4px;
+    width: 50px;
+    height: 50px;
+    border-radius: 10%;
+}
+
+.dice.white{
+    background-color: white;
+}
+.dice.red {
+    background-color: #c44123;
+}
+
+.dice.yellow {
+    background-color: #fecf4d;
+}
+
+.dice.green{
+    background-color: #458d59;
+}
+
+.dice.blue{
+    background-color: #1e3184;
+}
+
+.face {
+    display: grid;
+    grid-template-areas:
+        "a . c"
+        "e g f"
+        "d . b";
+        
+    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+    flex: 0 0 auto;
+    margin: 16px;
+    padding: 10px;
+    align-items: center;
+    justify-items: center;
+}
+
+.pip {
+    display: block;
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+}
+.pip:nth-child(2) {
+    grid-area: b;
+}
+.pip:nth-child(3) {
+    grid-area: c;
+}
+.pip:nth-child(4) {
+    grid-area: d;
+}
+.pip:nth-child(5) {
+    grid-area: e;
+}
+.pip:nth-child(6) {
+    grid-area: f;
+}
+
+.pip:nth-child(odd):last-child {
+    grid-area: g;
+}
