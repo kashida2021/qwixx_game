@@ -7,3 +7,25 @@
 	align-content: center;
 	align-items: center;
 }
+
+.left-side{
+	width: fit-content;
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.game-page-container{
+	display: flex;
+}
+
+.game-card-container{
+	flex: 1;
+	padding: 20px;
+}
+
+.opponent-zone, .player-zone{
+	margin-bottom: 20px;
+}
+
