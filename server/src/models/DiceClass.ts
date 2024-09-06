@@ -16,12 +16,12 @@ export default class Dice {
     };
 
     this._diceValues = {
-      [DiceColour.White1]: 0,
-      [DiceColour.White2]: 0,
-      [DiceColour.Red]: 0,
-      [DiceColour.Yellow]: 0,
-      [DiceColour.Green]: 0,
-      [DiceColour.Blue]: 0,
+      [DiceColour.White1]: 1,
+      [DiceColour.White2]: 1,
+      [DiceColour.Red]: 1,
+      [DiceColour.Yellow]: 1,
+      [DiceColour.Green]: 1,
+      [DiceColour.Blue]: 1,
     };
   }
 
