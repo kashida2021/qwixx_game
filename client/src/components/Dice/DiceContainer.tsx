@@ -1,4 +1,4 @@
-import Dice from "./Dice";
+import Die from "./Die";
 import { DiceColours } from "../../types/enums";
 import { Socket } from "socket.io-client";
 
@@ -24,7 +24,7 @@ const DiceContainer: React.FC<{ diceState: Record<string, number>, socket: Socke
   return (
     <div>
       {diceEntries.map(([colourKey, value]) => (
-        <Dice key={colourKey} colour={colourMap[colourKey]} colourKey={colourKey} value={value}/>
+        <Die key={colourKey} colour={colourMap[colourKey]} colourKey={colourKey} value={value}/>
       ))}
       <button onClick={handleDiceRoll}>Roll Dice</button>
     </div>
