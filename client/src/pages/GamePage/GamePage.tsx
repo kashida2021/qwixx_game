@@ -9,9 +9,9 @@ import { QwixxLogic } from "../../types/qwixxLogic";
 // import { rowColour} from "../../../../shared/types";
 import DiceContainer from "../../components/Dice/DiceContainer";
 //interface GameState {
-  //players: {
-    //[playerId: string]: GameCardData 
-  //}
+//players: {
+//[playerId: string]: GameCardData
+//}
 //}
 
 interface IGameProps {
@@ -23,12 +23,20 @@ interface IGameProps {
   // setGameBoardState: Dispatch<SetStateAction<GameBoard | null>>;
 }
 
-export const Game: React.FC<IGameProps> = ({ lobbyId, userId, members, gameState, socket }) => {
-  
-  const [playerChoice, setPlayerChoice] = useState<{row: string; num:number} | null>(null);
+export const Game: React.FC<IGameProps> = ({
+  lobbyId,
+  userId,
+  members,
+  gameState,
+  socket,
+}) => {
+  const [playerChoice, setPlayerChoice] = useState<{
+    row: string;
+    num: number;
+  } | null>(null);
   const handleCellClick = (rowColour: string, num: number) => {
-    setPlayerChoice({row: rowColour, num});
-  }
+    setPlayerChoice({ row: rowColour, num });
+  };
 
   useEffect(() => {
     console.log(playerChoice);
@@ -51,38 +59,50 @@ export const Game: React.FC<IGameProps> = ({ lobbyId, userId, members, gameState
 
   //     setGameBoardState(gameBoardState);
   // }
-  console.log(gameState)
   const filteredMembers = members.filter((member) => member !== userId);
 
   const handleNumberSelection = () => {
-    socket.emit("mark_numbers", {lobbyId, userId, playerChoice});
+    socket.emit("mark_numbers", { lobbyId, userId, playerChoice });
     console.log(playerChoice);
-  }
+  };
 
   return (
-    <div>
-      <h1>Lobby: {lobbyId}</h1>
+    <div className="game-page-container">
       {/* Left hand dice zone */}
-      <div>
-       <DiceContainer diceState={gameState.dice} socket={socket} lobbyId={lobbyId} /> 
+      <div className="left-side">
+        <h1>Lobby: {lobbyId}</h1>
+        <DiceContainer
+          diceState={gameState.dice}
+          socket={socket}
+          lobbyId={lobbyId}
+        />
       </div>
       <div className="game-card-container">
-				{/* Opponents' game cards */}
+        {/* Opponents' game cards */}
         <div
           className="opponent-zone"
           id="opponentZone"
           aria-label="opponent-zone"
         >
           {filteredMembers.map((member, index) => (
-            <GameCard key={index} member={member} isOpponent={true} gameCardData={gameState.players[member]} cellClick={handleCellClick}/>
+            <GameCard
+              key={index}
+              member={member}
+              isOpponent={true}
+              gameCardData={gameState.players[member]}
+              cellClick={handleCellClick}
+            />
           ))}
         </div>
-				{/* Player's game card */}
+        {/* Player's game card */}
         <div className="player-zone" id="playerZone" aria-label="player-zone">
-          <GameCard member={userId} isOpponent={false} gameCardData={gameState.players[userId]} cellClick={handleCellClick}/>
-          <button
-          onClick={handleNumberSelection}
-          >Confirm</button>
+          <GameCard
+            member={userId}
+            isOpponent={false}
+            gameCardData={gameState.players[userId]}
+            cellClick={handleCellClick}
+          />
+          <button onClick={handleNumberSelection}>Confirm</button>
         </div>
       </div>
     </div>

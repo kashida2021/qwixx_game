@@ -1,6 +1,7 @@
 import Die from "./Die";
 import { DiceColours } from "../../types/enums";
 import { Socket } from "socket.io-client";
+import "./DiceContainer.css"
 
 const DiceContainer: React.FC<{ diceState: Record<string, number>, socket: Socket, lobbyId: string, }> = ({
   diceState, socket, lobbyId,
@@ -23,7 +24,7 @@ const DiceContainer: React.FC<{ diceState: Record<string, number>, socket: Socke
 	}
 
   return (
-    <div>
+    <div className="dice-container">
       {diceEntries.map(([colourKey, value]) => (
         <Die key={colourKey} colour={colourMap[colourKey]} colourKey={colourKey} value={value}/>
       ))}
