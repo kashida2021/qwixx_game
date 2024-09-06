@@ -7,7 +7,7 @@ import { QwixxLogic } from "../../types/qwixxLogic";
 // import GameBoard from "../../../../shared/GameBoard";
 // import { SetStateAction, Dispatch } from "react";
 // import { rowColour} from "../../../../shared/types";
-
+import DiceContainer from "../../components/Dice/DiceContainer";
 //interface GameState {
   //players: {
     //[playerId: string]: GameCardData 
@@ -62,6 +62,10 @@ export const Game: React.FC<IGameProps> = ({ lobbyId, userId, members, gameState
   return (
     <div>
       <h1>Lobby: {lobbyId}</h1>
+      {/* Left hand dice zone */}
+      <div>
+       <DiceContainer diceState={gameState.dice} socket={socket} lobbyId={lobbyId} /> 
+      </div>
       <div className="game-card-container">
 				{/* Opponents' game cards */}
         <div
