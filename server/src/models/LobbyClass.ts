@@ -57,6 +57,7 @@ export default class Lobby {
     return this._gameLogic.serialize();
   }
 
+  //Can be a problem if we ever wanted to make another game but keep the lobby.
   rollDice(): Record<DiceColour, number> | undefined {
     return this._gameLogic?.rollDice();
   }

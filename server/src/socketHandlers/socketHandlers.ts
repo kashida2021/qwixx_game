@@ -195,5 +195,10 @@ export default function initializeSocketHandler(io: Server) {
         console.log("Updated game state:", updatedGameState);
       }
     });
+    
+    socket.on("roll_dice", ({ lobbyId }) => {
+      const diceResult = lobbiesMap[lobbyId].rollDice();
+      io.to(lobbyId).emit("dice_rolled", {dice: diceResult});
+    })
   });
 }
