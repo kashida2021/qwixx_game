@@ -1,7 +1,7 @@
 import "./Die.css";
 
 const Pip = ({ color }) => {
-  return <span className="pip" style={{ backgroundColor: color }} />;
+  return <span aria-label="die pip" className="pip" style={{ backgroundColor: color }} />;
 };
 
 
