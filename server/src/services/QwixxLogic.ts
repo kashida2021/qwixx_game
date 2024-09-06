@@ -1,6 +1,7 @@
 import Player from "../models/PlayerClass";
 import Dice from "../models/DiceClass";
 import { rowColour } from "../enums/rowColours";
+import { DiceColour } from "../enums/DiceColours";
 
 export default class QwixxLogic {
   private _playersArray: Player[];
@@ -11,9 +12,9 @@ export default class QwixxLogic {
     this._dice = dice;
   }
 
-  rollDice() {
+  rollDice(): Record<DiceColour, number> {
     return this._dice.rollAllDice();
-  };
+  }
 
   makeMove(playerName: string, row: string, num: number) {
     let colourToMark: rowColour;
