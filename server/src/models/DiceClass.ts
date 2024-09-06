@@ -25,7 +25,7 @@ export default class Dice {
     };
   }
 
-  rollAllDice(): void {
+  rollAllDice() {
     let diceColours = Object.keys(this._dice);
     diceColours.forEach((colour) => {
       const dieColour = colour as DiceColour;
@@ -36,6 +36,7 @@ export default class Dice {
         this._diceValues[dieColour] = this._dice[dieColour].value;
       }
     });
+    return this._diceValues;
   }
 
   get diceValues(): Record<DiceColour, number> {
