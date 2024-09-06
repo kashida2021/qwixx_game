@@ -70,20 +70,42 @@ function App() {
     //   setGameBoardState(gameBoard);
     // };
 
-    const onGameInitialised = (data: { path: string; gameState: QwixxLogic }) => {
+    const onGameInitialised = (data: {
+      path: string;
+      gameState: QwixxLogic;
+    }) => {
       // The received data object has a path property and players.
       // Players is an array of player objects that contain initial game card state.
-      // We might need to use it for setting up the game cards on the front end. 
-      // If not, we can refactor the data object to not include it. 
+      // We might need to use it for setting up the game cards on the front end.
+      // If not, we can refactor the data object to not include it.
       setGamePath(data.path);
       setGameState(data.gameState);
       console.log(data.gameState);
     };
 
-    const updateMarkedNumbers = (data: {gameState: QwixxLogic }) => {
+    const updateMarkedNumbers = (data: { gameState: QwixxLogic }) => {
       setGameState(data.gameState);
       console.log("data received from backend", data);
-    }
+    };
+
+    const handleDiceRolled = (data: { dice: QwixxLogic['dice'] }) => {
+      setGameState((prevState) => {
+        if (!prevState) {
+          return {
+            players: {},
+            dice: data.dice,
+          };
+        }
+
+        return {
+          ...prevState,
+          dice: {
+            ...prevState,
+            ...data.dice,
+          },
+        };
+      });
+    };
 
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
@@ -94,6 +116,7 @@ function App() {
     // socket.on("gameBoard_created", createGameBoard);
     socket.on("game_initialised", onGameInitialised);
     socket.on("update_markedNumbers", updateMarkedNumbers);
+    socket.on("dice_rolled", handleDiceRolled);
 
     return () => {
       socket.off("connect");
@@ -103,8 +126,9 @@ function App() {
       socket.off("user_disconnected");
       socket.off("current_members");
       // socket.off("gameBoard_created");
-      socket.off("game_initialised"); 
+      socket.off("game_initialised");
       socket.off("update_markedNumbers");
+      socket.off("dice_rolled");
     };
   }, []);
 
@@ -143,14 +167,14 @@ function App() {
           path={`/game/${lobbyId}`}
           element={
             gameState ? (
-            <Game
-              socket={socket}
-              lobbyId={lobbyId}
-              userId={userId}
-              members={members}
-              gameState={gameState}
-              // setGameBoardState={setGameBoardState}
-            />
+              <Game
+                socket={socket}
+                lobbyId={lobbyId}
+                userId={userId}
+                members={members}
+                gameState={gameState}
+                // setGameBoardState={setGameBoardState}
+              />
             ) : (
               <div>Loading...</div>
             )
