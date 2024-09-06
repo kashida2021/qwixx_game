@@ -52,8 +52,6 @@ export default class Dice {
   }
 
   serialize() {
-    return {
-      dice: this._diceValues,
-    };
+    return this._diceValues;
   }
 }

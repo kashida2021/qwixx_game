@@ -202,7 +202,6 @@ export default function initializeSocketHandler(io: Server) {
     socket.on("roll_dice", ({ lobbyId }) => {
       const diceResult = lobbiesMap[lobbyId].rollDice();
       io.to(lobbyId).emit("dice_rolled", {dice: diceResult});
-      console.log(diceResult);
     })
   });
 }
