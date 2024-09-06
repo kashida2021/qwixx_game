@@ -11,6 +11,10 @@ export default class QwixxLogic {
     this._dice = dice;
   }
 
+  rollDice() {
+    return this._dice.rollAllDice();
+  };
+
   makeMove(playerName: string, row: string, num: number) {
     let colourToMark: rowColour;
 

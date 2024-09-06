@@ -6,7 +6,7 @@ import Dice from "../../models/DiceClass";
 
 let mockPlayersArray: Player[];
 let mockDice: Dice;
-
+let testGame: QwixxLogic
 describe("Qwixx Logic integration tests:", () => {
   beforeEach(() => {
     const mockgameCard1 = new qwixxBaseGameCard();
@@ -18,10 +18,10 @@ describe("Qwixx Logic integration tests:", () => {
     mockDice = new Dice(SixSidedDie);
 
     mockPlayersArray = [mockPlayer1, mockPlayer2];
+
+    testGame = new QwixxLogic(mockPlayersArray, mockDice);
   });
   it("should return all players", () => {
-    const testGame = new QwixxLogic(mockPlayersArray, mockDice);
-
     expect(testGame.players.length).toBe(2);
     testGame.players.forEach((player) => {
       expect(player.gameCard instanceof qwixxBaseGameCard).toBe(true);
@@ -29,8 +29,6 @@ describe("Qwixx Logic integration tests:", () => {
   });
 
   it("should make a move and return the correct result", () => {
-    const testGame = new QwixxLogic(mockPlayersArray, mockDice);
-
     const mockPlayer1MoveResult = testGame.makeMove("test-player1", "red", 1);
     expect(mockPlayer1MoveResult).toEqual({
       playerName: "test-player1",
@@ -51,17 +49,21 @@ describe("Qwixx Logic integration tests:", () => {
   });
 
   it("should return a message if the player isn't found when making a move", () => {
-    const testGame = new QwixxLogic(mockPlayersArray, mockDice);
-
     const nonPlayerResult = testGame.makeMove("test-player3", "red", 1);
     expect(nonPlayerResult).toBe("Player not found");
   });
 
   it("should throw an error if colour doesn't exist in rowColour enum", () => {
-    const testGame = new QwixxLogic(mockPlayersArray, mockDice);
-
     expect(() => {
       testGame.makeMove("test-player1", "orange", 1);
     }).toThrow("Invalid colour");
   });
+
+  it("should roll all dice and return a value", () => {
+    const diceValues = testGame.rollDice();
+    Object.values(diceValues).forEach((value) => {
+      expect(value).toBeGreaterThanOrEqual(1);
+      expect(value).toBeLessThanOrEqual(6);
+    })
+  })
 });
