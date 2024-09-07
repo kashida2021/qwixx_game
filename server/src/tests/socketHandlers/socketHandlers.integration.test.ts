@@ -5,6 +5,13 @@ import { type AddressInfo } from "node:net";
 import { io as ioc, type Socket as ClientSocket } from "socket.io-client";
 import { Server, type Socket as ServerSocket } from "socket.io";
 import initializeSocketHandler from "../../socketHandlers/socketHandlers";
+import { generateUniqueRoomId } from "../../utils/roomUtils";
+
+const generateUniqueRoomIdMock = generateUniqueRoomId as jest.MockedFunction<
+  typeof generateUniqueRoomId
+>;
+
+jest.mock("../../utils/roomUtils");
 
 describe("socket event handler test", () => {
   let io: Server,
@@ -26,9 +33,12 @@ describe("socket event handler test", () => {
           done();
         });
       });
+
+      generateUniqueRoomIdMock.mockReturnValue("1234");
     });
 
     afterEach((done) => {
+      jest.clearAllMocks();
       io.close();
       clientSocket1.disconnect();
       done();
@@ -63,7 +73,7 @@ describe("socket event handler test", () => {
     });
   });
 
-  describe.skip("socket event handlers with 2 clients", () => {
+  describe("socket event handlers with 2 clients", () => {
     beforeEach((done) => {
       const httpServer = createServer();
       io = new Server(httpServer);
@@ -86,17 +96,38 @@ describe("socket event handler test", () => {
       done();
     });
 
-    it.skip("Can start a game", (done) => {
+    it("Can start a game", (done) => {
+     
       clientSocket1.emit("create_lobby", "clientSocket1", () => {
-        clientSocket2.emit("join_lobby", {
-          localLobbyId: "1234",
-          userId: "clientSocket2",
-        }, () => {
-            console.log(io.sockets.adapter.rooms.get("1234")); 
-            done(); 
-        });
+        clientSocket2.emit(
+          "join_lobby",
+          {
+            localLobbyId: "1234",
+            userId: "clientSocket2",
+          },
+          () => {
+            clientSocket1.emit("start_game", { lobbyId: "1234" });
+          }
+        );
       });
 
+      clientSocket1.on(
+        "game_initialised",
+        (data: { path: string; gameState: any }) => {
+          expect(data.path).toBe("/game/1234");
+          expect(data.gameState.players.clientSocket1).toEqual({
+            rows: { red: [], yellow: [], green: [], blue: [] },
+            isLocked: { red: false, yellow: false, green: false, blue: false },
+            penalties: 0,
+          });
+           expect(data.gameState.players.clientSocket2).toEqual({
+            rows: { red: [], yellow: [], green: [], blue: [] },
+            isLocked: { red: false, yellow: false, green: false, blue: false },
+            penalties: 0,
+          });
+          done();
+        }
+      );
     });
   });
 });

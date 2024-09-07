@@ -31,23 +31,22 @@ describe("Qwixx Logic integration tests:", () => {
   it("should make a move and return the correct result", () => {
     const testGame = new QwixxLogic(mockPlayersArray, mockDice);
 
-    const mockPlayer1MoveResult = testGame.makeMove("test-player1", "red", 1);
-    expect(mockPlayer1MoveResult).toEqual({
-      playerName: "test-player1",
-      row: "red",
-      num: 1,
-    });
+    const gameState = testGame.makeMove("test-player1", "red", 1);
+    if (typeof gameState === "object") {
+      expect(gameState.players).toHaveProperty("test-player1");
+      expect(gameState.players).toHaveProperty("test-player2");
+      expect(gameState.players["test-player1"]).toHaveProperty("penalties", 0);
+      expect(gameState.players["test-player2"]).toHaveProperty("penalties", 0);
 
-    const mockPlayer2MoveResult = testGame.makeMove(
-      "test-player2",
-      "yellow",
-      1
-    );
-    expect(mockPlayer2MoveResult).toEqual({
-      playerName: "test-player2",
-      row: "yellow",
-      num: 1,
-    });
+      expect(gameState.dice).toMatchObject({
+        white1: expect.any(Number),
+        white2: expect.any(Number),
+        red: expect.any(Number),
+        yellow: expect.any(Number),
+        green: expect.any(Number),
+        blue: expect.any(Number),
+      });
+    }
   });
 
   it("should return a message if the player isn't found when making a move", () => {

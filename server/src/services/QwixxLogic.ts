@@ -13,7 +13,6 @@ export default class QwixxLogic {
 
   makeMove(playerName: string, row: string, num: number) {
     let colourToMark: rowColour;
-
     switch (row.toLowerCase()) {
       case "red":
         colourToMark = rowColour.Red;
@@ -37,7 +36,8 @@ export default class QwixxLogic {
         if (player.gameCard.markNumbers(colourToMark, num)) {
           // Only returning the event data.
           // Might need to refactor later if should send back a complete state of a player's scoreboard.
-          return { playerName, row, num };
+         // return { playerName, row, num };
+         return this.serialize();
         }
       }
     }

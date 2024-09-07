@@ -56,7 +56,7 @@ export const Game: React.FC<IGameProps> = ({ lobbyId, userId, members, gameState
 
   const handleNumberSelection = () => {
     socket.emit("mark_numbers", {lobbyId, userId, playerChoice});
-    console.log(playerChoice);
+    console.log("player's choice:", playerChoice);
   }
 
   return (
