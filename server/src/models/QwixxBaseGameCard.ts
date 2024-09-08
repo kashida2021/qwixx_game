@@ -1,9 +1,9 @@
 import { rowColour } from "../enums/rowColours";
 
-export default class GameBoard {
+export default class qwixxBaseGameCard {
   private _rows: { [key in rowColour]: number[] };
   private _numbers: number[];
-  private _lockedRows: string[];
+  private _isLocked: { [key in rowColour]: boolean };
   private _penalties: number[];
 
   constructor() {
@@ -16,27 +16,22 @@ export default class GameBoard {
 
     this._numbers = Array.from({ length: 12 }, (_, i) => i + 2);
 
-    this._lockedRows = [];
+    this._isLocked = {
+      [rowColour.Red]: false,
+      [rowColour.Yellow]: false,
+      [rowColour.Green]: false,
+      [rowColour.Blue]: false,
+    };
 
     this._penalties = [];
   }
 
   serialize() {
     return {
-      gameBoard: this._rows,
-      numbers: this._numbers,
-      lockedRows: this._lockedRows,
-      penalties: this._penalties,
+      rows: this._rows,
+      isLocked: this._isLocked,
+      penalties: this._penalties.length,
     };
-  }
-
-  static from(data: any): GameBoard {
-    const gameBoard = new GameBoard();
-    gameBoard._rows = data.gameBoard;
-    gameBoard._numbers = data.numbers;
-    gameBoard._lockedRows = data.lockedRows;
-    gameBoard._penalties = data.penalties;
-    return gameBoard;
   }
 
   get MarkedNumbers() {
@@ -50,14 +45,17 @@ export default class GameBoard {
   markNumbers(row: rowColour, number: number) {
     if (!this._rows[row].includes(number)) {
       this._rows[row].push(number);
+      return true;
+    } else {
+      return false;
     }
   }
 
-  getLockedRows() {
-    return this._lockedRows;
+  get isLocked() {
+    return this._isLocked;
   }
 
-  getPenalties() {
+  get penalties() {
     return this._penalties;
   }
 }

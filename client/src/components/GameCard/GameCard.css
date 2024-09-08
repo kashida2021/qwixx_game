@@ -1,0 +1,89 @@
+.game-card{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.row{
+    display: flex;
+    justify-content: space-around;
+    max-width: 800px;
+    padding: 5px;
+    gap: 0.5rem;
+}
+
+.row > li{
+    width: 4rem;
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.row.red{
+    background-color: #c44123;
+}
+
+.row.yellow{
+    background-color: #fecf4d;
+}
+
+.row.green{
+    background-color: #458d59;
+}
+
+.row.blue{
+    background-color: #1e3184;
+}
+
+.cell-btn, .lock-btn{
+    display: inline-block;
+    font-size: 1.5rem;
+    width: 100%;
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.cell-btn.red, .lock-btn.red{
+    background-color: #ffdddd;
+    color:#c44123;
+}
+
+.cell-btn.yellow, .lock-btn.yellow{
+    background-color: #fbfbf4;
+    color:#fecf4d;
+}
+
+.cell-btn.blue, .lock-btn.blue{
+    background-color: #ddddff;
+    color:#1e3184;
+}
+
+.cell-btn.green, .lock-btn.green{
+    background-color: #ddffdd;
+    color:#458d59;
+
+}
+
+.cell-btn:hover, .lock-btn:hover{
+    box-shadow: 0.25rem 0.25rem 0.25rem 0 rgba(0,0,0,0.24);
+    cursor: pointer;
+}
+
+.penalties-container > ul{
+    display: flex;
+    gap: 1rem;
+}
+
+.penalties-container > ul > li{
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.cell-btn.clicked {
+    background-color: black;
+    color: white;
+  }
+
+  
+
+

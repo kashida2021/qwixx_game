@@ -1,6 +1,6 @@
-import "./Lobby.css";
+import "./LobbyPage.css";
 import { Socket } from "socket.io-client";
-import { SetStateAction, Dispatch, MouseEvent } from "react";
+import { SetStateAction, Dispatch, MouseEvent, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface ILobbyProps {
@@ -11,6 +11,7 @@ interface ILobbyProps {
   setMembers: Dispatch<SetStateAction<string[]>>;
   notifications: string[];
   setNotifications: Dispatch<SetStateAction<string[]>>;
+  gamePath: string;
 }
 
 //The lobby page should:
@@ -38,10 +39,11 @@ export const Lobby: React.FC<ILobbyProps> = ({
   notifications,
   setMembers,
   setNotifications,
+  gamePath,
 }) => {
   const navigate = useNavigate();
 
-  const leaveRoom = (e: MouseEvent<HTMLButtonElement>): void => {
+  const handleLeaveRoom = (e: MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
     if (lobbyId && userId) {
       socket.emit(
@@ -58,36 +60,27 @@ export const Lobby: React.FC<ILobbyProps> = ({
     }
   };
 
-  const startGame = (e: MouseEvent<HTMLButtonElement>): void => {
+  const handleStartGame = (e: MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
-    if (lobbyId && userId) {
-      socket.emit(
-        "start_game",
-        { lobbyId, userId },
-        (response: { success: boolean }) => {
-          if (response.success) {
-            navigate(`/game/${lobbyId}`);
-          }
-        }
-      );
+    if (members.length < 2) {
+      setNotifications(["Not enough players to start game."]);
+      return;
+    }
+
+    if (members.length > 5) {
+      setNotifications(["There are too many players to start the game."]);
+      return;
+    }
+
+    if (lobbyId && members.length >= 2 && members.length <= 5) {
+      socket.emit("start_game", { lobbyId, members });
+      return; 
     }
   };
 
-  //useEffect(() => {
-  // should these be stored in handler functions
-  //socket.on("user_left", (lobbyMembers, user) => {
-  // setMembers(lobbyMembers);
-  //setNotifications((prevNotifications) => [...prevNotifications, `${user} has left`])
-  //})
-
-  //socket.on("user_disconnected", (lobbyMembers, user) => {
-  //setMembers(lobbyMembers);
-  //setNotifications((prevNotifications) => [...prevNotifications, `${user} has disconnected`])
-  //})
-
-  //socket.on("current_members", (lobbyMembers) => {
-  //setMembers(lobbyMembers);
-  //})
+  useEffect(() => {
+    navigate(gamePath);
+  }, [navigate, gamePath]);
 
   return (
     <div className="Lobby-container">
@@ -113,8 +106,8 @@ export const Lobby: React.FC<ILobbyProps> = ({
           ))}
         </ul>
         <form>
-          <button onClick={startGame}>Start Game</button>
-          <button onClick={leaveRoom}>Leave Lobby</button>
+          <button onClick={handleStartGame}>Start Game</button>
+          <button onClick={handleLeaveRoom}>Leave Lobby</button>
         </form>
       </div>
     </div>

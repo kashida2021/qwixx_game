@@ -6,6 +6,9 @@ import { io as ioc, type Socket as ClientSocket } from "socket.io-client";
 import { Server, type Socket as ServerSocket } from "socket.io";
 import initializeSocketHandler from "../../socketHandlers/socketHandlers";
 import { generateUniqueRoomId } from "../../utils/roomUtils";
+import Player from "../../models/PlayerClass";
+import GameBoard from "../../models/QwixxBaseGameCard";
+import QwixxLogic from "../../services/QwixxLogic";
 
 const generateUniqueRoomIdMock = generateUniqueRoomId as jest.MockedFunction<
   typeof generateUniqueRoomId
@@ -188,7 +191,7 @@ describe("socket event handler test", () => {
               () => {
                 clientSocket1.emit("start_game", {
                   lobbyId: "1234",
-                  playerNames: ["clientSocket1", "clientSocket2"],
+                  members: ["clientSocket1", "clientSocket2"],
                 });
                 resolve();
               }
@@ -198,10 +201,83 @@ describe("socket event handler test", () => {
 
         const gameStartedData: any = await waitFor(
           clientSocket1,
-          "game_started"
+          "game_initialised"
         );
-        expect(gameStartedData[0]._name).toBe("clientSocket1");
-        expect(gameStartedData[1]._name).toBe("clientSocket2");
+
+        expect(gameStartedData.path).toBe("/game/1234");
+
+        expect(
+          gameStartedData.gameState.players["clientSocket1"]
+        ).toBeDefined();
+        expect(
+          gameStartedData.gameState.players["clientSocket1"].rows
+        ).toBeTruthy();
+        expect(gameStartedData.gameState.players["clientSocket1"].rows).toEqual(
+          {
+            red: [],
+            yellow: [],
+            green: [],
+            blue: [],
+          }
+        );
+
+        expect(
+          gameStartedData.gameState.players["clientSocket2"]
+        ).toBeDefined();
+        expect(
+          gameStartedData.gameState.players["clientSocket2"].rows
+        ).toBeTruthy();
+        expect(gameStartedData.gameState.players["clientSocket2"].rows).toEqual(
+          {
+            red: [],
+            yellow: [],
+            green: [],
+            blue: [],
+          }
+        );
+      });
+
+      test("can mark a number", async () => {
+        generateUniqueRoomIdMock.mockReturnValueOnce("1234");
+
+        await new Promise<void>((resolve) => {
+          clientSocket1.emit("create_lobby", "clientSocket1", () => {
+            clientSocket2.emit(
+              "join_lobby",
+              {
+                localLobbyId: "1234",
+                userId: "clientSocket2",
+              },
+              () => {
+                clientSocket1.emit("start_game", { lobbyId: "1234" });
+                resolve();
+              }
+            );
+          });
+        });
+
+        await new Promise<void>((resolve) => {
+          clientSocket2.on("game_initialised", () => {
+            clientSocket2.emit("mark_numbers", {
+              lobbyId: "1234",
+              userId: "clientSocket2",
+              playerChoice: { row: "red", num: 5 },
+            });
+            resolve();
+          });
+        });
+
+        const updatedGameState: any = await waitFor(
+          clientSocket2,
+          "update_markedNumbers"
+        );
+
+        const player2 = updatedGameState.gameState.players.clientSocket2;
+        expect(player2).toEqual({
+          rows: { red: [5], yellow: [], green: [], blue: [] },
+          isLocked: { red: false, yellow: false, green: false, blue: false },
+          penalties: 0,
+        });
       });
     });
   });

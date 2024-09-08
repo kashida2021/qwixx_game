@@ -9,10 +9,10 @@ describe("Dice integration tests", () => {
     testDice = new Dice(SixSidedDie);
   });
 
-  it("should initialize with all dice values as 0", () => {
+  it("should initialize with all dice values as 1", () => {
     const diceValues = Object.values(testDice.diceValues);
     diceValues.forEach((value) => {
-      expect(value).toBe(0);
+      expect(value).toBe(1);
     });
   });
 

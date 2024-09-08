@@ -16,17 +16,17 @@ export default class Dice {
     };
 
     this._diceValues = {
-      [DiceColour.White1]: 0,
-      [DiceColour.White2]: 0,
-      [DiceColour.Red]: 0,
-      [DiceColour.Yellow]: 0,
-      [DiceColour.Green]: 0,
-      [DiceColour.Blue]: 0,
+      [DiceColour.White1]: 1,
+      [DiceColour.White2]: 1,
+      [DiceColour.Red]: 1,
+      [DiceColour.Yellow]: 1,
+      [DiceColour.Green]: 1,
+      [DiceColour.Blue]: 1,
     };
   }
 
-  rollAllDice(): void {
-    let diceColours = Object.keys(this._dice);
+  rollAllDice(): Record<DiceColour, number> {
+    let diceColours = Object.keys(this._dice) as DiceColour[];
     diceColours.forEach((colour) => {
       const dieColour = colour as DiceColour;
       if (this._dice[dieColour].active === false) {
@@ -36,6 +36,7 @@ export default class Dice {
         this._diceValues[dieColour] = this._dice[dieColour].value;
       }
     });
+    return this._diceValues;
   }
 
   get diceValues(): Record<DiceColour, number> {
@@ -48,5 +49,9 @@ export default class Dice {
     } else {
       throw new Error(`Die colour ${colour} does not exist`);
     }
+  }
+
+  serialize() {
+    return this._diceValues;
   }
 }

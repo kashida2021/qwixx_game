@@ -1,7 +1,7 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import Modal from "../../../src/components/modal/modal";
+import Modal from "../../../src/components/Modal/modal";
 import React from "react";
 import { MemoryRouter } from "react-router-dom";
 import "@testing-library/jest-dom";
