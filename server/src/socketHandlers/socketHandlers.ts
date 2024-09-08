@@ -196,6 +196,16 @@ export default function initializeSocketHandler(io: Server) {
           console.log("Updated game state:", updatedGameState);
         }
       }
+
+      if (gameLogic?.haveAllPlayersSubmitted()) {
+        gameLogic.resetAllPlayersSubmission();
+        gameLogic.nextTurn();
+
+        const serializedGameState = lobbiesMap[lobbyId].serializedGameLogic;
+
+        io.to(lobbyId).emit("turn_ended", { gameState: serializedGameState });
+        console.log("turn ended", serializedGameState);
+      }
     });
 
     socket.on("roll_dice", ({ lobbyId }) => {
