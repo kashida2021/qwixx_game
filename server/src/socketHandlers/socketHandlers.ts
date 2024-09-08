@@ -184,21 +184,23 @@ export default function initializeSocketHandler(io: Server) {
 
     socket.on("mark_numbers", ({ lobbyId, userId, playerChoice }) => {
       const gameLogic = lobbiesMap[lobbyId].gameLogic;
-      
+
       if (gameLogic) {
-        const { row: rowColour, num } = playerChoice;
-        const updatedGameState = gameLogic.makeMove(userId, rowColour, num);
+        if (playerChoice) {
+          const { row: rowColour, num } = playerChoice;
+          const updatedGameState = gameLogic.makeMove(userId, rowColour, num);
 
-        const responseData = { gameState: updatedGameState };
+          const responseData = { gameState: updatedGameState };
 
-        io.to(lobbyId).emit("update_markedNumbers", responseData);
-        console.log("Updated game state:", updatedGameState);
+          io.to(lobbyId).emit("update_markedNumbers", responseData);
+          console.log("Updated game state:", updatedGameState);
+        }
       }
     });
-    
+
     socket.on("roll_dice", ({ lobbyId }) => {
       const diceResult = lobbiesMap[lobbyId].rollDice();
-      io.to(lobbyId).emit("dice_rolled", {dice: diceResult});
-    })
+      io.to(lobbyId).emit("dice_rolled", { dice: diceResult });
+    });
   });
 }
