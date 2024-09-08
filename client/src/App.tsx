@@ -99,6 +99,7 @@ function App() {
           return {
             players: {},
             dice: data.dice,
+            activePlayer: "",
           };
         }
 

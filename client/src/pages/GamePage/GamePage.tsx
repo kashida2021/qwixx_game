@@ -75,6 +75,8 @@ export const Game: React.FC<IGameProps> = ({
           diceState={gameState.dice}
           socket={socket}
           lobbyId={lobbyId}
+          gameState={gameState}
+          userId= {userId}
         />
       </div>
       <div className="game-card-container">
