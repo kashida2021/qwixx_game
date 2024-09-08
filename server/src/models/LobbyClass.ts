@@ -6,6 +6,11 @@ import { initializePlayers } from "./InitializePlayer";
 import SixSidedDie from "./SixSidedDieClass";
 import { DiceColour } from "../enums/DiceColours";
 
+interface SerializedGameState {
+  players: Record<string, any>;
+  dice: Record<DiceColour, number>;
+  activePlayer: string;
+}
 export default class Lobby {
   private _lobbyId: string;
   private _players: string[];
@@ -33,6 +38,10 @@ export default class Lobby {
 
   get gameLogic(): QwixxLogic | null {
     return this._gameLogic;
+  }
+
+  get serializedGameLogic(): SerializedGameState | undefined {
+    return this._gameLogic?.serialize();
   }
 
   addPlayer(userId: string): boolean {

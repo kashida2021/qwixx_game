@@ -17,8 +17,13 @@ export default class Player {
   get hasSubmittedChoice(): boolean {
     return this._hasSubmittedChoice;
   }
+
   resetSubmission() {
     this._hasSubmittedChoice = false;
+  }
+
+  markSubmitted() {
+    this._hasSubmittedChoice = true;
   }
 
   //Using a getter for gameCard for now to allow quicker protoyping

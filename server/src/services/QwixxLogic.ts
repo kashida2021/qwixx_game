@@ -61,6 +61,7 @@ export default class QwixxLogic {
           // Only returning the event data.
           // Might need to refactor later if should send back a complete state of a player's scoreboard.
           // return { playerName, row, num };
+          player.markSubmitted();
           return this.serialize();
         }
       }
