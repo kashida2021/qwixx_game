@@ -2,14 +2,23 @@ import qwixxBaseGameCard from "./QwixxBaseGameCard";
 export default class Player {
   private _name;
   private _gameCard: qwixxBaseGameCard;
+  private _hasSubmittedChoice = false;
 
   constructor(name: string, gameCard: qwixxBaseGameCard) {
     this._name = name;
     this._gameCard = gameCard;
+    this._hasSubmittedChoice = false;
   }
 
   get name(): string {
     return this._name;
+  }
+
+  get hasSubmittedChoice(): boolean {
+    return this._hasSubmittedChoice;
+  }
+  resetSubmission() {
+    this._hasSubmittedChoice = false;
   }
 
   //Using a getter for gameCard for now to allow quicker protoyping
