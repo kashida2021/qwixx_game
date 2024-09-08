@@ -6,14 +6,25 @@ import { DiceColour } from "../enums/DiceColours";
 export default class QwixxLogic {
   private _playersArray: Player[];
   private _dice: Dice;
+  private _currentTurnIndex = 0;
 
   constructor(players: Player[], dice: Dice) {
     this._playersArray = players;
     this._dice = dice;
+    this._currentTurnIndex = 0;
   }
 
   rollDice(): Record<DiceColour, number> {
     return this._dice.rollAllDice();
+  }
+
+  get currentPlayer() {
+    return this.players[this._currentTurnIndex];
+  }
+
+  nextTurn() {
+    return (this._currentTurnIndex =
+      (this._currentTurnIndex + 1) % this._playersArray.length);
   }
 
   makeMove(playerName: string, row: string, num: number) {
@@ -41,8 +52,8 @@ export default class QwixxLogic {
         if (player.gameCard.markNumbers(colourToMark, num)) {
           // Only returning the event data.
           // Might need to refactor later if should send back a complete state of a player's scoreboard.
-         // return { playerName, row, num };
-         return this.serialize();
+          // return { playerName, row, num };
+          return this.serialize();
         }
       }
     }
@@ -62,6 +73,7 @@ export default class QwixxLogic {
     return {
       players: serializedPlayers,
       dice: this._dice.serialize(),
+      activePlayer: this.currentPlayer.name,
     };
   }
 }
