@@ -24,4 +24,5 @@ export interface QwixxLogic {
     green: number;
     blue: number;
   };
+  activePlayer: string;
 }
