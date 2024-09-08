@@ -27,6 +27,14 @@ export default class QwixxLogic {
       (this._currentTurnIndex + 1) % this._playersArray.length);
   }
 
+  resetAllPlayersSubmission() {
+    this._playersArray.forEach((player) => player.resetSubmission());
+  }
+
+  haveAllPlayersSubmitted(): boolean {
+    return this._playersArray.every((player) => player.hasSubmittedChoice);
+  }
+
   makeMove(playerName: string, row: string, num: number) {
     let colourToMark: rowColour;
     switch (row.toLowerCase()) {
