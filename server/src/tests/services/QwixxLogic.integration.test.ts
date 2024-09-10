@@ -50,6 +50,17 @@ describe("Qwixx Logic integration tests:", () => {
     }
   });
 
+  it("should updated hasSubmitted when a player makes a move", () => {
+    testGame.makeMove("test-player1", "red", 1);
+    expect(testGame.players[0].hasSubmittedChoice).toBe(true);
+  });
+
+  it("should update haveAllPlayersSubmitted when every player has made a move", () => {
+    testGame.makeMove("test-player1", "red", 1);
+    testGame.makeMove("test-player2", "blue", 3);
+    expect(testGame.haveAllPlayersSubmitted()).toEqual(true);
+  });
+
   it("should return a message if the player isn't found when making a move", () => {
     const nonPlayerResult = testGame.makeMove("test-player3", "red", 1);
     expect(nonPlayerResult).toBe("Player not found");
