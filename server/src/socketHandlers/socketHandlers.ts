@@ -185,7 +185,7 @@ export default function initializeSocketHandler(io: Server) {
     socket.on("mark_numbers", ({ lobbyId, userId, playerChoice }) => {
       const gameLogic = lobbiesMap[lobbyId].gameLogic;
 
-      if (gameLogic) {
+      if (gameLogic && gameLogic.hasRolled) {
         if (playerChoice) {
           const { row: rowColour, num } = playerChoice;
           const updatedGameState = gameLogic.makeMove(userId, rowColour, num);
