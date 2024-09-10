@@ -6,7 +6,7 @@ import Dice from "../../models/DiceClass";
 
 let mockPlayersArray: Player[];
 let mockDice: Dice;
-let testGame: QwixxLogic
+let testGame: QwixxLogic;
 describe("Qwixx Logic integration tests:", () => {
   beforeEach(() => {
     const mockgameCard1 = new qwixxBaseGameCard();
@@ -65,6 +65,15 @@ describe("Qwixx Logic integration tests:", () => {
     Object.values(diceValues).forEach((value) => {
       expect(value).toBeGreaterThanOrEqual(1);
       expect(value).toBeLessThanOrEqual(6);
-    })
-  })
+    });
+  });
+
+  it("should have an active player, which is the first player players array", () => {
+    expect(testGame.currentPlayer.name).toBe("test-player1");
+  });
+
+  it("should change active player to the next player at end of the turn", () => {
+    testGame.nextTurn();
+    expect(testGame.currentPlayer.name).toBe("test-player2");
+  });
 });
