@@ -21,6 +21,7 @@ describe("Qwixx Logic integration tests:", () => {
 
     testGame = new QwixxLogic(mockPlayersArray, mockDice);
   });
+
   it("should return all players", () => {
     expect(testGame.players.length).toBe(2);
     testGame.players.forEach((player) => {
@@ -66,6 +67,11 @@ describe("Qwixx Logic integration tests:", () => {
       expect(value).toBeGreaterThanOrEqual(1);
       expect(value).toBeLessThanOrEqual(6);
     });
+  });
+
+  it("should update the hasRolled property to true once a dice has been rolled", () => {
+    testGame.rollDice();
+    expect(testGame.hasRolled).toBe(true);
   });
 
   it("should have an active player, which is the first player players array", () => {
