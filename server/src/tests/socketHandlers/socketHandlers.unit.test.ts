@@ -257,7 +257,14 @@ describe("socket event handler test", () => {
         });
 
         await new Promise<void>((resolve) => {
-          clientSocket2.on("game_initialised", () => {
+          clientSocket1.on("game_initialised", () => {
+            clientSocket1.emit("roll_dice", { lobbyId: "1234" });
+            resolve();
+          });
+        });
+
+        await new Promise<void>((resolve) => {
+          clientSocket2.on("dice_rolled", () => {
             clientSocket2.emit("mark_numbers", {
               lobbyId: "1234",
               userId: "clientSocket2",
