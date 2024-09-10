@@ -35,10 +35,56 @@ const diceState = {
   blue: 1,
 };
 
+const mockGameState = {
+  players: {
+    testUser1: {
+      rows: {
+        red: [],
+        yellow: [],
+        green: [],
+        blue: [],
+      },
+      isLocked: {
+        red: false,
+        yellow: false,
+        green: false,
+        blue: false,
+      },
+      penalties: 0,
+    },
+    testUser2: {
+      rows: {
+        red: [],
+        yellow: [],
+        green: [],
+        blue: [],
+      },
+      isLocked: {
+        red: false,
+        yellow: false,
+        green: false,
+        blue: false,
+      },
+      penalties: 0,
+    },
+  },
+  dice:{
+    white1: 1,
+    white2: 2,
+    red: 3,
+    yellow: 4,
+    green: 5,
+    blue: 6,
+  },
+  activePlayer: "testUser1"
+};
+
+const mockUserId = "testUser1"
+
 describe("DiceContainer test", () => {
   test("It renders the dice with correct number of pips", () => {
     render(
-      <DiceContainer diceState={diceState} lobbyId="1234" socket={socket} />
+      <DiceContainer diceState={diceState} lobbyId="1234" socket={socket} gameState={mockGameState} userId={mockUserId} />
     );
     const whiteDice1 = screen.getByLabelText("white1 die");
     const whiteDice2 = screen.getByLabelText("white2 die");
@@ -64,7 +110,7 @@ describe("DiceContainer test", () => {
 
   test("When roll dice is clicked, it calls the socket event", async () => {
     render(
-      <DiceContainer diceState={diceState} lobbyId="1234" socket={socket} />
+      <DiceContainer diceState={diceState} lobbyId="1234" socket={socket} gameState={mockGameState} userId={mockUserId}/>
     );
     const rollDiceBtn = screen.getByRole("button", { name: "Roll Dice" });
     await user.click(rollDiceBtn);
