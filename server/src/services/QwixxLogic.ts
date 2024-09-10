@@ -6,15 +6,18 @@ import { DiceColour } from "../enums/DiceColours";
 export default class QwixxLogic {
   private _playersArray: Player[];
   private _dice: Dice;
-  private _currentTurnIndex = 0;
+  private _currentTurnIndex: number;
+  private _hasRolled: boolean;
 
   constructor(players: Player[], dice: Dice) {
     this._playersArray = players;
     this._dice = dice;
     this._currentTurnIndex = 0;
+    this._hasRolled = false;
   }
 
   rollDice(): Record<DiceColour, number> {
+    this._hasRolled = true;
     return this._dice.rollAllDice();
   }
 
@@ -22,7 +25,12 @@ export default class QwixxLogic {
     return this.players[this._currentTurnIndex];
   }
 
+  get hasRolled() {
+    return this._hasRolled;
+  }
+
   nextTurn() {
+    this._hasRolled = false;
     return (this._currentTurnIndex =
       (this._currentTurnIndex + 1) % this._playersArray.length);
   }
