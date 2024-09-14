@@ -197,15 +197,15 @@ export default function initializeSocketHandler(io: Server) {
         }
       }
 
-      if (gameLogic?.haveAllPlayersSubmitted()) {
-        gameLogic.resetAllPlayersSubmission();
-        gameLogic.nextTurn();
+      //if (gameLogic?.haveAllPlayersSubmitted()) {
+      //gameLogic.resetAllPlayersSubmission();
+      //gameLogic.nextTurn();
 
-        const serializedGameState = lobbiesMap[lobbyId].serializedGameLogic;
+      //const serializedGameState = lobbiesMap[lobbyId].serializedGameLogic;
 
-        io.to(lobbyId).emit("turn_ended", { gameState: serializedGameState });
-        console.log("turn ended", serializedGameState);
-      }
+      //io.to(lobbyId).emit("turn_ended", { gameState: serializedGameState });
+      //console.log("turn ended", serializedGameState);
+      //}
     });
 
     socket.on("roll_dice", ({ lobbyId }) => {
