@@ -70,6 +70,12 @@ export default class QwixxLogic {
           // Might need to refactor later if should send back a complete state of a player's scoreboard.
           // return { playerName, row, num };
           player.markSubmitted();
+
+          if (this.haveAllPlayersSubmitted()) {
+            this.resetAllPlayersSubmission();
+            this.nextTurn();
+          }
+
           return this.serialize();
         }
       }
