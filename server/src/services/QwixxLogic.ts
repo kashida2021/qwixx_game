@@ -70,8 +70,13 @@ export default class QwixxLogic {
           // Might need to refactor later if should send back a complete state of a player's scoreboard.
           // return { playerName, row, num };
           player.markSubmitted();
+          console.log("player has submitted choice", player.hasSubmittedChoice);
 
           if (this.haveAllPlayersSubmitted()) {
+            console.log(
+              "have all players submitted",
+              this.haveAllPlayersSubmitted()
+            );
             this.resetAllPlayersSubmission();
             this.nextTurn();
           }
