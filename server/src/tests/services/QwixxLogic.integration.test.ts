@@ -55,10 +55,15 @@ describe("Qwixx Logic integration tests:", () => {
     expect(testGame.players[0].hasSubmittedChoice).toBe(true);
   });
 
-  it("should update haveAllPlayersSubmitted when every player has made a move", () => {
+  it("should update haveAllPlayersSubmitted when every player has made a move, then reset submission and call next turn", () => {
+    const resetSpy = jest.spyOn(testGame, "resetAllPlayersSubmission");
+    const nextTurnSpy = jest.spyOn(testGame, "nextTurn");
+
     testGame.makeMove("test-player1", "red", 1);
     testGame.makeMove("test-player2", "blue", 3);
-    expect(testGame.haveAllPlayersSubmitted()).toEqual(true);
+    //expect(testGame.haveAllPlayersSubmitted()).toEqual(true);
+    expect(resetSpy).toHaveBeenCalled();
+    expect(nextTurnSpy).toHaveBeenCalled();
   });
 
   it("should return a message if the player isn't found when making a move", () => {
