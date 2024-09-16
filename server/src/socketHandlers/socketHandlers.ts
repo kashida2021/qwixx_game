@@ -183,19 +183,26 @@ export default function initializeSocketHandler(io: Server) {
     });
 
     socket.on("mark_numbers", ({ lobbyId, userId, playerChoice }) => {
+      if(!lobbyId || !userId || !playerChoice){
+        //TODO: Socket event for errors
+        console.error("Missing data");
+      }
+      
       const gameLogic = lobbiesMap[lobbyId].gameLogic;
 
-      if (gameLogic && gameLogic.hasRolled) {
-        if (playerChoice) {
-          const { row: rowColour, num } = playerChoice;
-          const updatedGameState = gameLogic.makeMove(userId, rowColour, num);
-
-          const responseData = { gameState: updatedGameState };
-
-          io.to(lobbyId).emit("update_markedNumbers", responseData);
-          console.log("Updated game state:", updatedGameState);
-        }
+      if (!gameLogic){
+        //TODO: Socket event for errors
+        console.error("Game doesn't exist. Has it been instantiated yet?")
       }
+
+      
+      const { row: rowColour, num } = playerChoice;
+      const updatedGameState = gameLogic?.makeMove(userId, rowColour, num);
+
+      const responseData = { gameState: updatedGameState };
+
+      io.to(lobbyId).emit("update_markedNumbers", responseData);
+      console.log("Updated game state:", updatedGameState);
 
       //if (gameLogic?.haveAllPlayersSubmitted()) {
       //gameLogic.resetAllPlayersSubmission();
