@@ -16,34 +16,38 @@ export default class QwixxLogic {
     this._hasRolled = false;
   }
 
-  rollDice(): Record<DiceColour, number> {
+  public rollDice(): Record<DiceColour, number> {
     this._hasRolled = true;
     return this._dice.rollAllDice();
   }
 
-  get currentPlayer() {
-    return this.players[this._currentTurnIndex];
+  private get currentPlayer() {
+    return this._playersArray[this._currentTurnIndex];
   }
 
-  get hasRolled() {
+  private get hasRolled() {
     return this._hasRolled;
   }
 
-  nextTurn() {
+  private nextTurn() {
     this._hasRolled = false;
     return (this._currentTurnIndex =
       (this._currentTurnIndex + 1) % this._playersArray.length);
   }
 
-  resetAllPlayersSubmission() {
+  private resetAllPlayersSubmission() {
     this._playersArray.forEach((player) => player.resetSubmission());
   }
 
-  haveAllPlayersSubmitted(): boolean {
+  private haveAllPlayersSubmitted(): boolean {
     return this._playersArray.every((player) => player.hasSubmittedChoice);
   }
 
-  makeMove(playerName: string, row: string, num: number) {
+  public makeMove(playerName: string, row: string, num: number) {
+    if(!this.hasRolled){
+      throw new Error("Dice hasn't been rolled yet.")
+    }
+    
     let colourToMark: rowColour;
     switch (row.toLowerCase()) {
       case "red":
@@ -59,40 +63,34 @@ export default class QwixxLogic {
         colourToMark = rowColour.Blue;
         break;
       default:
-        throw new Error("Invalid colour");
+        throw new Error("Invalid colour.");
     }
 
-    for (const player of this._playersArray) {
-      if (player.name === playerName) {
-        // console.log(playerName);
-        if (player.gameCard.markNumbers(colourToMark, num)) {
-          // Only returning the event data.
-          // Might need to refactor later if should send back a complete state of a player's scoreboard.
-          // return { playerName, row, num };
-          player.markSubmitted();
-          console.log("player has submitted choice", player.hasSubmittedChoice);
+    const player = this._playersArray.find(player => player.name === playerName);
 
-          if (this.haveAllPlayersSubmitted()) {
-            console.log(
-              "have all players submitted",
-              this.haveAllPlayersSubmitted()
-            );
-            this.resetAllPlayersSubmission();
-            this.nextTurn();
-          }
-
-          return this.serialize();
-        }
-      }
+    if(!player){
+      throw new Error("Player not found.");
     }
-    return "Player not found";
+
+    if(!player?.gameCard.markNumbers(colourToMark, num)){
+      throw new Error("Invalid move.");
+    }
+    
+    player.markSubmitted();
+
+    if(this.haveAllPlayersSubmitted()){
+      this.resetAllPlayersSubmission();
+      this.nextTurn();
+    }
+
+    return this.serialize();
   }
 
-  get players() {
-    return this._playersArray;
-  }
+  // private get players() {
+  //   return this._playersArray;
+  // }
 
-  serialize() {
+  public serialize() {
     const serializedPlayers = this._playersArray.reduce((acc, player) => {
       acc[player.name] = player.serialize();
       return acc;
