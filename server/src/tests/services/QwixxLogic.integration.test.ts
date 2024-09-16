@@ -51,29 +51,56 @@ describe("Qwixx Logic integration tests:", () => {
     }
   });
 
-  test("current player can only mark a maximum of 2 numbers", () => {
+  test("current player can submit up to 2 moves", () => {
     testGame.rollDice();
-    testGame.makeMove("test-player1", "red", 1);
     testGame.makeMove("test-player1", "red", 2);
+    expect(mockPlayer1.submissionCount).toBe(1);
 
-    expect(() => {
-      testGame.makeMove("test-player1", "red", 3);
-    }).toThrow("Player already marked a number");
+    testGame.makeMove("test-player1", "red", 3);
+    expect(mockPlayer1.submissionCount).toBe(2);
   });
 
-  test("non current player can only mark a maximum of 1 number", () => {
+  test("current player can't submit more than 2 moves", () => {
     testGame.rollDice();
-    testGame.makeMove("test-player2", "red", 1);
+    testGame.makeMove("test-player1", "red", 2);
+    testGame.makeMove("test-player1", "red", 3);
 
     expect(() => {
-      testGame.makeMove("test-player2", "red", 2);
+      testGame.makeMove("test-player1", "red", 4);
     }).toThrow("Player already marked a number");
   });
 
-  // it.skip("should updated hasSubmitted when a player makes a move", () => {
-  //   testGame.makeMove("test-player1", "red", 1);
-  //   expect(testGame.players[0].hasSubmittedChoice).toBe(true);
-  // });
+  test("current player's hasSubmittedChoice is updated after submitting 2 moves", () => {
+    testGame.rollDice();
+
+    testGame.makeMove("test-player1", "red", 1);
+    expect(mockPlayer1.hasSubmittedChoice).toBe(false);
+
+    testGame.makeMove("test-player1", "red", 2);
+    expect(mockPlayer1.hasSubmittedChoice).toBe(true);
+  });
+
+  test("non-current player can submit up to 1 move", () => {
+    testGame.rollDice();
+    testGame.makeMove("test-player2", "red", 2);
+    expect(mockPlayer2.submissionCount).toBe(1);
+  });
+
+  test("non-current player can't submit more than 1 moves", () => {
+    testGame.rollDice();
+    testGame.makeMove("test-player2", "red", 2);
+
+    expect(() => {
+      testGame.makeMove("test-player2", "red", 3);
+    }).toThrow("Player already marked a number");
+  });
+
+  test("non-current player's hasSubmittedChoice is updated after submitting 1 move", () => {
+    testGame.rollDice();
+
+    testGame.makeMove("test-player2", "red", 1);
+    expect(mockPlayer2.hasSubmittedChoice).toBe(true);
+  });
 
   test("when all players have submitted a move, it should go to the next turn by making the next player the current player", () => {
     testGame.rollDice();
@@ -90,26 +117,6 @@ describe("Qwixx Logic integration tests:", () => {
     const finalMoveState = testGame.makeMove("test-player2", "blue", 3);
     expect(finalMoveState.activePlayer).toBe("test-player2");
   });
-  //Maybe should break this test down into smaller parts.
-  // it.skip("should reset players submission and go to the next turn when every player has made a move", () => {
-  //   const resetSpy = jest.spyOn(testGame, "resetAllPlayersSubmission");
-  //   const nextTurnSpy = jest.spyOn(testGame, "nextTurn");
-
-  //   expect(testGame.currentPlayer).toBe(mockPlayer1);
-
-  //   testGame.makeMove("test-player1", "red", 1);
-
-  //   expect(resetSpy).not.toHaveBeenCalled();
-  //   expect(nextTurnSpy).not.toHaveBeenCalled();
-
-  //   const gameState = testGame.makeMove("test-player2", "blue", 3);
-
-  //   expect(resetSpy).toHaveBeenCalled();
-  //   expect(nextTurnSpy).toHaveBeenCalled();
-
-  //   expect(testGame.hasRolled).toBe(false);
-  //   expect(testGame.currentPlayer).toBe(mockPlayer2);
-  //   });
 
   it("should throw an error if the player isn't found when making a move", () => {
     testGame.rollDice();
@@ -132,21 +139,4 @@ describe("Qwixx Logic integration tests:", () => {
       expect(value).toBeLessThanOrEqual(6);
     });
   });
-
-  //hasRolled() should potentially be a private method.
-  // it.skip("should update the hasRolled property to true once a dice has been rolled", () => {
-  //   testGame.rollDice();
-  //   expect(testGame.hasRolled).toBe(true);
-  // });
-
-  //currentPlayer should potentially be a private method.
-  // it.skip("should have an active player, which is the first player players array", () => {
-  //   expect(testGame.currentPlayer.name).toBe("test-player1");
-  // });
-
-  //nextTurn() should be a private method
-  // it.skip("should change active player to the next player at end of the turn", () => {
-  //   testGame.nextTurn();
-  //   expect(testGame.currentPlayer.name).toBe("test-player2");
-  // });
 });
