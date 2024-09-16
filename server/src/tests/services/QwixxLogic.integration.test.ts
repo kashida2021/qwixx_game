@@ -33,8 +33,7 @@ describe("Qwixx Logic integration tests:", () => {
   // });
 
   it("should make a move and return the correct result", () => {
-    const testGame = new QwixxLogic(mockPlayersArray, mockDice);
-
+    testGame.rollDice(); 
     const gameState = testGame.makeMove("test-player1", "red", 1);
     if (typeof gameState === "object") {
       expect(gameState.players).toHaveProperty("test-player1");
@@ -53,18 +52,37 @@ describe("Qwixx Logic integration tests:", () => {
     }
   });
 
+  test("current player can only mark a maximum of 2 numbers", () => {
+    testGame.rollDice();
+    testGame.makeMove("test-player1", "red", 1);
+    testGame.makeMove("test-player1", "red", 2);
+
+    expect(() => {testGame.makeMove("test-player1", "red", 3)}).toThrow("Player already marked a number");
+  })
+
+  test("non current player can only mark a maximum of 1 number", () => {
+   testGame.rollDice();
+   testGame.makeMove("test-player2", "red", 1);
+
+   expect(() => {testGame.makeMove("test-player2", "red", 2)}).toThrow("Player already marked a number");
+  })
+
   // it.skip("should updated hasSubmitted when a player makes a move", () => {
   //   testGame.makeMove("test-player1", "red", 1);
   //   expect(testGame.players[0].hasSubmittedChoice).toBe(true);
   // });
 
   test("when all players have submitted a move, it should go to the next turn by making the next player the current player", () => {
+    testGame.rollDice();
     const initialGameState = testGame.serialize();
 
     expect(initialGameState.activePlayer).toBe('test-player1');
 
     const firstMoveState = testGame.makeMove("test-player1", "red", 1);
     expect(firstMoveState.activePlayer).toBe("test-player1");
+
+    const secondMoveState = testGame.makeMove("test-player1", "red", 2);
+    expect(secondMoveState.activePlayer).toBe("test-player1");
 
     const finalMoveState = testGame.makeMove("test-player2", "blue", 3);
     expect(finalMoveState.activePlayer).toBe("test-player2");
@@ -91,12 +109,14 @@ describe("Qwixx Logic integration tests:", () => {
   //   });
 
   it("should throw an error if the player isn't found when making a move", () => {
+    testGame.rollDice();
     expect(() => {
       testGame.makeMove("test-player3", "red", 1);
     }).toThrow("Player not found");
   });
 
   it("should throw an error if colour doesn't exist in rowColour enum", () => {
+    testGame.rollDice();
     expect(() => {
       testGame.makeMove("test-player1", "orange", 1);
     }).toThrow("Invalid colour");

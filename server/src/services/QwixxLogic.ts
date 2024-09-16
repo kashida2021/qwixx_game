@@ -44,10 +44,10 @@ export default class QwixxLogic {
   }
 
   public makeMove(playerName: string, row: string, num: number) {
-    if(!this.hasRolled){
-      throw new Error("Dice hasn't been rolled yet.")
+    if (!this.hasRolled) {
+      throw new Error("Dice hasn't been rolled yet.");
     }
-    
+
     let colourToMark: rowColour;
     switch (row.toLowerCase()) {
       case "red":
@@ -66,19 +66,35 @@ export default class QwixxLogic {
         throw new Error("Invalid colour.");
     }
 
-    const player = this._playersArray.find(player => player.name === playerName);
+    const player = this._playersArray.find(
+      (player) => player.name === playerName
+    );
 
-    if(!player){
+    if (!player) {
       throw new Error("Player not found.");
     }
 
-    if(!player?.gameCard.markNumbers(colourToMark, num)){
+    if (player === this.currentPlayer && player.submissionCount === 2) {
+      throw new Error("Player already marked a number.");
+    }
+
+    if (player !== this.currentPlayer && player.submissionCount === 1) {
+      throw new Error("Player already marked a number.");
+    }
+
+    if (!player.markNumber(colourToMark, num)) {
       throw new Error("Invalid move.");
     }
-    
-    player.markSubmitted();
 
-    if(this.haveAllPlayersSubmitted()){
+    if (
+      (player === this.currentPlayer && player.submissionCount === 2) ||
+      (player !== this.currentPlayer && player.submissionCount === 1)
+    ) {
+      player.markSubmitted();
+    }
+
+
+    if (this.haveAllPlayersSubmitted()) {
       this.resetAllPlayersSubmission();
       this.nextTurn();
     }
