@@ -25,15 +25,14 @@ describe("Qwixx Logic integration tests:", () => {
     testGame = new QwixxLogic(mockPlayersArray, mockDice);
   });
 
-  // it.skip("should return all players", () => {
-  //   expect(testGame.players.length).toBe(2);
-  //   testGame.players.forEach((player) => {
-  //     expect(player.gameCard instanceof qwixxBaseGameCard).toBe(true);
-  //   });
-  // });
+  test("making a move before rolling dice throws an error", () => {
+    expect(() => testGame.makeMove("test-player1", "red", 2)).toThrow(
+      "Dice hasn't been rolled yet."
+    );
+  });
 
   it("should make a move and return the correct result", () => {
-    testGame.rollDice(); 
+    testGame.rollDice();
     const gameState = testGame.makeMove("test-player1", "red", 1);
     if (typeof gameState === "object") {
       expect(gameState.players).toHaveProperty("test-player1");
@@ -57,15 +56,19 @@ describe("Qwixx Logic integration tests:", () => {
     testGame.makeMove("test-player1", "red", 1);
     testGame.makeMove("test-player1", "red", 2);
 
-    expect(() => {testGame.makeMove("test-player1", "red", 3)}).toThrow("Player already marked a number");
-  })
+    expect(() => {
+      testGame.makeMove("test-player1", "red", 3);
+    }).toThrow("Player already marked a number");
+  });
 
   test("non current player can only mark a maximum of 1 number", () => {
-   testGame.rollDice();
-   testGame.makeMove("test-player2", "red", 1);
+    testGame.rollDice();
+    testGame.makeMove("test-player2", "red", 1);
 
-   expect(() => {testGame.makeMove("test-player2", "red", 2)}).toThrow("Player already marked a number");
-  })
+    expect(() => {
+      testGame.makeMove("test-player2", "red", 2);
+    }).toThrow("Player already marked a number");
+  });
 
   // it.skip("should updated hasSubmitted when a player makes a move", () => {
   //   testGame.makeMove("test-player1", "red", 1);
@@ -76,7 +79,7 @@ describe("Qwixx Logic integration tests:", () => {
     testGame.rollDice();
     const initialGameState = testGame.serialize();
 
-    expect(initialGameState.activePlayer).toBe('test-player1');
+    expect(initialGameState.activePlayer).toBe("test-player1");
 
     const firstMoveState = testGame.makeMove("test-player1", "red", 1);
     expect(firstMoveState.activePlayer).toBe("test-player1");
@@ -86,7 +89,7 @@ describe("Qwixx Logic integration tests:", () => {
 
     const finalMoveState = testGame.makeMove("test-player2", "blue", 3);
     expect(finalMoveState.activePlayer).toBe("test-player2");
-  })
+  });
   //Maybe should break this test down into smaller parts.
   // it.skip("should reset players submission and go to the next turn when every player has made a move", () => {
   //   const resetSpy = jest.spyOn(testGame, "resetAllPlayersSubmission");
@@ -95,12 +98,12 @@ describe("Qwixx Logic integration tests:", () => {
   //   expect(testGame.currentPlayer).toBe(mockPlayer1);
 
   //   testGame.makeMove("test-player1", "red", 1);
-  
+
   //   expect(resetSpy).not.toHaveBeenCalled();
   //   expect(nextTurnSpy).not.toHaveBeenCalled();
 
   //   const gameState = testGame.makeMove("test-player2", "blue", 3);
-   
+
   //   expect(resetSpy).toHaveBeenCalled();
   //   expect(nextTurnSpy).toHaveBeenCalled();
 
