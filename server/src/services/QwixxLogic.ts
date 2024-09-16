@@ -74,12 +74,15 @@ export default class QwixxLogic {
       throw new Error("Player not found.");
     }
 
-    if (player === this.currentPlayer && player.submissionCount === 2) {
-      throw new Error("Player already marked a number.");
-    }
+    // if (player === this.currentPlayer && player.submissionCount === 2) {
+    //   throw new Error("Player already marked a number.");
+    // }
 
-    if (player !== this.currentPlayer && player.submissionCount === 1) {
-      throw new Error("Player already marked a number.");
+    // if (player !== this.currentPlayer && player.submissionCount === 1) {
+    //   throw new Error("Player already marked a number.");
+    // }
+    if (player.hasSubmittedChoice){
+      throw new Error("Player already marked a number.")
     }
 
     if (!player.markNumber(colourToMark, num)) {
