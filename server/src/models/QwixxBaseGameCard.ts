@@ -42,7 +42,7 @@ export default class qwixxBaseGameCard {
     return this._numbers;
   }
 
-  markNumbers(row: rowColour, number: number) {
+  public markNumbers(row: rowColour, number: number) {
     if (!this._rows[row].includes(number)) {
       this._rows[row].push(number);
       return true;
