@@ -98,6 +98,28 @@ export default class QwixxLogic {
     return this.serialize();
   }
 
+  public endTurn(playerName: string){
+     const player = this._playersArray.find(
+      (player) => player.name === playerName
+    );
+
+    if (!player) {
+      throw new Error("Player not found.");
+    }
+
+    if (player.hasSubmittedChoice){
+      throw new Error("Player already ended their turn.")
+    }
+
+    player.markSubmitted();
+
+    if (this.haveAllPlayersSubmitted()) {
+      this.resetAllPlayersSubmission();
+      this.nextTurn();
+    }
+
+    return this.serialize();
+  }
   // private get players() {
   //   return this._playersArray;
   // }

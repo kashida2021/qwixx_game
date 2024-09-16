@@ -139,4 +139,10 @@ describe("Qwixx Logic integration tests:", () => {
       expect(value).toBeLessThanOrEqual(6);
     });
   });
+
+  test("non-current player can end their turn without submitting a move", () => {
+    testGame.rollDice();
+    testGame.endTurn("test-player2");
+    expect(mockPlayer2.hasSubmittedChoice).toBeTruthy(); 
+  })
 });
