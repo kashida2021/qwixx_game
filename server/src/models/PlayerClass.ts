@@ -14,15 +14,15 @@ export default class Player {
     return this._name;
   }
 
-  get hasSubmittedChoice(): boolean {
+  public get hasSubmittedChoice(): boolean {
     return this._hasSubmittedChoice;
   }
 
-  resetSubmission() {
+  public resetSubmission() {
     this._hasSubmittedChoice = false;
   }
 
-  markSubmitted() {
+  public markSubmitted() {
     this._hasSubmittedChoice = true;
   }
 
