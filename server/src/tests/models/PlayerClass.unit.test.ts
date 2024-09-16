@@ -1,7 +1,9 @@
+import { rowColour } from "../../enums/rowColours";
 import Player from "../../models/PlayerClass";
 import qwixxBaseGameCard from "../../models/QwixxBaseGameCard";
 
 const mockGameCard: Partial<qwixxBaseGameCard> = {
+  markNumbers: jest.fn(),
 };
 
 describe("Player Class tests", () => {
@@ -11,9 +13,12 @@ describe("Player Class tests", () => {
     expect(testPlayer.name).toEqual("testPlayer");
   });
 
-  it("Should take a score card in its constructor and be able to return it", () => {
+  test("submission count should increment when incrementSubmissionCount is called", () => {
+    (mockGameCard.markNumbers! as jest.Mock).mockReturnValue(true);
+   
     const testPlayer = new Player("testPlayer", mockGameCard as qwixxBaseGameCard);
-    console.log(testPlayer.gameCard)
-    expect(testPlayer.gameCard).toEqual(mockGameCard);
-  });
+    
+    testPlayer.markNumber(rowColour.Red,2);
+    expect(testPlayer.submissionCount).toBe(1);
+  })
 });

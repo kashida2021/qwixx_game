@@ -1,13 +1,16 @@
 import qwixxBaseGameCard from "./QwixxBaseGameCard";
+import { rowColour } from "../enums/rowColours";
 export default class Player {
   private _name;
   private _gameCard: qwixxBaseGameCard;
-  private _hasSubmittedChoice = false;
+  private _hasSubmittedChoice;
+  private _submissionCount; 
 
   constructor(name: string, gameCard: qwixxBaseGameCard) {
     this._name = name;
     this._gameCard = gameCard;
     this._hasSubmittedChoice = false;
+    this._submissionCount = 0; 
   }
 
   get name(): string {
@@ -26,11 +29,23 @@ export default class Player {
     this._hasSubmittedChoice = true;
   }
 
-  //Using a getter for gameCard for now to allow quicker protoyping
-  //Likely needs refactoring in the future for looser coupling with the gameCard class
-  get gameCard(): qwixxBaseGameCard {
-    return this._gameCard;
+  public get submissionCount(): number {
+    return this._submissionCount;
   }
+
+  public markNumber(colour: rowColour, num: number) {
+   if(!this._gameCard.markNumbers(colour, num)){
+      return false
+    }
+
+    this.incrementSubmissionCount()
+    return true;
+  }
+
+  private incrementSubmissionCount() {
+    this._submissionCount ++
+  }
+
 
   serialize() {
     return this._gameCard.serialize();
