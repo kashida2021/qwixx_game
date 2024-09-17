@@ -1,12 +1,5 @@
 import { Server, Socket } from "socket.io";
 import { generateUniqueRoomId } from "../utils/roomUtils";
-// import GameBoard from "../../../shared/GameBoard";
-// import GameBoard from "../models/GameBoardTemp";
-import QwixxLogic from "../services/QwixxLogic";
-import { initializePlayers } from "../models/InitializePlayer";
-import { initializeGameCards } from "../models/InitializeGameCards";
-import Dice from "../models/DiceClass";
-import SixSidedDie from "../models/SixSidedDieClass";
 import Lobby from "../models/LobbyClass";
 
 //Useful methods for getting visibilty on rooms
@@ -183,27 +176,35 @@ export default function initializeSocketHandler(io: Server) {
     });
 
     socket.on("mark_numbers", ({ lobbyId, userId, playerChoice }) => {
-      if(!lobbyId || !userId || !playerChoice){
-        //TODO: Socket event for errors
+      if (!lobbyId || !userId || !playerChoice) {
         console.error("Missing data");
+        socket.emit("error_occured", {
+          message: "Missing data for marking numbers",
+        });
       }
-      
+
       const gameLogic = lobbiesMap[lobbyId].gameLogic;
 
-      if (!gameLogic){
-        //TODO: Socket event for errors
-        console.error("Game doesn't exist. Has it been instantiated yet?")
+      if (!gameLogic) {
+        console.error("Game doesn't exist. Has it been instantiated yet?");
+        socket.emit("error_occured", {
+          message: "The game session doesn't exist.",
+        });
       }
 
-      
-      const { row: rowColour, num } = playerChoice;
-      const updatedGameState = gameLogic?.makeMove(userId, rowColour, num);
+      try {
+        const { row: rowColour, num } = playerChoice;
+        const updatedGameState = gameLogic?.makeMove(userId, rowColour, num);
 
-      const responseData = { gameState: updatedGameState };
+        const responseData = { gameState: updatedGameState };
 
-      io.to(lobbyId).emit("update_markedNumbers", responseData);
-      console.log("Updated game state:", updatedGameState);
-
+        io.to(lobbyId).emit("update_markedNumbers", responseData);
+        console.log("Updated game state:", updatedGameState);
+      } catch (err) {
+        if (err instanceof Error) {
+          socket.emit("error_occured", { message: err.message });
+        }
+      }
       //if (gameLogic?.haveAllPlayersSubmitted()) {
       //gameLogic.resetAllPlayersSubmission();
       //gameLogic.nextTurn();
