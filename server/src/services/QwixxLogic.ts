@@ -21,7 +21,7 @@ export default class QwixxLogic {
     return this._dice.rollAllDice();
   }
 
-  private get currentPlayer() {
+  private get activePlayer() {
     return this._playersArray[this._currentTurnIndex];
   }
 
@@ -41,6 +41,13 @@ export default class QwixxLogic {
 
   private haveAllPlayersSubmitted(): boolean {
     return this._playersArray.every((player) => player.hasSubmittedChoice);
+  }
+ 
+  private processPlayersSubmission(){
+    if (this.haveAllPlayersSubmitted()){
+      this.resetAllPlayersSubmission();
+      this.nextTurn();
+    }
   }
 
   public makeMove(playerName: string, row: string, num: number) {
@@ -83,13 +90,13 @@ export default class QwixxLogic {
     }
 
     if (
-      (player === this.currentPlayer && player.submissionCount === 2) ||
-      (player !== this.currentPlayer && player.submissionCount === 1)
+      (player === this.activePlayer && player.submissionCount === 2) ||
+      (player !== this.activePlayer && player.submissionCount === 1)
     ) {
       player.markSubmitted();
     }
 
-    this.checkPlayersSubmission();
+    this.processPlayersSubmission();
 
     return this.serialize();
   }
@@ -107,26 +114,19 @@ export default class QwixxLogic {
       throw new Error("Player already finished their turn.")
     }
 
-    if(player !== this.currentPlayer){
+    if(player !== this.activePlayer){
       player.markSubmitted();
     }
 
-    //TODO:Half implemented as need to think about how to handle penalties.
-    if(player === this.currentPlayer){
+    if(player === this.activePlayer){
       player.markSubmitted();
     }
-
-    this.checkPlayersSubmission();
+    
+    this.processPlayersSubmission();
 
     return this.serialize();
   }
 
-  private checkPlayersSubmission(){
-    if (this.haveAllPlayersSubmitted()){
-      this.resetAllPlayersSubmission();
-      this.nextTurn();
-    }
-  }
   // private get players() {
   //   return this._playersArray;
   // }
@@ -140,7 +140,7 @@ export default class QwixxLogic {
     return {
       players: serializedPlayers,
       dice: this._dice.serialize(),
-      activePlayer: this.currentPlayer.name,
+      activePlayer: this.activePlayer.name,
     };
   }
 }
