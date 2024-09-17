@@ -43,7 +43,7 @@ describe("Qwixx Logic tests", () => {
     const testGame = new QwixxLogic(playersArrayMock, diceMock as Dice);
     
     testGame.rollDice();
-    testGame.makeMove("player1", "red", 1);
+    testGame.makeMove("player1", "red", 2);
     
     expect(player1Mock.markNumber).toHaveBeenCalledWith("red", 2);
     expect(player1Mock.markNumber).toHaveBeenCalledTimes(1);
