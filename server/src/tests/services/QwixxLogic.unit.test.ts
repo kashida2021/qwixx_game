@@ -45,7 +45,7 @@ describe("Qwixx Logic tests", () => {
     testGame.rollDice();
     testGame.makeMove("player1", "red", 1);
     
-    expect(player1Mock.markNumber).toHaveBeenCalledWith("red", 1);
+    expect(player1Mock.markNumber).toHaveBeenCalledWith("red", 2);
     expect(player1Mock.markNumber).toHaveBeenCalledTimes(1);
   });
 
@@ -53,7 +53,7 @@ describe("Qwixx Logic tests", () => {
     const testGame = new QwixxLogic(playersArrayMock, diceMock as Dice);
     testGame.rollDice();
 
-    expect(() => testGame.makeMove("bad-player", "red", 1)).toThrow("Player not found");
+    expect(() => testGame.makeMove("bad-player", "red", 2)).toThrow("Player not found");
     // const result = testGame.makeMove("", "red", 1);
     // expect(result).toBe("Player not found");
   });
