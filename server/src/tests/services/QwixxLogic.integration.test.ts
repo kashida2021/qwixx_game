@@ -33,7 +33,7 @@ describe("Qwixx Logic integration tests:", () => {
 
   it("should make a move and return the correct result", () => {
     testGame.rollDice();
-    const gameState = testGame.makeMove("test-player1", "red", 1);
+    const gameState = testGame.makeMove("test-player1", "red", 2);
     if (typeof gameState === "object") {
       expect(gameState.players).toHaveProperty("test-player1");
       expect(gameState.players).toHaveProperty("test-player2");
@@ -73,10 +73,10 @@ describe("Qwixx Logic integration tests:", () => {
   test("current player's hasSubmittedChoice is updated after submitting 2 moves", () => {
     testGame.rollDice();
 
-    testGame.makeMove("test-player1", "red", 1);
+    testGame.makeMove("test-player1", "red", 2);
     expect(mockPlayer1.hasSubmittedChoice).toBe(false);
 
-    testGame.makeMove("test-player1", "red", 2);
+    testGame.makeMove("test-player1", "red", 3);
     expect(mockPlayer1.hasSubmittedChoice).toBe(true);
   });
 
@@ -98,7 +98,7 @@ describe("Qwixx Logic integration tests:", () => {
   test("non-current player's hasSubmittedChoice is updated after submitting 1 move", () => {
     testGame.rollDice();
 
-    testGame.makeMove("test-player2", "red", 1);
+    testGame.makeMove("test-player2", "red", 2);
     expect(mockPlayer2.hasSubmittedChoice).toBe(true);
   });
 
@@ -108,10 +108,10 @@ describe("Qwixx Logic integration tests:", () => {
 
     expect(initialGameState.activePlayer).toBe("test-player1");
 
-    const firstMoveState = testGame.makeMove("test-player1", "red", 1);
+    const firstMoveState = testGame.makeMove("test-player1", "red", 2);
     expect(firstMoveState.activePlayer).toBe("test-player1");
 
-    const secondMoveState = testGame.makeMove("test-player1", "red", 2);
+    const secondMoveState = testGame.makeMove("test-player1", "red", 3);
     expect(secondMoveState.activePlayer).toBe("test-player1");
 
     const finalMoveState = testGame.makeMove("test-player2", "blue", 3);
@@ -139,7 +139,7 @@ describe("Qwixx Logic integration tests:", () => {
   it("should throw an error if the player isn't found when making a move", () => {
     testGame.rollDice();
     expect(() => {
-      testGame.makeMove("test-player3", "red", 1);
+      testGame.makeMove("test-player3", "red", 2);
     }).toThrow("Player not found");
   });
 

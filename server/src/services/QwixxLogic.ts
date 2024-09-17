@@ -73,6 +73,10 @@ export default class QwixxLogic {
         throw new Error("Invalid colour.");
     }
 
+    if(num < 2 || num > 12){
+      throw new Error("Dice number is out of range.")
+    }
+
     const player = this._playersArray.find(
       (player) => player.name === playerName
     );
