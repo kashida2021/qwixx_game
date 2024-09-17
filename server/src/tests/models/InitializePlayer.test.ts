@@ -1,10 +1,10 @@
 import { initializePlayers } from "../../models/InitializePlayer";
 import qwixxBaseGameCard from "../../models/QwixxBaseGameCard";
 
-const mockGameCard1 = new qwixxBaseGameCard;
-const mockGameCard2 = new qwixxBaseGameCard;;
-const mockGameCard3 = new qwixxBaseGameCard;;
-const mockGameCard4 = new qwixxBaseGameCard;;
+const mockGameCard1 = new qwixxBaseGameCard();
+const mockGameCard2 = new qwixxBaseGameCard();
+const mockGameCard3 = new qwixxBaseGameCard();
+const mockGameCard4 = new qwixxBaseGameCard();
 
 describe("initializePlayers tests", () => {
   test("given 1 player name, it returns an error", () => {
@@ -43,10 +43,24 @@ describe("initializePlayers tests", () => {
     const result = initializePlayers(mockPlayerNames, mockGameCards);
     expect(result.length).toBe(4);
     for (let i = 0; i < result.length; i++) {
-      const playerName = result[i];
-      expect(playerName).toBeDefined();
-      expect(playerName.name).toBe(`player${i + 1}`);
-      expect(playerName.gameCard instanceof qwixxBaseGameCard).toBe(true);
+      const player = result[i];
+      expect(player).toBeDefined();
+      expect(player.name).toBe(`player${i + 1}`);
+      expect(player.serialize()).toEqual({
+        isLocked: {
+          blue: false,
+          green: false,
+          red: false,
+          yellow: false,
+        },
+        penalties: 0,
+        rows: {
+          blue: [],
+          green: [],
+          red: [],
+          yellow: [],
+        },
+      });
     }
   });
 });
