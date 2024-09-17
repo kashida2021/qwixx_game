@@ -145,4 +145,10 @@ describe("Qwixx Logic integration tests:", () => {
     testGame.endTurn("test-player2");
     expect(mockPlayer2.hasSubmittedChoice).toBeTruthy(); 
   })
+
+  test("current player can end their turn without submitting a move", () => {
+    testGame.rollDice();
+    testGame.endTurn("test-player1");
+    expect(mockPlayer1.hasSubmittedChoice).toBeTruthy();
+  })
 });

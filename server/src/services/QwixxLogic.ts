@@ -111,6 +111,11 @@ export default class QwixxLogic {
       player.markSubmitted();
     }
 
+    //TODO:Half implemented as need to think about how to handle penalties.
+    if(player === this.currentPlayer){
+      player.markSubmitted();
+    }
+
     this.checkPlayersSubmission();
 
     return this.serialize();
