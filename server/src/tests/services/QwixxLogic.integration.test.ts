@@ -67,7 +67,7 @@ describe("Qwixx Logic integration tests:", () => {
 
     expect(() => {
       testGame.makeMove("test-player1", "red", 4);
-    }).toThrow("Player already marked a number");
+    }).toThrow("Player already finished their turn");
   });
 
   test("current player's hasSubmittedChoice is updated after submitting 2 moves", () => {
@@ -92,7 +92,7 @@ describe("Qwixx Logic integration tests:", () => {
 
     expect(() => {
       testGame.makeMove("test-player2", "red", 3);
-    }).toThrow("Player already marked a number");
+    }).toThrow("Player already finished their turn");
   });
 
   test("non-current player's hasSubmittedChoice is updated after submitting 1 move", () => {

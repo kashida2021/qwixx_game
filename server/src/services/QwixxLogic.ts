@@ -75,7 +75,7 @@ export default class QwixxLogic {
     }
 
     if (player.hasSubmittedChoice){
-      throw new Error("Player already marked a number.")
+      throw new Error("Player already finished their turn.")
     }
 
     if (!player.markNumber(colourToMark, num)) {
@@ -89,11 +89,7 @@ export default class QwixxLogic {
       player.markSubmitted();
     }
 
-
-    if (this.haveAllPlayersSubmitted()) {
-      this.resetAllPlayersSubmission();
-      this.nextTurn();
-    }
+    this.checkPlayersSubmission();
 
     return this.serialize();
   }
@@ -108,17 +104,23 @@ export default class QwixxLogic {
     }
 
     if (player.hasSubmittedChoice){
-      throw new Error("Player already ended their turn.")
+      throw new Error("Player already finished their turn.")
     }
 
-    player.markSubmitted();
+    if(player !== this.currentPlayer){
+      player.markSubmitted();
+    }
 
-    if (this.haveAllPlayersSubmitted()) {
+    this.checkPlayersSubmission();
+
+    return this.serialize();
+  }
+
+  private checkPlayersSubmission(){
+    if (this.haveAllPlayersSubmitted()){
       this.resetAllPlayersSubmission();
       this.nextTurn();
     }
-
-    return this.serialize();
   }
   // private get players() {
   //   return this._playersArray;
