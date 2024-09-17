@@ -23,6 +23,7 @@ export default class Player {
 
   public resetSubmission() {
     this._hasSubmittedChoice = false;
+    this._submissionCount = 0;
   }
 
   public markSubmitted() {
@@ -38,14 +39,9 @@ export default class Player {
       return false
     }
 
-    this.incrementSubmissionCount()
+    this._submissionCount ++
     return true;
   }
-
-  private incrementSubmissionCount() {
-    this._submissionCount ++
-  }
-
 
   serialize() {
     return this._gameCard.serialize();

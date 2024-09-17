@@ -102,7 +102,7 @@ describe("Qwixx Logic integration tests:", () => {
     expect(mockPlayer2.hasSubmittedChoice).toBe(true);
   });
 
-  test("when all players have submitted a move, it should go to the next turn by making the next player the current player", () => {
+  test("when all players have submitted a move, it should go to the next turn by making the next player the active player", () => {
     testGame.rollDice();
     const initialGameState = testGame.serialize();
 
@@ -116,6 +116,24 @@ describe("Qwixx Logic integration tests:", () => {
 
     const finalMoveState = testGame.makeMove("test-player2", "blue", 3);
     expect(finalMoveState.activePlayer).toBe("test-player2");
+  });
+
+  test("when the game goes to the next turn, all players' submission state is reset", () => {
+    testGame.rollDice();
+
+    testGame.makeMove("test-player1", "red", 2);
+    testGame.makeMove("test-player2", "blue", 3);
+
+    expect(mockPlayer1.submissionCount).toBe(1);
+    expect(mockPlayer2.submissionCount).toBe(1);
+    expect(mockPlayer2.hasSubmittedChoice).toBeTruthy();
+
+    testGame.makeMove("test-player1", "red", 3);
+
+    expect(mockPlayer1.hasSubmittedChoice).toBeFalsy();
+    expect(mockPlayer1.submissionCount).toBe(0);
+    expect(mockPlayer2.hasSubmittedChoice).toBeFalsy();
+    expect(mockPlayer2.submissionCount).toBe(0);
   });
 
   it("should throw an error if the player isn't found when making a move", () => {
@@ -143,12 +161,12 @@ describe("Qwixx Logic integration tests:", () => {
   test("non-current player can end their turn without submitting a move", () => {
     testGame.rollDice();
     testGame.endTurn("test-player2");
-    expect(mockPlayer2.hasSubmittedChoice).toBeTruthy(); 
-  })
+    expect(mockPlayer2.hasSubmittedChoice).toBeTruthy();
+  });
 
   test("current player can end their turn without submitting a move", () => {
     testGame.rollDice();
     testGame.endTurn("test-player1");
     expect(mockPlayer1.hasSubmittedChoice).toBeTruthy();
-  })
+  });
 });
