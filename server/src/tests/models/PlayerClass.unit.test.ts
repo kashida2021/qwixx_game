@@ -21,4 +21,16 @@ describe("Player Class tests", () => {
     testPlayer.markNumber(rowColour.Red,2);
     expect(testPlayer.submissionCount).toBe(1);
   })
+
+  test("submission count should return to 0 after markSubmitted() call", () => {
+    (mockGameCard.markNumbers! as jest.Mock).mockReturnValue(true);
+    const testPlayer = new Player("testPlayer", mockGameCard as qwixxBaseGameCard);
+
+    testPlayer.markNumber(rowColour.Red, 2);
+    testPlayer.markNumber(rowColour.Red, 3);
+    expect(testPlayer.submissionCount).toBe(2);
+
+    testPlayer.resetSubmission();
+    expect(testPlayer.submissionCount).toBe(0);
+  })
 });
