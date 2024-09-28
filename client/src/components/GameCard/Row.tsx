@@ -46,12 +46,25 @@ const Row: React.FC<RowProps> = ({
   // }, [gameCardData, rowColour]);
 
   const renderRow = () => {
+
+    const markedNumbers = gameCardData.rows[rowColour] || [];
+    const maxMarkedNumber = markedNumbers.length > 0 ? Math.max(...markedNumbers) : undefined
+    const minMarkedNumber = markedNumbers.length > 0 ? Math.min(...markedNumbers) : undefined
+
     return (
       <ol className={`row ${rowColour}`} aria-label={`row-${rowColour}`}>
         {buttonNumbers.map((num, numIndex) => {
           // const isDisabled = gameCardData[rowColour].includes(num) || locked;
           const isDisabled = gameCardData.rows[rowColour].includes(num);
           const classAttributes = isDisabled ? "clicked" : "";
+          
+          let notValid = false;
+
+          if(rowIndex < 2) {
+            notValid = maxMarkedNumber !== undefined && num < maxMarkedNumber;
+          } else {
+            notValid = minMarkedNumber !== undefined && num > minMarkedNumber;
+          }
 
           return (
             <CellButton
