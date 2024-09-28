@@ -56,7 +56,6 @@ const Row: React.FC<RowProps> = ({
         {buttonNumbers.map((num, numIndex) => {
           // const isDisabled = gameCardData[rowColour].includes(num) || locked;
           const isDisabled = gameCardData.rows[rowColour].includes(num);
-          const classAttributes = isDisabled ? "clicked" : "";
           
           let notValid = false;
 
@@ -65,6 +64,8 @@ const Row: React.FC<RowProps> = ({
           } else {
             notValid = minMarkedNumber !== undefined && num > minMarkedNumber;
           }
+
+          const classAttributes = isDisabled ? "clicked" : notValid ? "disabled" : "" ;
 
           return (
             <CellButton
