@@ -19,6 +19,9 @@ const CellButton: React.FC<ICellButton> = ({
 }) => {
   const [isDisabled, setIsDisabled] = useState(isClicked);
 
+  const notValid = clickAttributes === "disabled";
+
+
   const handleClick = () => {
   console.log("clicked")
   cellClick(rowColour, num);
@@ -42,7 +45,7 @@ const CellButton: React.FC<ICellButton> = ({
         <button
           className={`cell-btn ${rowColour} ${clickAttributes}`}
           aria-label="interactive-button"
-          disabled={isDisabled}
+          disabled={isDisabled || notValid}
           onClick={handleClick}
         >
           {num}
