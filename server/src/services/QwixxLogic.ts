@@ -89,6 +89,16 @@ export default class QwixxLogic {
       throw new Error("Player already finished their turn.")
     }
 
+    // non-active player
+    // validate num === white dice sum
+    if(player !== this.activePlayer && num !== this._dice.diceValues.white1 + this._dice.diceValues.white2){
+      throw new Error("Number selected doesn't equal to sum of white dice.")
+    }
+
+    // active-player
+    // validate num === white dice sum || white die + coloured die
+
+
     if (!player.markNumber(colourToMark, num)) {
       throw new Error("Invalid move.");
     }
