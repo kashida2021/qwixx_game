@@ -1,5 +1,5 @@
 import { describe, expect, test, vi} from "vitest"; // it - add later
-import { render, screen } from "@testing-library/react"; // waitFor, within add later
+import { render, screen, waitFor } from "@testing-library/react"; // waitFor, within add later
 import { userEvent } from "@testing-library/user-event";
 import React from "react";
 import Row from "../../../src/components/GameCard/Row";
@@ -131,6 +131,28 @@ describe("Row component test:", () => {
 
       expect(redButtons[4]).toBeDisabled();
     });
+
+    test("when a button is clicked the numbers below are disabled", async () => {
+      render(
+        <Row
+          rowColour={RowColour.Red}
+          numbers={numbers}
+          isOpponent={false}
+          rowIndex={0}
+          gameCardData={gameCardDataWithNumbers}
+          cellClick={mockCellClick}
+        />
+      );
+
+      const redButtons = screen.getAllByRole("button");
+      await user.click(redButtons[4]);
+
+      await waitFor(()=> {
+        expect(redButtons[3]).toHaveClass("disabled");
+        expect(redButtons[2]).toHaveClass("disabled");
+      })
+    });
+
 
     test("when the row is locked, all buttons are disabled", async () => {
       render(
