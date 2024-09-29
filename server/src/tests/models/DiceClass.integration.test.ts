@@ -49,4 +49,12 @@ describe("Dice integration tests", () => {
       "Die colour purple does not exist"
     );
   });
+
+  test("validColouredNumbers returns an array of valid number", () => {
+    const diceValues = testDice.rollAllDice();
+
+    const num = diceValues.white1 + diceValues.red;
+
+    expect(testDice.validColouredNumbers.includes(num)).toBeTruthy();
+  })
 });
