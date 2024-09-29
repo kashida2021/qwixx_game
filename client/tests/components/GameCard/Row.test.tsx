@@ -39,6 +39,22 @@ const gameCardDataWithNumbers: QwixxLogic['players'][string] = {
   penalties: 0,
 };
 
+const gameCardMarked: QwixxLogic['players'][string] = {
+  rows: {
+    red: [6],
+    yellow: [],
+    green: [],
+    blue: [],
+  },
+  isLocked: {
+    red: false,
+    yellow: false,
+    green: false,
+    blue: false,
+  },
+  penalties: 0,
+};
+
 const gameCardWithLockedRow: QwixxLogic['players'][string] = {
   rows: {
     red: [],
@@ -95,8 +111,8 @@ describe("Row component test:", () => {
 
 
   //IGNORE THESE TESTS FOR NOW AS THEY'RE RELATED TO LOCKING UI
-  describe.skip("Player's Card", () => {
-    test("it renders buttons with disabled attribute", () => {
+  describe("Player's Card", () => {
+    test.skip("it renders buttons with disabled attribute", () => {
       render(
         <Row
           rowColour={RowColour.Red}
@@ -114,7 +130,8 @@ describe("Row component test:", () => {
       );
       expect(disabledButtons.length).toBe(4);
     });
-    test("when a button is clicked it becomes disabled", async () => {
+
+    test.skip("when a button is clicked it becomes disabled", async () => {
       render(
         <Row
           rowColour={RowColour.Red}
@@ -139,13 +156,13 @@ describe("Row component test:", () => {
           numbers={numbers}
           isOpponent={false}
           rowIndex={0}
-          gameCardData={gameCardDataWithNumbers}
+          gameCardData={gameCardMarked}
           cellClick={mockCellClick}
         />
       );
 
       const redButtons = screen.getAllByRole("button");
-      await user.click(redButtons[4]);
+      await user.click(redButtons[6]);
 
       await waitFor(()=> {
         expect(redButtons[3]).toHaveClass("disabled");
@@ -154,7 +171,7 @@ describe("Row component test:", () => {
     });
 
 
-    test("when the row is locked, all buttons are disabled", async () => {
+    test.skip("when the row is locked, all buttons are disabled", async () => {
       render(
         <Row
           rowColour={RowColour.Red}
@@ -170,7 +187,7 @@ describe("Row component test:", () => {
       redButtons.forEach((button) => expect(button).toBeDisabled());
     });
 
-    test("when a user clicks the last number, it locks the row", async () => {
+    test.skip("when a user clicks the last number, it locks the row", async () => {
       render(
         <Row
           rowColour={RowColour.Red}
