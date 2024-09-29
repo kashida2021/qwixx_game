@@ -43,6 +43,10 @@ export default class Dice {
     return this._diceValues;
   }
 
+  get validColouredNumber(): number[] {
+    return [10,10,10,10,10,10,10,10]
+  }
+
   disableDie(colour: DiceColour): void {
     if (this._dice[colour]) {
       this._dice[colour].disable();

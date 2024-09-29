@@ -104,8 +104,8 @@ export default class QwixxLogic {
        throw new Error("Number selected doesn't equal to sum of white dice.")
     }
 
-    if(player === this.activePlayer && player.submissionCount === 1 && num !== this._dice.validNumbers){
-      throw new Error("Number selected doesn't equal to sum of white dice and coloured die.")
+    if(player === this.activePlayer && player.submissionCount === 1 && !this._dice.validColouredNumber.includes(num)){
+      throw new Error("Number selected doesn't equal to sum of white die and coloured die.")
     }
 
     if (!player.markNumber(colourToMark, num)) {
