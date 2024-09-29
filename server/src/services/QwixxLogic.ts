@@ -97,7 +97,16 @@ export default class QwixxLogic {
 
     // active-player
     // validate num === white dice sum || white die + coloured die
+    // player first selects the sum of the white dice or they pass.
+    // player then selects the sum of a whtie dice + coloured die
+    // console.log(player.submissionCount);
+    if(player === this.activePlayer && player.submissionCount === 0 && num !== this._dice.diceValues.white1 + this._dice.diceValues.white2){
+       throw new Error("Number selected doesn't equal to sum of white dice.")
+    }
 
+    if(player === this.activePlayer && player.submissionCount === 1 && num !== this._dice.validNumbers){
+      throw new Error("Number selected doesn't equal to sum of white dice and coloured die.")
+    }
 
     if (!player.markNumber(colourToMark, num)) {
       throw new Error("Invalid move.");
