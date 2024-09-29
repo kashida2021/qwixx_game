@@ -43,8 +43,10 @@ export default class Dice {
     return this._diceValues;
   }
 
-  get validColouredNumber(): number[] {
-    return [10,10,10,10,10,10,10,10]
+  get validColouredNumbers(): number[] {
+    const whiteValues = [this._diceValues.white1, this._diceValues.white2];
+    const colouredValues = [this._diceValues.red, this._diceValues.yellow, this._diceValues.green, this._diceValues.blue];
+    return whiteValues.flatMap(white => colouredValues.filter(value => value > 0).map(value => value + white));
   }
 
   disableDie(colour: DiceColour): void {
