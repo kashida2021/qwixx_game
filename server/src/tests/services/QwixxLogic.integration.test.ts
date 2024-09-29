@@ -23,6 +23,8 @@ describe("Qwixx Logic integration tests:", () => {
     mockPlayersArray = [mockPlayer1, mockPlayer2];
 
     testGame = new QwixxLogic(mockPlayersArray, mockDice);
+
+    jest.resetAllMocks();
   });
 
   test("making a move before rolling dice throws an error", () => {
@@ -81,7 +83,7 @@ describe("Qwixx Logic integration tests:", () => {
   });
 
   test.only("active player marking a number that doesn't equal the sum of white dice should throw an error", () => {
-    jest.spyOn(Dice.prototype, "diceValues", "get").mockReturnValueOnce({
+    jest.spyOn(mockDice, "diceValues", "get").mockReturnValueOnce({
       white1: 5,
       white2: 5,
       red: 5,
@@ -109,7 +111,7 @@ describe("Qwixx Logic integration tests:", () => {
         .spyOn(mockPlayer1, "submissionCount", "get")
         .mockReturnValue(1);
 
-      jest.spyOn(Dice.prototype, "diceValues", "get").mockReturnValue({
+      jest.spyOn(mockDice, "diceValues", "get").mockReturnValueOnce({
         white1: 5,
         white2: 5,
         red: 5,
@@ -127,6 +129,17 @@ describe("Qwixx Logic integration tests:", () => {
       );
     }
   );
+
+  test.only("active-player can mark a number that equals the sum of a white and a coloured die", () => {
+    const getterMock = jest
+      .spyOn(mockPlayer1, "submissionCount", "get")
+      .mockReturnValue(1);
+
+    const diceResults = testGame.rollDice();
+    console.log(diceResults);
+    testGame.makeMove("test-player1", "red", diceResults.white1 + diceResults.red);
+    expect(mockPlayer1.hasSubmittedChoice).toEqual(2);
+  });
 
   test("non-current player can submit up to 1 move", () => {
     testGame.rollDice();
