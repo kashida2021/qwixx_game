@@ -52,9 +52,9 @@ describe("Qwixx Logic tests", () => {
     const testGame = new QwixxLogic(playersArrayMock, diceMock as Dice);
 
     testGame.rollDice();
-    testGame.makeMove("player1", "red", 2);
+    testGame.makeMove("player1", "red", 10);
 
-    expect(player1Mock.markNumber).toHaveBeenCalledWith("red", 2);
+    expect(player1Mock.markNumber).toHaveBeenCalledWith("red", 10);
     expect(player1Mock.markNumber).toHaveBeenCalledTimes(1);
   });
 
@@ -82,7 +82,7 @@ describe("Qwixx Logic tests", () => {
     (player2Mock.markNumber as jest.Mock).mockReturnValue(true);
 
     const testGame = new QwixxLogic(playersArrayMock, diceMock as Dice);
-   
+
     testGame.rollDice();
     testGame.makeMove("player2", "red", 10);
 
@@ -90,5 +90,43 @@ describe("Qwixx Logic tests", () => {
     expect(player2Mock.markNumber).toHaveBeenCalledTimes(1);
   });
 
+  // test.only("active player marking a number that doesn't equal the sum of white dice should throw an error", () => {
+  //   // const getterMock = jest
+  //   //   .spyOn(Player.prototype, "submissionCount", "get")
+  //   //   .mockReturnValueOnce(0);
 
+  //   const testGame = new QwixxLogic(playersArrayMock, diceMock as Dice);
+  //   testGame.rollDice();
+
+  //   // expect(getterMock).toHaveBeenCalled();
+
+  //   expect(() => {
+  //     testGame.makeMove("player1", "red", 9);
+  //   }).toThrow("Number selected doesn't equal to sum of white dice.");
+  // });
+
+  // test.each([
+  //   ["red", 9],
+  //   ["yellow", 9],
+  //   ["green", 9],
+  //   ["blue", 9],
+  // ])(
+  //   "active-player marking a number that doesn't equal the sum of a white dice and a %s dice should throw an error",
+  //   (row, num) => {
+  //     // const getterMock = jest
+  //     //   .spyOn(Player.prototype, "submissionCount", "get")
+  //     //   .mockReturnValueOnce(1);
+
+  //     const testGame = new QwixxLogic(playersArrayMock, diceMock as Dice);
+  //     testGame.rollDice();
+
+  //     // expect(getterMock).toHaveBeenCalled(); 
+
+  //     expect(() => {
+  //       testGame.makeMove("player1", row, num);
+  //     }).toThrow(
+  //       "Number selected doesn't equal to sum of white die and coloured die."
+  //     );
+  //   }
+  // );
 });

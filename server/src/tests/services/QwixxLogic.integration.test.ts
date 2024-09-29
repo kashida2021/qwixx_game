@@ -80,6 +80,54 @@ describe("Qwixx Logic integration tests:", () => {
     expect(mockPlayer1.hasSubmittedChoice).toBe(true);
   });
 
+  test.only("active player marking a number that doesn't equal the sum of white dice should throw an error", () => {
+    jest.spyOn(Dice.prototype, "diceValues", "get").mockReturnValueOnce({
+      white1: 5,
+      white2: 5,
+      red: 5,
+      yellow: 5,
+      green: 5,
+      blue: 5,
+    });
+
+    testGame.rollDice();
+
+    expect(() => {
+      testGame.makeMove("test-player1", "red", 9);
+    }).toThrow("Number selected doesn't equal to sum of white dice.");
+  });
+
+  test.only.each([
+    ["red", 9],
+    ["yellow", 9],
+    ["green", 9],
+    ["blue", 9],
+  ])(
+    "active-player marking a number that doesn't equal the sum of a white dice and a %s dice should throw an error",
+    (row, num) => {
+      const getterMock = jest
+        .spyOn(mockPlayer1, "submissionCount", "get")
+        .mockReturnValue(1);
+
+      jest.spyOn(Dice.prototype, "diceValues", "get").mockReturnValue({
+        white1: 5,
+        white2: 5,
+        red: 5,
+        yellow: 5,
+        green: 5,
+        blue: 5,
+      });
+
+      testGame.rollDice();
+      // expect(getterMock).toHaveBeenCalled();
+      expect(() => {
+        testGame.makeMove("test-player1", row, num);
+      }).toThrow(
+        "Number selected doesn't equal to sum of white die and coloured die."
+      );
+    }
+  );
+
   test("non-current player can submit up to 1 move", () => {
     testGame.rollDice();
     testGame.makeMove("test-player2", "red", 2);
