@@ -42,9 +42,9 @@ export default class QwixxLogic {
   private haveAllPlayersSubmitted(): boolean {
     return this._playersArray.every((player) => player.hasSubmittedChoice);
   }
- 
-  private processPlayersSubmission(){
-    if (this.haveAllPlayersSubmitted()){
+
+  private processPlayersSubmission() {
+    if (this.haveAllPlayersSubmitted()) {
       this.resetAllPlayersSubmission();
       this.nextTurn();
     }
@@ -73,8 +73,8 @@ export default class QwixxLogic {
         throw new Error("Invalid colour.");
     }
 
-    if(num < 2 || num > 12){
-      throw new Error("Dice number is out of range.")
+    if (num < 2 || num > 12) {
+      throw new Error("Dice number is out of range.");
     }
 
     const player = this._playersArray.find(
@@ -85,14 +85,17 @@ export default class QwixxLogic {
       throw new Error("Player not found.");
     }
 
-    if (player.hasSubmittedChoice){
-      throw new Error("Player already finished their turn.")
+    if (player.hasSubmittedChoice) {
+      throw new Error("Player already finished their turn.");
     }
 
     // non-active player
     // validate num === white dice sum
-    if(player !== this.activePlayer && num !== this._dice.diceValues.white1 + this._dice.diceValues.white2){
-      throw new Error("Number selected doesn't equal to sum of white dice.")
+    if (
+      player !== this.activePlayer &&
+      num !== this._dice.diceValues.white1 + this._dice.diceValues.white2
+    ) {
+      throw new Error("Number selected doesn't equal to sum of white dice.");
     }
 
     // active-player
@@ -100,12 +103,22 @@ export default class QwixxLogic {
     // player first selects the sum of the white dice or they pass.
     // player then selects the sum of a whtie dice + coloured die
     // console.log(player.submissionCount);
-    if(player === this.activePlayer && player.submissionCount === 0 && num !== this._dice.diceValues.white1 + this._dice.diceValues.white2){
-       throw new Error("Number selected doesn't equal to sum of white dice.")
+    if (
+      player === this.activePlayer &&
+      player.submissionCount === 0 &&
+      num !== this._dice.diceValues.white1 + this._dice.diceValues.white2
+    ) {
+      throw new Error("Number selected doesn't equal to sum of white dice.");
     }
 
-    if(player === this.activePlayer && player.submissionCount === 1 && !this._dice.validColouredNumbers.includes(num)){
-      throw new Error("Number selected doesn't equal to sum of white die and coloured die.")
+    if (
+      player === this.activePlayer &&
+      player.submissionCount === 1 &&
+      !this._dice.validColouredNumbers[colourToMark]?.includes(num)
+    ) {
+      throw new Error(
+        "Number selected doesn't equal to sum of white die and coloured die."
+      );
     }
 
     if (!player.markNumber(colourToMark, num)) {
@@ -124,8 +137,8 @@ export default class QwixxLogic {
     return this.serialize();
   }
 
-  public endTurn(playerName: string){
-     const player = this._playersArray.find(
+  public endTurn(playerName: string) {
+    const player = this._playersArray.find(
       (player) => player.name === playerName
     );
 
@@ -133,18 +146,18 @@ export default class QwixxLogic {
       throw new Error("Player not found.");
     }
 
-    if (player.hasSubmittedChoice){
-      throw new Error("Player already finished their turn.")
+    if (player.hasSubmittedChoice) {
+      throw new Error("Player already finished their turn.");
     }
 
-    if(player !== this.activePlayer){
+    if (player !== this.activePlayer) {
       player.markSubmitted();
     }
 
-    if(player === this.activePlayer){
+    if (player === this.activePlayer) {
       player.markSubmitted();
     }
-    
+
     this.processPlayersSubmission();
 
     return this.serialize();
