@@ -11,8 +11,9 @@ export default class SixSidedDie {
     return this._value;
   }
 
-  rollDie(): void {
+  rollDie(): number {
     this._value = Math.floor(Math.random() * 6) + 1;
+    return this._value;
   }
 
   get active(): boolean {
