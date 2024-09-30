@@ -32,8 +32,9 @@ export default class Dice {
       if (this._dice[dieColour].active === false) {
         this._diceValues[dieColour] = 0;
       } else {
-        this._dice[dieColour].rollDie();
-        this._diceValues[dieColour] = this._dice[dieColour].value;
+        // this._dice[dieColour].rollDie();
+        // this._diceValues[dieColour] = this._dice[dieColour].value;
+        this._diceValues[dieColour] = this._dice[dieColour].rollDie();
       }
     });
     return this._diceValues;
