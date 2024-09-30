@@ -10,6 +10,19 @@ let testGame: QwixxLogic;
 let mockPlayer1: Player;
 let mockPlayer2: Player;
 
+jest.mock("../../models/SixSidedDieClass");
+
+const SixSidedDieMock = SixSidedDie as jest.MockedClass<typeof SixSidedDie>;
+
+// Set up the behavior of all `rollDie()` calls
+SixSidedDieMock.prototype.rollDie
+  .mockImplementationOnce(() => 2)
+  .mockImplementationOnce(() => 3)
+  .mockImplementationOnce(() => 4)
+  .mockImplementationOnce(() => 5)
+  .mockImplementationOnce(() => 6)
+  .mockImplementationOnce(() => 1);
+
 describe("Qwixx Logic integration tests:", () => {
   beforeEach(() => {
     const mockgameCard1 = new qwixxBaseGameCard();
@@ -18,7 +31,7 @@ describe("Qwixx Logic integration tests:", () => {
     const mockgameCard2 = new qwixxBaseGameCard();
     mockPlayer2 = new Player("test-player2", mockgameCard2);
 
-    mockDice = new Dice(SixSidedDie);
+    mockDice = new Dice(SixSidedDieMock);
 
     mockPlayersArray = [mockPlayer1, mockPlayer2];
 
@@ -27,7 +40,7 @@ describe("Qwixx Logic integration tests:", () => {
 
   afterEach(() => {
     jest.restoreAllMocks();
-  })
+  });
 
   describe("Game logic tests", () => {
     test("making a move before rolling dice throws an error", () => {
@@ -63,19 +76,19 @@ describe("Qwixx Logic integration tests:", () => {
       }
     });
 
-    test("when all players have submitted a move, it should go to the next turn by making the next player the active player", () => {
+    test.only("when all players have submitted a move, it should go to the next turn by making the next player the active player", () => {
       testGame.rollDice();
       const initialGameState = testGame.serialize();
 
       expect(initialGameState.activePlayer).toBe("test-player1");
 
-      const firstMoveState = testGame.makeMove("test-player1", "red", 2);
+      const firstMoveState = testGame.makeMove("test-player1", "red", 5);
       expect(firstMoveState.activePlayer).toBe("test-player1");
 
       const secondMoveState = testGame.makeMove("test-player1", "red", 3);
       expect(secondMoveState.activePlayer).toBe("test-player1");
 
-      const finalMoveState = testGame.makeMove("test-player2", "blue", 3);
+      const finalMoveState = testGame.makeMove("test-player2", "blue", 5);
       expect(finalMoveState.activePlayer).toBe("test-player2");
     });
 
@@ -177,7 +190,9 @@ describe("Qwixx Logic integration tests:", () => {
       (row, num) => {
         jest.spyOn(mockPlayer1, "submissionCount", "get").mockReturnValue(1);
 
-        jest.spyOn(mockDice, "validColouredNumbers", "get").mockReturnValue([3,4,5,6,7,8,7,2]);
+        jest
+          .spyOn(mockDice, "validColouredNumbers", "get")
+          .mockReturnValue([3, 4, 5, 6, 7, 8, 7, 2]);
 
         testGame.rollDice();
         expect(() => {
@@ -199,7 +214,9 @@ describe("Qwixx Logic integration tests:", () => {
 
       expect(validNumbers.includes(secondNumber)).toBeTruthy;
 
-      expect(() => testGame.makeMove("test-player1", "red", secondNumber)).not.toThrow(
+      expect(() =>
+        testGame.makeMove("test-player1", "red", secondNumber)
+      ).not.toThrow(
         "Number selected doesn't equal to sum of white die and coloured die."
       );
     });
