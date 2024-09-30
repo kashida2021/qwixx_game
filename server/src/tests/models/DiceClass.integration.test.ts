@@ -50,11 +50,11 @@ describe("Dice integration tests", () => {
     );
   });
 
-  test("validColouredNumbers returns an array of valid number", () => {
+  test("validColouredNumbers returns an object of valid number", () => {
     const diceValues = testDice.rollAllDice();
 
     const num = diceValues.white1 + diceValues.red;
 
-    expect(testDice.validColouredNumbers.includes(num)).toBeTruthy();
+    expect(testDice.validColouredNumbers["red"]?.includes(num)).toBeTruthy();
   })
 });
