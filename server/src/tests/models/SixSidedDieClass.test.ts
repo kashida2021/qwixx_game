@@ -14,6 +14,12 @@ describe("Die Class tests", () => {
     expect(testDie.value).toEqual(1);
   });
 
+  test("rollDie() method should return the value of the dice roll", () => {
+    const result = testDie.rollDie();
+    expect(result).toBeGreaterThanOrEqual(1);
+    expect(result).toBeLessThanOrEqual(6);
+  });
+
   test("When the rollDie method is called it updates the die's value", () => {
     testDie.rollDie();
     const rollResult = testDie.value;
