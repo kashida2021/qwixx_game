@@ -15,16 +15,16 @@ jest.mock("../../models/SixSidedDieClass");
 const SixSidedDieMock = SixSidedDie as jest.MockedClass<typeof SixSidedDie>;
 
 // Set up the behavior of all `rollDie()` calls
-SixSidedDieMock.prototype.rollDie
-  .mockImplementationOnce(() => 2)
-  .mockImplementationOnce(() => 3)
-  .mockImplementationOnce(() => 4)
-  .mockImplementationOnce(() => 5)
-  .mockImplementationOnce(() => 6)
-  .mockImplementationOnce(() => 1);
-
 describe("Qwixx Logic integration tests:", () => {
   beforeEach(() => {
+    SixSidedDieMock.prototype.rollDie
+      .mockImplementationOnce(() => 2)
+      .mockImplementationOnce(() => 3)
+      .mockImplementationOnce(() => 4)
+      .mockImplementationOnce(() => 5)
+      .mockImplementationOnce(() => 6)
+      .mockImplementationOnce(() => 1);
+
     const mockgameCard1 = new qwixxBaseGameCard();
     mockPlayer1 = new Player("test-player1", mockgameCard1);
 
@@ -76,16 +76,18 @@ describe("Qwixx Logic integration tests:", () => {
       }
     });
 
-    test.only("when all players have submitted a move, it should go to the next turn by making the next player the active player", () => {
-      testGame.rollDice();
+    test("when all players have submitted a move, it should go to the next turn by making the next player the active player", () => {
+      const result = testGame.rollDice();
       const initialGameState = testGame.serialize();
-
+      console.log(result);
       expect(initialGameState.activePlayer).toBe("test-player1");
+
+      
 
       const firstMoveState = testGame.makeMove("test-player1", "red", 5);
       expect(firstMoveState.activePlayer).toBe("test-player1");
 
-      const secondMoveState = testGame.makeMove("test-player1", "red", 3);
+      const secondMoveState = testGame.makeMove("test-player1", "red", 7);
       expect(secondMoveState.activePlayer).toBe("test-player1");
 
       const finalMoveState = testGame.makeMove("test-player2", "blue", 5);
@@ -95,14 +97,14 @@ describe("Qwixx Logic integration tests:", () => {
     test("when the game goes to the next turn, all players' submission state is reset", () => {
       testGame.rollDice();
 
-      testGame.makeMove("test-player1", "red", 2);
-      testGame.makeMove("test-player2", "blue", 3);
+      testGame.makeMove("test-player1", "red", 5);
+      testGame.makeMove("test-player2", "blue", 5);
 
       expect(mockPlayer1.submissionCount).toBe(1);
       expect(mockPlayer2.submissionCount).toBe(1);
       expect(mockPlayer2.hasSubmittedChoice).toBeTruthy();
 
-      testGame.makeMove("test-player1", "red", 3);
+      testGame.makeMove("test-player1", "red", 7);
 
       expect(mockPlayer1.hasSubmittedChoice).toBeFalsy();
       expect(mockPlayer1.submissionCount).toBe(0);
@@ -136,30 +138,30 @@ describe("Qwixx Logic integration tests:", () => {
   describe("active player tests", () => {
     test("current player can submit up to 2 moves", () => {
       testGame.rollDice();
-      testGame.makeMove("test-player1", "red", 2);
+      testGame.makeMove("test-player1", "red", 5);
       expect(mockPlayer1.submissionCount).toBe(1);
 
-      testGame.makeMove("test-player1", "red", 3);
+      testGame.makeMove("test-player1", "red", 7);
       expect(mockPlayer1.submissionCount).toBe(2);
     });
 
     test("current player can't submit more than 2 moves", () => {
       testGame.rollDice();
-      testGame.makeMove("test-player1", "red", 2);
-      testGame.makeMove("test-player1", "red", 3);
+      testGame.makeMove("test-player1", "red", 5);
+      testGame.makeMove("test-player1", "red", 7);
 
       expect(() => {
-        testGame.makeMove("test-player1", "red", 4);
+        testGame.makeMove("test-player1", "yellow", 7);
       }).toThrow("Player already finished their turn");
     });
 
     test("current player's hasSubmittedChoice is updated after submitting 2 moves", () => {
       testGame.rollDice();
 
-      testGame.makeMove("test-player1", "red", 2);
+      testGame.makeMove("test-player1", "red", 5);
       expect(mockPlayer1.hasSubmittedChoice).toBe(false);
 
-      testGame.makeMove("test-player1", "red", 3);
+      testGame.makeMove("test-player1", "red", 7);
       expect(mockPlayer1.hasSubmittedChoice).toBe(true);
     });
 
@@ -192,7 +194,13 @@ describe("Qwixx Logic integration tests:", () => {
 
         jest
           .spyOn(mockDice, "validColouredNumbers", "get")
-          .mockReturnValue([3, 4, 5, 6, 7, 8, 7, 2]);
+          // .mockReturnValue([3, 4, 5, 6, 7, 8, 7, 2])
+          .mockReturnValue({
+            red: [3, 7],
+            yellow: [4, 8],
+            green: [5, 7],
+            blue: [6, 2],
+          });
 
         testGame.rollDice();
         expect(() => {
@@ -212,7 +220,7 @@ describe("Qwixx Logic integration tests:", () => {
 
       const validNumbers = mockDice.validColouredNumbers;
 
-      expect(validNumbers.includes(secondNumber)).toBeTruthy;
+      expect(validNumbers["red"]?.includes(secondNumber)).toBeTruthy;
 
       expect(() =>
         testGame.makeMove("test-player1", "red", secondNumber)
@@ -231,23 +239,23 @@ describe("Qwixx Logic integration tests:", () => {
   describe("non-active player tests", () => {
     test("non-current player can submit up to 1 move", () => {
       testGame.rollDice();
-      testGame.makeMove("test-player2", "red", 2);
+      testGame.makeMove("test-player2", "red", 5);
       expect(mockPlayer2.submissionCount).toBe(1);
     });
 
     test("non-current player can't submit more than 1 moves", () => {
       testGame.rollDice();
-      testGame.makeMove("test-player2", "red", 2);
+      testGame.makeMove("test-player2", "red", 5);
 
       expect(() => {
-        testGame.makeMove("test-player2", "red", 3);
+        testGame.makeMove("test-player2", "red", 7);
       }).toThrow("Player already finished their turn");
     });
 
     test("non-current player's hasSubmittedChoice is updated after submitting 1 move", () => {
       testGame.rollDice();
 
-      testGame.makeMove("test-player2", "red", 2);
+      testGame.makeMove("test-player2", "red", 5);
       expect(mockPlayer2.hasSubmittedChoice).toBe(true);
     });
 
