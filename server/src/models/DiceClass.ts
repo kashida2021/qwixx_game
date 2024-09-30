@@ -44,10 +44,24 @@ export default class Dice {
     return this._diceValues;
   }
 
-  get validColouredNumbers(): number[] {
-    const whiteValues = [this._diceValues.white1, this._diceValues.white2];
-    const colouredValues = [this._diceValues.red, this._diceValues.yellow, this._diceValues.green, this._diceValues.blue];
-    return whiteValues.flatMap(white => colouredValues.filter(value => value > 0).map(value => value + white));
+  // get validColouredNumbers(): number[] {
+  //   const whiteValues = [this._diceValues.white1, this._diceValues.white2];
+  //   const colouredValues = [this._diceValues.red, this._diceValues.yellow, this._diceValues.green, this._diceValues.blue];
+  //   return whiteValues.flatMap(white => colouredValues.filter(value => value > 0).map(value => value + white));
+  // }
+
+  get validColouredNumbers() {
+    const { white1, white2, ...colouredValues } = this._diceValues;
+    const result: { [key in DiceColour]?: number[] } = {};
+    
+    for (const [colour, value] of Object.entries(colouredValues)) {
+      const colourKey = colour as DiceColour;
+      if (value > 0) {
+        result[colourKey] = [value + white1, value + white2];
+      }
+    }
+    
+    return result;
   }
 
   disableDie(colour: DiceColour): void {
