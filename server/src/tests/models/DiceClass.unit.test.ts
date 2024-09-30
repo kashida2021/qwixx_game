@@ -21,11 +21,18 @@ describe("DiceClass unit test", () => {
       .mockReturnValueOnce(5) // Mock for Green
       .mockReturnValueOnce(1); // Mock for Blue (should be ignored)
 
+    const expectedNumbers = {
+      red: [6, 7],
+      yellow: [8, 9],
+      green: [7, 8],
+      blue: [3, 4],
+    };
+
     testDice.rollAllDice();
 
     const validColouredNumbers = testDice.validColouredNumbers;
 
-    expect(validColouredNumbers).toEqual([6, 8, 7, 3, 7, 9, 8, 4]);
+    expect(validColouredNumbers).toEqual(expectedNumbers);
   });
 
   it("should ignore sums involving dice values of 0", () => {
@@ -38,11 +45,18 @@ describe("DiceClass unit test", () => {
       .mockReturnValueOnce(5)
       .mockReturnValueOnce(0);
 
+    const expectedNumbers = {
+      red: [6, 7],
+      // yellow: [],
+      green: [7, 8],
+      // blue: [],
+    };
+
     testDice.rollAllDice();
 
     const validColouredNumbers = testDice.validColouredNumbers;
 
-    expect(validColouredNumbers).toEqual([6, 7, 7, 8]);
+    expect(validColouredNumbers).toEqual(expectedNumbers);
   });
 
   it("should ignore sums involving dice of negative values", () => {
@@ -55,11 +69,15 @@ describe("DiceClass unit test", () => {
       .mockReturnValueOnce(5)
       .mockReturnValueOnce(-1);
 
+    const expectedNumbers = {
+      green: [7, 8],
+    }
+
     testDice.rollAllDice();
 
     const validColouredNumbers = testDice.validColouredNumbers;
 
-    expect(validColouredNumbers).toEqual([7, 8]);
+    expect(validColouredNumbers).toEqual(expectedNumbers);
   });
 
   it("should hanlde duplicate sums for duplicate values", () => {
@@ -72,10 +90,25 @@ describe("DiceClass unit test", () => {
       .mockReturnValueOnce(5)
       .mockReturnValueOnce(4);
 
+    const expectedNumbers = {
+      red: [7, 7], 
+      yellow: [6, 6],
+      green: [7, 7], 
+      blue: [6, 6], 
+    }
     testDice.rollAllDice();
 
     const validColouredNumbers = testDice.validColouredNumbers;
 
-    expect(validColouredNumbers).toEqual([7, 6, 7, 6, 7, 6, 7, 6]);
+    expect(validColouredNumbers).toEqual(expectedNumbers);
   });
 });
+
+// diceValues = {
+//   red: [3,5],
+//   yellow: [4,6],
+//   green: [8,5],
+//   blue: [3,4],
+// }
+
+// !validColouredNumbers[colourToMark].includes(num)
