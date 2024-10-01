@@ -89,8 +89,10 @@ export default class QwixxLogic {
       throw new Error("Player already finished their turn.");
     }
 
-    // non-active player
-    // validate num === white dice sum
+    /**
+     * @description
+     * Checks the non-active player's number selection.
+     */
     if (
       player !== this.activePlayer &&
       num !== this._dice.diceValues.white1 + this._dice.diceValues.white2
@@ -98,11 +100,10 @@ export default class QwixxLogic {
       throw new Error("Number selected doesn't equal to sum of white dice.");
     }
 
-    // active-player
-    // validate num === white dice sum || white die + coloured die
-    // player first selects the sum of the white dice or they pass.
-    // player then selects the sum of a whtie dice + coloured die
-    // console.log(player.submissionCount);
+    /**
+     * @description
+     * Checks the active player's first number selection is valid.
+     */
     if (
       player === this.activePlayer &&
       player.submissionCount === 0 &&
@@ -111,6 +112,10 @@ export default class QwixxLogic {
       throw new Error("Number selected doesn't equal to sum of white dice.");
     }
 
+    /**
+     * @description
+     * Checks the active player's second number selection is valid.
+     */
     if (
       player === this.activePlayer &&
       player.submissionCount === 1 &&
