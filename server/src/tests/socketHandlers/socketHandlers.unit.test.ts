@@ -11,9 +11,9 @@ import GameBoard from "../../models/QwixxBaseGameCard";
 import QwixxLogic from "../../services/QwixxLogic";
 import Dice from "../../models/DiceClass";
 
-/**
- * @description
- * We need to stub the return value for diceValues as rolling the dice returns random numbers.
+/*
+ * Stub the return value for diceValues to avoid randomness in tests.
+ * This ensures that every time diceValues is accessed, it returns a predictable set of values.
  */
 jest.spyOn(Dice.prototype, "diceValues", "get").mockReturnValue({
   white1: 5,
@@ -24,9 +24,9 @@ jest.spyOn(Dice.prototype, "diceValues", "get").mockReturnValue({
   blue: 5,
 });
 
-/**
- * @description
- * generateUniqueRoomId returns a random 4 digit number so we need to control for each test case.
+/*
+ * Mock the generateUniqueRoomId function to return controlled values for tests.
+ * This ensures that tests using this mock do not generate random values.
  */
 const generateUniqueRoomIdMock = generateUniqueRoomId as jest.MockedFunction<
   typeof generateUniqueRoomId
