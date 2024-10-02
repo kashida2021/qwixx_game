@@ -109,4 +109,25 @@ describe("Qwixx Logic tests", () => {
       );
     }
   );
+  
+  test.each([
+    ["red", 10],
+    ["yellow", 10],
+    ["green", 10],
+    ["blue", 10],
+  ])(
+    "active-player marking a number that equals the sum of a white dice and a %s dice shouldn't throw an error",
+    (row, num) => {
+      jest.spyOn(player1Mock, "submissionCount", "get").mockReturnValue(1);
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
+
+      testGame.rollDice();
+
+      expect(() => {
+        testGame.makeMove("player1", row, num);
+      }).not.toThrow(
+        "Number selected doesn't equal to sum of white die and coloured die."
+      );
+    }
+  );
 });
