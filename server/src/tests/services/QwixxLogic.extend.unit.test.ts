@@ -15,7 +15,6 @@ class qwixxBaseGameCardMock extends qwixxBaseGameCard {
 class playerMock extends Player {
   markNumber = jest.fn();
 }
-
 class diceMock extends Dice {
   get diceValues(): Record<DiceColour, number> {
     return {
@@ -27,10 +26,17 @@ class diceMock extends Dice {
       blue: 5,
     };
   }
+  get validColouredNumbers() {
+    return {
+      red: [10, 10],
+      yellow: [10, 10],
+      green: [10, 10],
+      blue: [10, 10],
+    }
+  }
   rollAllDice = jest.fn();
   serialize = jest.fn();
 }
-
 class SixSidedDieMock extends SixSidedDie {}
 
 const fakeDice = new diceMock(SixSidedDieMock);
@@ -110,6 +116,27 @@ describe("Qwixx Logic tests", () => {
       expect(() => {
         testGame.makeMove("player1", row, num);
       }).toThrow(
+        "Number selected doesn't equal to sum of white die and coloured die."
+      );
+    }
+  );
+
+  test.each([
+    ["red", 10],
+    ["yellow", 10],
+    ["green", 10],
+    ["blue", 10],
+  ])(
+    "active-player marking a number that doesn't equal the sum of a white dice and a %s dice should throw an error",
+    (row, num) => {
+      jest.spyOn(player1Mock, "submissionCount", "get").mockReturnValue(1);
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
+
+      testGame.rollDice();
+
+      expect(() => {
+        testGame.makeMove("player1", row, num);
+      }).not.toThrow(
         "Number selected doesn't equal to sum of white die and coloured die."
       );
     }
