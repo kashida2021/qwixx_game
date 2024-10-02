@@ -89,8 +89,7 @@ export default class QwixxLogic {
       throw new Error("Player already finished their turn.");
     }
 
-    /**
-     * @description
+    /*
      * Checks the non-active player's number selection.
      */
     if (
@@ -100,9 +99,9 @@ export default class QwixxLogic {
       throw new Error("Number selected doesn't equal to sum of white dice.");
     }
 
-    /**
-     * @description
+    /*
      * Checks the active player's first number selection is valid.
+     * A valid move for first selection is the sum of the white dice.
      */
     if (
       player === this.activePlayer &&
@@ -112,9 +111,9 @@ export default class QwixxLogic {
       throw new Error("Number selected doesn't equal to sum of white dice.");
     }
 
-    /**
-     * @description
+    /*
      * Checks the active player's second number selection is valid.
+     * A valid move for the second selection is the sum of a white die + coloured die
      */
     if (
       player === this.activePlayer &&
