@@ -9,16 +9,44 @@ import { generateUniqueRoomId } from "../../utils/roomUtils";
 import Player from "../../models/PlayerClass";
 import GameBoard from "../../models/QwixxBaseGameCard";
 import QwixxLogic from "../../services/QwixxLogic";
+import Dice from "../../models/DiceClass";
 
+/**
+ * @description
+ * We need to stub the return value for diceValues as rolling the dice returns random numbers.
+ */
+jest.spyOn(Dice.prototype, "diceValues", "get").mockReturnValue({
+  white1: 5,
+  white2: 5,
+  red: 5,
+  yellow: 5,
+  green: 5,
+  blue: 5,
+});
+
+/**
+ * @description
+ * generateUniqueRoomId returns a random 4 digit number so we need to control for each test case.
+ */
 const generateUniqueRoomIdMock = generateUniqueRoomId as jest.MockedFunction<
   typeof generateUniqueRoomId
 >;
 
-//We can use this utility function to make our test "act" more synchronous
-//Need to use it with async/await, otherwise it returns a 'promise pending'
-//1st arg is the socket listening for the event
-//2nd arg is the event being listened for
-//Declare a variable and assign the function to it
+/**
+ * @param {ServerSocket | ClientSocket} socket
+ * @param {string} event 
+ * @returns {Promise<any>}
+ * @description
+ * We can use this utility funciton to make our test "act" more synchronous.
+ * It needs to be used with async/await, otherwise it reutns a "promise pending".
+ * 1st arg is the socket listening for the event.
+ * 2nd arg is the event being listened out for.
+ * Declare a variable and assign the funciton to it.
+ * Example usage:
+ * ```typescript
+ * const data = await waitFor(socket, 'message')
+ * ```
+ */
 function waitFor(socket: ServerSocket | ClientSocket, event: string) {
   return new Promise((resolve) => {
     socket.once(event, resolve);
@@ -42,7 +70,7 @@ describe("socket event handler test", () => {
   describe("2 clients:", () => {
     beforeEach((done) => {
       //Clean up mock for each test
-      generateUniqueRoomIdMock.mockReset();
+      generateUniqueRoomIdMock.mockClear();
 
       //Create mock clients for testing
       const httpServer = createServer();
@@ -268,7 +296,7 @@ describe("socket event handler test", () => {
             clientSocket2.emit("mark_numbers", {
               lobbyId: "1234",
               userId: "clientSocket2",
-              playerChoice: { row: "red", num: 5 },
+              playerChoice: { row: "red", num: 10 },
             });
             resolve();
           });
@@ -281,7 +309,7 @@ describe("socket event handler test", () => {
 
         const player2 = updatedGameState.gameState.players.clientSocket2;
         expect(player2).toEqual({
-          rows: { red: [5], yellow: [], green: [], blue: [] },
+          rows: { red: [10], yellow: [], green: [], blue: [] },
           isLocked: { red: false, yellow: false, green: false, blue: false },
           penalties: 0,
         });
