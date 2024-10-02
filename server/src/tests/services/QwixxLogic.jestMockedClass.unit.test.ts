@@ -5,41 +5,78 @@ import Dice from "../../models/DiceClass";
 import { DiceColour } from "../../enums/DiceColours";
 import SixSidedDie from "../../models/SixSidedDieClass";
 
-// Need to instantiate QwixxLogic class
-// I can:
-//create a fake
-//spyOn the method
-//mock a function?
+jest.mock("../../models/PlayerClass");
+jest.mock("../../models/DiceClass");
+jest.mock("../../models/QwixxBaseGameCard");
+jest.mock("../../models/SixSidedDieClass");
 
-const MockedGameCardClass = qwixxBaseGameCard as jest.Mocked<
+const GameCardMock = qwixxBaseGameCard as jest.MockedClass<
   typeof qwixxBaseGameCard
 >;
-const gameCardMock1 = new MockedGameCardClass();
-const gameCardMock2 = new MockedGameCardClass();
+const gameCardMock1 = new GameCardMock();
+const gameCardMock2 = new GameCardMock();
 
-const player1Mock = new Player("player1", gameCardMock1) as jest.Mocked<Player>;
-player1Mock.markNumber = jest.fn().mockReturnValue(true);
+const MockedPlayerClass = Player as jest.MockedClass<typeof Player>;
+MockedPlayerClass.mockImplementation(function (
+  this: any,
+  name: string,
+  gameCard: any
+) {
+  this.name = name;
+  this.gameCard = gameCard;
+  this.markNumber = jest.fn().mockReturnValue(true); 
+  // Set up a private variable to track submission count dynamically
+  let _submissionCount = 0;
 
-const player2Mock = new Player("player2", gameCardMock2) as jest.Mocked<Player>;
-player2Mock.markNumber = jest.fn().mockReturnValue(true);
+  // Use `Object.defineProperty` to set up the `submissionCount` getter
+  Object.defineProperty(this, "submissionCount", {
+    get: jest.fn(() => _submissionCount),
+    configurable: true,
+  });
 
-const MockedDie = SixSidedDie as jest.Mocked<typeof SixSidedDie>;
-const MockedDiceClass = Dice as jest.Mocked<typeof Dice>;
+  return this;
+});
+
+const player1Mock = new MockedPlayerClass("player1", gameCardMock1);
+const player2Mock = new MockedPlayerClass("player2", gameCardMock2);
+
+const MockedDie = SixSidedDie as jest.MockedClass<typeof SixSidedDie>;
+const MockedDiceClass = Dice as jest.MockedClass<typeof Dice>;
+MockedDiceClass.mockImplementation(function (
+  this: any,
+  DieClass: typeof SixSidedDie
+) {
+  // Create dice instances from the mocked SixSidedDie class
+  this._dice = {
+    [DiceColour.White1]: new DieClass(),
+    [DiceColour.White2]: new DieClass(),
+    [DiceColour.Red]: new DieClass(),
+    [DiceColour.Yellow]: new DieClass(),
+    [DiceColour.Green]: new DieClass(),
+    [DiceColour.Blue]: new DieClass(),
+  };
+
+  // Manually set the expected mock values for `diceValues`
+  this.diceValues = {
+    [DiceColour.White1]: 5,
+    [DiceColour.White2]: 5,
+    [DiceColour.Red]: 5,
+    [DiceColour.Yellow]: 5,
+    [DiceColour.Green]: 5,
+    [DiceColour.Blue]: 5,
+  };
+
+  // Set up `validColouredNumbers` mock values
+  this.validColouredNumbers = {
+    [DiceColour.Red]: [10, 10],
+    [DiceColour.Yellow]: [10, 10],
+    [DiceColour.Green]: [10, 10],
+    [DiceColour.Blue]: [10, 10],
+  };
+
+  return this;
+});
 const fakeDice = new MockedDiceClass(MockedDie);
-jest.spyOn(fakeDice, "diceValues", "get").mockReturnValue({
-  [DiceColour.White1]: 5,
-  [DiceColour.White2]: 5,
-  [DiceColour.Red]: 5,
-  [DiceColour.Yellow]: 5,
-  [DiceColour.Green]: 5,
-  [DiceColour.Blue]: 5,
-});
-jest.spyOn(fakeDice, "validColouredNumbers", "get").mockReturnValue({
-  [DiceColour.Red]: [10, 10],
-  [DiceColour.Yellow]: [10, 10],
-  [DiceColour.Green]: [10, 10],
-  [DiceColour.Blue]: [10, 10],
-});
 
 const playersArrayMock = [player1Mock, player2Mock];
 
