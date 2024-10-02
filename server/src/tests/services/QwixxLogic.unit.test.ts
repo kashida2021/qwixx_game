@@ -5,12 +5,6 @@ import Dice from "../../models/DiceClass";
 import { DiceColour } from "../../enums/DiceColours";
 import SixSidedDie from "../../models/SixSidedDieClass";
 
-// Need to instantiate QwixxLogic class
-// I can:
-//create a fake
-//spyOn the method
-//mock a function?
-
 const MockedGameCardClass = qwixxBaseGameCard as jest.Mocked<
   typeof qwixxBaseGameCard
 >;
@@ -18,12 +12,10 @@ const gameCardMock1 = new MockedGameCardClass();
 const gameCardMock2 = new MockedGameCardClass();
 
 const player1Mock = new Player("player1", gameCardMock1) as jest.Mocked<Player>;
-player1Mock.markNumber = jest.fn();
-player1Mock.markNumber.mockReturnValue(true);
+player1Mock.markNumber = jest.fn().mockReturnValue(true);
 
 const player2Mock = new Player("player2", gameCardMock2) as jest.Mocked<Player>;
-player2Mock.markNumber = jest.fn();
-player2Mock.markNumber.mockReturnValue(true);
+player2Mock.markNumber = jest.fn().mockReturnValue(true);
 
 const MockedDie = SixSidedDie as jest.Mocked<typeof SixSidedDie>;
 const MockedDiceClass = Dice as jest.Mocked<typeof Dice>;
