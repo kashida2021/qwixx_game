@@ -86,6 +86,7 @@ export default class QwixxLogic {
       if (!markSuccess) {
         throw new Error("Invalid move: cannot mark this number.");
       }
+      player.markSubmitted();
       this.processPlayersSubmission();
     }
 
