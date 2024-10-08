@@ -189,6 +189,27 @@ export default class QwixxLogic {
     };
   }
 
+  public validMoveAvailable(): Record<string, boolean> {
+    const playerMoveAvailable: Record<string, boolean> = {};
+
+    for (const player of this._playersArray) {
+      let hasValidMove = false;
+
+      for (let row of ["red", "yellow", "green", "blue"]) {
+        for (let num = 2; num <= 12; num++) {
+          const validationResult = this.validMove(player.name, row, num);
+          if (validationResult.isValid) {
+            hasValidMove = true;
+            break;
+          }
+        }
+        if (hasValidMove) break;
+      }
+      playerMoveAvailable[player.name] = hasValidMove;
+    }
+    return playerMoveAvailable;
+  }
+
   public endTurn(playerName: string) {
     const player = this._playersArray.find(
       (player) => player.name === playerName
