@@ -86,8 +86,14 @@ export default class QwixxLogic {
       if (!markSuccess) {
         throw new Error("Invalid move: cannot mark this number.");
       }
-      player.markSubmitted();
-      this.processPlayersSubmission();
+
+      if (
+        (player === this.activePlayer && player.submissionCount === 2) ||
+        (player !== this.activePlayer && player.submissionCount === 1)
+      ) {
+        player.markSubmitted();
+        this.processPlayersSubmission();
+      }
     }
 
     return this.serialize();
@@ -177,16 +183,9 @@ export default class QwixxLogic {
       };
     }
 
-    if (
-      (player === this.activePlayer && player.submissionCount === 2) ||
-      (player !== this.activePlayer && player.submissionCount === 1)
-    ) {
-      return { isValid: true, errorMessage: null };
-    }
-
     return {
-      isValid: false,
-      errorMessage: new Error("Unknown error or invalid game state."),
+      isValid: true,
+      errorMessage: null,
     };
   }
 
