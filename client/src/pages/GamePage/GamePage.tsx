@@ -8,6 +8,7 @@ import { QwixxLogic } from "../../types/qwixxLogic";
 // import { SetStateAction, Dispatch } from "react";
 // import { rowColour} from "../../../../shared/types";
 import DiceContainer from "../../components/Dice/DiceContainer";
+import { MoveAvailability } from "../../types/GameCardData";
 //interface GameState {
 //players: {
 //[playerId: string]: GameCardData
@@ -20,6 +21,7 @@ interface IGameProps {
   userId: string;
   members: string[];
   gameState: QwixxLogic;
+  availableMoves: MoveAvailability;
   // setGameBoardState: Dispatch<SetStateAction<GameBoard | null>>;
 }
 
@@ -29,6 +31,7 @@ export const Game: React.FC<IGameProps> = ({
   members,
   gameState,
   socket,
+  availableMoves,
 }) => {
   const [playerChoice, setPlayerChoice] = useState<{
     row: string;
@@ -66,6 +69,11 @@ export const Game: React.FC<IGameProps> = ({
     console.log("player's choice:", playerChoice);
   }
 
+  const hasSubmitted = gameState.players[userId].hasSubmittedChoice;
+  const hasAvailableMoves = availableMoves[userId];
+  console.log("player has moves:", hasAvailableMoves);
+
+
   return (
     <div className="game-page-container">
       {/* Left hand dice zone */}
@@ -91,7 +99,7 @@ export const Game: React.FC<IGameProps> = ({
               key={index}
               member={member}
               isOpponent={true}
-              gameCardData={gameState.players[member]}
+              gameCardData={gameState.players[member].gamecard}
               cellClick={handleCellClick}
             />
           ))}
@@ -101,10 +109,15 @@ export const Game: React.FC<IGameProps> = ({
           <GameCard
             member={userId}
             isOpponent={false}
-            gameCardData={gameState.players[userId]}
+            gameCardData={gameState.players[userId].gamecard}
             cellClick={handleCellClick}
           />
-          <button onClick={handleNumberSelection}>Confirm</button>
+          {!hasAvailableMoves && !hasSubmitted ? (
+            <button className="penalty-btn">Accept Penalty</button>
+          ):
+          (<button onClick={handleNumberSelection} disabled={hasSubmitted}>Confirm</button>)
+          }
+          
         </div>
       </div>
     </div>

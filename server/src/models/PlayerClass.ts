@@ -4,13 +4,13 @@ export default class Player {
   private _name;
   private _gameCard: qwixxBaseGameCard;
   private _hasSubmittedChoice;
-  private _submissionCount; 
+  private _submissionCount;
 
   constructor(name: string, gameCard: qwixxBaseGameCard) {
     this._name = name;
     this._gameCard = gameCard;
     this._hasSubmittedChoice = false;
-    this._submissionCount = 0; 
+    this._submissionCount = 0;
   }
 
   get name(): string {
@@ -35,15 +35,18 @@ export default class Player {
   }
 
   public markNumber(colour: rowColour, num: number) {
-   if(!this._gameCard.markNumbers(colour, num)){
-      return false
+    if (!this._gameCard.markNumbers(colour, num)) {
+      return false;
     }
 
-    this._submissionCount ++
+    this._submissionCount++;
     return true;
   }
 
   serialize() {
-    return this._gameCard.serialize();
+    return {
+      gamecard: this._gameCard.serialize(),
+      hasSubmittedChoice: this._hasSubmittedChoice,
+    };
   }
 }
