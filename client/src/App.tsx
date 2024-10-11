@@ -85,8 +85,9 @@ function App() {
       console.log(data.gameState);
     };
 
-    const updateMarkedNumbers = (data: { gameState: QwixxLogic }) => {
+    const updateMarkedNumbers = (data: { gameState: QwixxLogic, moveAvailability: MoveAvailability }) => {
       setGameState(data.gameState);
+      setAvailableMoves(data.moveAvailability);
       console.log("data received from backend", data);
     };
 
@@ -111,6 +112,7 @@ function App() {
         };
       });
       setAvailableMoves(data.moveAvailability);
+      console.log("move availability after dice roll", data.moveAvailability);
     };
 
     socket.on("connect", onConnect);
