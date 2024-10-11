@@ -13,3 +13,7 @@ export interface GameCardData {
   };
   penalties: number;
 }
+
+export interface MoveAvailability {
+  [playerName: string]: boolean;
+}

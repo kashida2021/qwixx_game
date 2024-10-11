@@ -7,6 +7,7 @@ import { socket } from "./services/socketServices";
 // import GameBoard from "../../shared/GameBoard";
 import Game from "./pages/GamePage/GamePage";
 import { QwixxLogic } from "./types/qwixxLogic";
+import { MoveAvailability} from "./types/GameCardData";
 
 function App() {
   const [isConnected, setIsConnected] = useState(socket.connected);
@@ -17,6 +18,7 @@ function App() {
   const [notifications, setNotifications] = useState<string[]>([]);
   const [gameState, setGameState] = useState<QwixxLogic | null>(null);
   const [gamePath, setGamePath] = useState("");
+  const [availableMoves, setAvailableMoves] = useState<MoveAvailability>({});
 
   //Need to consier if this is overkill for our app as it's only being used in one place.
   //  const handleInputChange =
@@ -93,7 +95,7 @@ function App() {
       //console.log("turn ended", data );
     //}
 
-    const handleDiceRolled = (data: { dice: QwixxLogic['dice'] }) => {
+    const handleDiceRolled = (data: { dice: QwixxLogic['dice'], moveAvailability: MoveAvailability }) => {
       setGameState((prevState) => {
         if (!prevState) {
           return {
@@ -108,6 +110,7 @@ function App() {
           dice: data.dice,
         };
       });
+      setAvailableMoves(data.moveAvailability);
     };
 
     socket.on("connect", onConnect);
@@ -178,6 +181,7 @@ function App() {
                 userId={userId}
                 members={members}
                 gameState={gameState}
+                availableMoves={availableMoves}
                 // setGameBoardState={setGameBoardState}
               />
             ) : (
