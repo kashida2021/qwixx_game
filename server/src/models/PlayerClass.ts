@@ -17,6 +17,10 @@ export default class Player {
     return this._name;
   }
 
+  get gameCard(): qwixxBaseGameCard {
+    return this._gameCard;
+  }
+
   public get hasSubmittedChoice(): boolean {
     return this._hasSubmittedChoice;
   }

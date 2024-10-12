@@ -220,11 +220,13 @@ export default function initializeSocketHandler(io: Server) {
 
     socket.on("roll_dice", ({ lobbyId }) => {
       const diceResult = lobbiesMap[lobbyId].rollDice();
+      const hasRolled = lobbiesMap[lobbyId].gameLogic?.hasRolled;
       const moveAvailability =
         lobbiesMap[lobbyId].gameLogic?.validMoveAvailable();
       io.to(lobbyId).emit("dice_rolled", {
         dice: diceResult,
         moveAvailability,
+        hasRolled,
       });
     });
   });
