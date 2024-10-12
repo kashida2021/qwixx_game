@@ -28,4 +28,5 @@ export interface QwixxLogic {
     blue: number;
   };
   activePlayer: string;
+  hasRolled: boolean;
 }

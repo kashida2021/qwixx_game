@@ -96,23 +96,27 @@ function App() {
       //console.log("turn ended", data );
     //}
 
-    const handleDiceRolled = (data: { dice: QwixxLogic['dice'], moveAvailability: MoveAvailability }) => {
+    const handleDiceRolled = (data: { dice: QwixxLogic['dice'], moveAvailability: MoveAvailability, hasRolled: boolean }) => {
       setGameState((prevState) => {
         if (!prevState) {
           return {
             players: {},
             dice: data.dice,
             activePlayer: "",
+            hasRolled: false
           };
         }
 
         return {
           ...prevState,
           dice: data.dice,
+          hasRolled: data.hasRolled
         };
       });
       setAvailableMoves(data.moveAvailability);
       console.log("move availability after dice roll", data.moveAvailability);
+      console.log("has dice been rolled", data.hasRolled);
+      console.log("data after dice roll", data);
     };
 
     socket.on("connect", onConnect);

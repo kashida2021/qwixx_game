@@ -58,4 +58,14 @@ export default class qwixxBaseGameCard {
   get penalties() {
     return this._penalties;
   }
+
+  public getHighestMarkedNumber(row: rowColour): number {
+    const markedNumbers = this._rows[row];
+    return markedNumbers.length ? Math.max(...markedNumbers) : 1;
+  }
+
+  public getLowestMarkedNumber(row: rowColour): number {
+    const markedNumbers = this._rows[row];
+    return markedNumbers.length ? Math.min(...markedNumbers) : 13;
+  }
 }

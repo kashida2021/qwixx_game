@@ -29,7 +29,7 @@ export default class QwixxLogic {
     return this._playersArray[this._currentTurnIndex];
   }
 
-  private get hasRolled() {
+  public get hasRolled() {
     return this._hasRolled;
   }
 
@@ -134,6 +134,11 @@ export default class QwixxLogic {
       };
     }
 
+    const highestMarkedNumber =
+      player.gameCard.getHighestMarkedNumber(colourToMark);
+    const lowestMarkedNumber =
+      player.gameCard.getLowestMarkedNumber(colourToMark);
+
     /*
      * Checks the non-active player's number selection.
      */
@@ -181,6 +186,27 @@ export default class QwixxLogic {
           "Number selected doesn't equal to sum of white die and coloured die."
         ),
       };
+    }
+
+    /*add check for number being lower or higher than last checked number */
+    if (colourToMark === "red" || colourToMark === "yellow") {
+      if (num <= highestMarkedNumber) {
+        return {
+          isValid: false,
+          errorMessage: new Error(
+            "Number must be above the last marked number"
+          ),
+        };
+      }
+    } else if (colourToMark === "green" || colourToMark === "blue") {
+      if (num >= lowestMarkedNumber) {
+        return {
+          isValid: false,
+          errorMessage: new Error(
+            "Number must be below the last marked number"
+          ),
+        };
+      }
     }
 
     return {
@@ -250,6 +276,7 @@ export default class QwixxLogic {
       players: serializedPlayers,
       dice: this._dice.serialize(),
       activePlayer: this.activePlayer.name,
+      hasRolled: this._hasRolled,
     };
   }
 }
