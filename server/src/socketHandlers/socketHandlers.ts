@@ -229,5 +229,40 @@ export default function initializeSocketHandler(io: Server) {
         hasRolled,
       });
     });
+
+    socket.on("submit_penalty", ({ userId, lobbyId }) => {
+      if (!lobbyId || !userId) {
+        console.error("Missing data");
+        socket.emit("error_occured", {
+          message: "Missing data for marking penalties",
+        });
+        return;
+      }
+
+      const gameState = lobbiesMap[lobbyId].gameLogic;
+
+      if (!gameState) {
+        socket.emit("error_occured", { message: "Lobby or game not found" });
+        return;
+      }
+
+      const playerExists = gameState.playerExistsInLobby(userId);
+
+      if (!playerExists) {
+        socket.emit("error_occured", { message: "Player not found" });
+        return;
+      }
+
+      try {
+        gameState?.processPenalty(userId);
+        io.to(lobbyId).emit("penalty_processed", {
+          updatedGameState: gameState.serialize(),
+        });
+      } catch (err) {
+        if (err instanceof Error) {
+          socket.emit("error_occured", { message: err.message });
+        }
+      }
+    });
   });
 }

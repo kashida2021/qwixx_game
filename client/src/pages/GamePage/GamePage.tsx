@@ -69,6 +69,10 @@ export const Game: React.FC<IGameProps> = ({
     console.log("player's choice:", playerChoice);
   }
 
+  const handlePenalty = () => {
+    socket.emit("submit_penalty", {userId, lobbyId});
+  }
+
   const hasSubmitted = gameState.players[userId].hasSubmittedChoice;
   const hasAvailableMoves = availableMoves[userId];
   const hasRolled = gameState.hasRolled;
@@ -114,7 +118,7 @@ export const Game: React.FC<IGameProps> = ({
             cellClick={handleCellClick}
           />
           {!hasAvailableMoves && !hasSubmitted && hasRolled ? (
-            <button className="penalty-btn">Accept Penalty</button>
+            <button className="penalty-btn" onClick={handlePenalty}>Accept Penalty</button>
           ):
           (<button onClick={handleNumberSelection} disabled={hasSubmitted}>Confirm</button>)
           }
