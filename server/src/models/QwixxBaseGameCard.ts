@@ -30,7 +30,7 @@ export default class qwixxBaseGameCard {
     return {
       rows: this._rows,
       isLocked: this._isLocked,
-      penalties: this._penalties.length,
+      penalties: this._penalties,
     };
   }
 

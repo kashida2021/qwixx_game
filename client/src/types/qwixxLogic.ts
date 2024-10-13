@@ -14,7 +14,7 @@ export interface QwixxLogic {
           green: boolean;
           blue: boolean;
         };
-        penalties: number;
+        penalties: number[];
       };
       hasSubmittedChoice: boolean;
     };

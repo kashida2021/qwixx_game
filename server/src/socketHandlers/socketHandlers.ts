@@ -254,9 +254,11 @@ export default function initializeSocketHandler(io: Server) {
       }
 
       try {
-        gameState?.processPenalty(userId);
+        const updatedGameState = gameState?.processPenalty(userId);
+        console.log("penalty processed gamedata:", updatedGameState);
+
         io.to(lobbyId).emit("penalty_processed", {
-          updatedGameState: gameState.serialize(),
+          responseData: updatedGameState,
         });
       } catch (err) {
         if (err instanceof Error) {
