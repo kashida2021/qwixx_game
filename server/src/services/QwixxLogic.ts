@@ -29,6 +29,10 @@ export default class QwixxLogic {
     return this._playersArray[this._currentTurnIndex];
   }
 
+  public playerExistsInLobby(playerName: string): Player | undefined {
+    return this._playersArray.find((player) => player.name === playerName);
+  }
+
   public get hasRolled() {
     return this._hasRolled;
   }
@@ -256,6 +260,22 @@ export default class QwixxLogic {
     if (player === this.activePlayer) {
       player.markSubmitted();
     }
+
+    this.processPlayersSubmission();
+
+    return this.serialize();
+  }
+
+  public processPenalty(playerName: string) {
+    const player = this._playersArray.find(
+      (player) => player.name === playerName
+    );
+    if (!player) {
+      throw new Error("Player not found");
+    }
+
+    player.addPenalty();
+    player.markSubmitted();
 
     this.processPlayersSubmission();
 

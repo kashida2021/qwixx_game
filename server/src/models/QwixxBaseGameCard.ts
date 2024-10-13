@@ -59,6 +59,10 @@ export default class qwixxBaseGameCard {
     return this._penalties;
   }
 
+  public addPenalty() {
+    this._penalties.push(1);
+  }
+
   public getHighestMarkedNumber(row: rowColour): number {
     const markedNumbers = this._rows[row];
     return markedNumbers.length ? Math.max(...markedNumbers) : 1;

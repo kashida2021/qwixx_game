@@ -47,6 +47,10 @@ export default class Player {
     return true;
   }
 
+  public addPenalty() {
+    this._gameCard.addPenalty();
+  }
+
   serialize() {
     return {
       gamecard: this._gameCard.serialize(),
