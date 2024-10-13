@@ -119,6 +119,11 @@ function App() {
       console.log("data after dice roll", data);
     };
 
+    const updatePenalty = (data: {responseData: QwixxLogic}) => {
+      setGameState(data.responseData)
+      console.log("penalty data", data.responseData);
+    }
+
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
     socket.on("player_joined", handlePlayerJoined);
@@ -129,6 +134,7 @@ function App() {
     socket.on("game_initialised", onGameInitialised);
     socket.on("update_markedNumbers", updateMarkedNumbers);
     socket.on("dice_rolled", handleDiceRolled);
+    socket.on("penalty_processed", updatePenalty);
     //socket.on("turn_ended", endTurn);
 
     return () => {
@@ -142,6 +148,7 @@ function App() {
       socket.off("game_initialised");
       socket.off("update_markedNumbers");
       socket.off("dice_rolled");
+      socket.off("penalty_processed");
       //socket.off("turn_ended");
     };
   }, []);
