@@ -60,7 +60,7 @@ export default class qwixxBaseGameCard {
   }
 
   public addPenalty() {
-    this._penalties.push(1);
+    this._penalties.push(this._penalties.length + 1);
   }
 
   public getHighestMarkedNumber(row: rowColour): number {
