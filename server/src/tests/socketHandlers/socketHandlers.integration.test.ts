@@ -97,7 +97,6 @@ describe("socket event handler test", () => {
     });
 
     it("Can start a game", (done) => {
-     
       clientSocket1.emit("create_lobby", "clientSocket1", () => {
         clientSocket2.emit(
           "join_lobby",
@@ -116,14 +115,30 @@ describe("socket event handler test", () => {
         (data: { path: string; gameState: any }) => {
           expect(data.path).toBe("/game/1234");
           expect(data.gameState.players.clientSocket1).toEqual({
-            rows: { red: [], yellow: [], green: [], blue: [] },
-            isLocked: { red: false, yellow: false, green: false, blue: false },
-            penalties: 0,
+            gamecard: {
+              rows: { red: [], yellow: [], green: [], blue: [] },
+              isLocked: {
+                red: false,
+                yellow: false,
+                green: false,
+                blue: false,
+              },
+              penalties: [],
+            },
+            hasSubmittedChoice: false,
           });
-           expect(data.gameState.players.clientSocket2).toEqual({
-            rows: { red: [], yellow: [], green: [], blue: [] },
-            isLocked: { red: false, yellow: false, green: false, blue: false },
-            penalties: 0,
+          expect(data.gameState.players.clientSocket2).toEqual({
+            gamecard: {
+              rows: { red: [], yellow: [], green: [], blue: [] },
+              isLocked: {
+                red: false,
+                yellow: false,
+                green: false,
+                blue: false,
+              },
+              penalties: [],
+            },
+            hasSubmittedChoice: false,
           });
           done();
         }
