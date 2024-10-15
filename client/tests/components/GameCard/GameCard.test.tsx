@@ -21,53 +21,63 @@ interface PlayerChoice {
   number: number;
 }
 
+const mockAvailableMoves = {testUser1: true, testUser2: true, testUser3: true}
 const membersArrayMock = ["testUser1", "testUser2", "testUser3"];
 const gameState = {
   players: {
     testUser1: {
-      rows: {
-        red: [],
-        yellow: [],
-        green: [],
-        blue: [],
+      gamecard: {
+        rows: {
+          red: [],
+          yellow: [],
+          green: [],
+          blue: [],
+        },
+        isLocked: {
+          red: false,
+          yellow: false,
+          green: false,
+          blue: false,
+        },
+        penalties: [],
       },
-      isLocked: {
-        red: false,
-        yellow: false,
-        green: false,
-        blue: false,
+      hasSubmittedChoice: false,
       },
-      penalties: 0,
-    },
     testUser2: {
-      rows: {
-        red: [],
-        yellow: [],
-        green: [],
-        blue: [],
+      gamecard: {
+        rows: {
+          red: [],
+          yellow: [],
+          green: [],
+          blue: [],
+        },
+        isLocked: {
+          red: false,
+          yellow: false,
+          green: false,
+          blue: false,
+        },
+        penalties: [],
       },
-      isLocked: {
-        red: false,
-        yellow: false,
-        green: false,
-        blue: false,
-      },
-      penalties: 0,
+      hasSubmittedChoice: false,
     },
     testUser3: {
-      rows: {
-        red: [],
-        yellow: [],
-        green: [],
-        blue: [],
+      gamecard: {
+        rows: {
+          red: [],
+          yellow: [],
+          green: [],
+          blue: [],
+        },
+        isLocked: {
+          red: false,
+          yellow: false,
+          green: false,
+          blue: false,
+        },
+        penalties: [],
       },
-      isLocked: {
-        red: false,
-        yellow: false,
-        green: false,
-        blue: false,
-      },
-      penalties: 0,
+      hasSubmittedChoice: false,
     },
   },
   dice:{
@@ -78,6 +88,8 @@ const gameState = {
     green: 5,
     blue: 6,
   },
+  activePlayer: "testUser1" ,
+  hasRolled: false
 };
 
 let lobbyIdMock: string = "1234";
@@ -103,53 +115,53 @@ vi.mock(
     );
     
 
-const emptyGameCardData: QwixxLogic['players'][string] = {
-  rows: {
-    red: [],
-    yellow: [],
-    green: [],
-    blue: [],
-  },
-  isLocked: {
-    red: false,
-    yellow: false,
-    green: false,
-    blue: false,
-  },
-  penalties: 0,
-};
+const emptyGameCardData: QwixxLogic['players'][string]['gamecard'] = {
+    rows: {
+      red: [],
+      yellow: [],
+      green: [],
+      blue: [],
+    },
+    isLocked: {
+      red: false,
+      yellow: false,
+      green: false,
+      blue: false,
+    },
+    penalties: [],
+  };
 
-const gameCardDataWithNumbers: QwixxLogic['players'][string] = {
-  rows: {
-    red: [2, 3, 4, 5],
-    yellow: [2],
-    green: [11],
-    blue: [11],
-  },
-  isLocked: {
-    red: false,
-    yellow: false,
-    green: false,
-    blue: false,
-  },
-  penalties: 0,
-};
+const gameCardDataWithNumbers: QwixxLogic['players'][string]['gamecard'] = {
+    rows: {
+      red: [2, 3, 4, 5],
+      yellow: [2],
+      green: [11],
+      blue: [11],
+    },
+    isLocked: {
+      red: false,
+      yellow: false,
+      green: false,
+      blue: false,
+    },
+    penalties: [],
+  };
 
-const gameCardWithLockedRow: QwixxLogic['players'][string] = {
-  rows: {
-    red: [2, 3, 4, 5, 12],
-    yellow: [],
-    green: [],
-    blue: [],
-  },
-  isLocked: {
-    red: true,
-    yellow: false,
-    green: false,
-    blue: false,
-  },
-  penalties: 0,
-};
+const gameCardWithLockedRow: QwixxLogic['players'][string]['gamecard'] = {
+    rows: {
+      red: [2, 3, 4, 5, 12],
+      yellow: [],
+      green: [],
+      blue: [],
+    },
+    isLocked: {
+      red: true,
+      yellow: false,
+      green: false,
+      blue: false,
+    },
+    penalties: [],
+  };
 
 const cssRowRed = "row-red";
 const cssRowYellow = "row-yellow";
@@ -412,6 +424,7 @@ describe("Game Card Test:", () => {
                 members={membersArrayMock}
                 lobbyId={lobbyIdMock}
                 gameState={gameState}
+                availableMoves={mockAvailableMoves}
               />
           </MemoryRouter>
       )
