@@ -3,6 +3,10 @@ import Dice from "../models/DiceClass";
 import { rowColour } from "../enums/rowColours";
 import { DiceColour } from "../enums/DiceColours";
 
+interface ValidationResult {
+  isValid: boolean;
+  errorMessage: Error | null;
+}
 export default class QwixxLogic {
   private _playersArray: Player[];
   private _dice: Dice;
@@ -25,7 +29,11 @@ export default class QwixxLogic {
     return this._playersArray[this._currentTurnIndex];
   }
 
-  private get hasRolled() {
+  public playerExistsInLobby(playerName: string): Player | undefined {
+    return this._playersArray.find((player) => player.name === playerName);
+  }
+
+  public get hasRolled() {
     return this._hasRolled;
   }
 
@@ -50,31 +58,69 @@ export default class QwixxLogic {
     }
   }
 
-  public makeMove(playerName: string, row: string, num: number) {
-    if (!this.hasRolled) {
-      throw new Error("Dice hasn't been rolled yet.");
-    }
-
-    let colourToMark: rowColour;
+  private getColourFromRow(row: string): rowColour {
     switch (row.toLowerCase()) {
       case "red":
-        colourToMark = rowColour.Red;
-        break;
+        return rowColour.Red;
       case "yellow":
-        colourToMark = rowColour.Yellow;
-        break;
+        return rowColour.Yellow;
       case "green":
-        colourToMark = rowColour.Green;
-        break;
+        return rowColour.Green;
       case "blue":
-        colourToMark = rowColour.Blue;
-        break;
+        return rowColour.Blue;
       default:
         throw new Error("Invalid colour.");
     }
+  }
+
+  public makeMove(playerName: string, row: string, num: number) {
+    const colourToMark = this.getColourFromRow(row);
+    const validationResult = this.validMove(playerName, row, num);
+
+    if (!validationResult.isValid) {
+      throw validationResult.errorMessage;
+    }
+
+    const player = this._playersArray.find(
+      (player) => player.name === playerName
+    );
+
+    if (player) {
+      const markSuccess = player.markNumber(colourToMark, num);
+      if (!markSuccess) {
+        throw new Error("Invalid move: cannot mark this number.");
+      }
+
+      if (
+        (player === this.activePlayer && player.submissionCount === 2) ||
+        (player !== this.activePlayer && player.submissionCount === 1)
+      ) {
+        player.markSubmitted();
+        this.processPlayersSubmission();
+      }
+    }
+
+    return this.serialize();
+  }
+
+  public validMove(
+    playerName: string,
+    row: string,
+    num: number
+  ): ValidationResult {
+    const colourToMark = this.getColourFromRow(row);
+    if (!this.hasRolled) {
+      return {
+        isValid: false,
+        errorMessage: new Error("Dice hasn't been rolled yet."),
+      };
+    }
 
     if (num < 2 || num > 12) {
-      throw new Error("Dice number is out of range.");
+      return {
+        isValid: false,
+        errorMessage: new Error("Dice number is out of range."),
+      };
     }
 
     const player = this._playersArray.find(
@@ -82,12 +128,20 @@ export default class QwixxLogic {
     );
 
     if (!player) {
-      throw new Error("Player not found.");
+      return { isValid: false, errorMessage: new Error("Player not found.") };
     }
 
     if (player.hasSubmittedChoice) {
-      throw new Error("Player already finished their turn.");
+      return {
+        isValid: false,
+        errorMessage: new Error("Player already finished their turn."),
+      };
     }
+
+    const highestMarkedNumber =
+      player.gameCard.getHighestMarkedNumber(colourToMark);
+    const lowestMarkedNumber =
+      player.gameCard.getLowestMarkedNumber(colourToMark);
 
     /*
      * Checks the non-active player's number selection.
@@ -96,7 +150,12 @@ export default class QwixxLogic {
       player !== this.activePlayer &&
       num !== this._dice.diceValues.white1 + this._dice.diceValues.white2
     ) {
-      throw new Error("Number selected doesn't equal to sum of white dice.");
+      return {
+        isValid: false,
+        errorMessage: new Error(
+          "Number selected doesn't equal to sum of white dice."
+        ),
+      };
     }
 
     /*
@@ -108,7 +167,12 @@ export default class QwixxLogic {
       player.submissionCount === 0 &&
       num !== this._dice.diceValues.white1 + this._dice.diceValues.white2
     ) {
-      throw new Error("Number selected doesn't equal to sum of white dice.");
+      return {
+        isValid: false,
+        errorMessage: new Error(
+          "Number selected doesn't equal to sum of white dice."
+        ),
+      };
     }
 
     /*
@@ -120,25 +184,60 @@ export default class QwixxLogic {
       player.submissionCount === 1 &&
       !this._dice.validColouredNumbers[colourToMark]?.includes(num)
     ) {
-      throw new Error(
-        "Number selected doesn't equal to sum of white die and coloured die."
-      );
+      return {
+        isValid: false,
+        errorMessage: new Error(
+          "Number selected doesn't equal to sum of white die and coloured die."
+        ),
+      };
     }
 
-    if (!player.markNumber(colourToMark, num)) {
-      throw new Error("Invalid move.");
+    /*add check for number being lower or higher than last checked number */
+    if (colourToMark === "red" || colourToMark === "yellow") {
+      if (num <= highestMarkedNumber) {
+        return {
+          isValid: false,
+          errorMessage: new Error(
+            "Number must be above the last marked number"
+          ),
+        };
+      }
+    } else if (colourToMark === "green" || colourToMark === "blue") {
+      if (num >= lowestMarkedNumber) {
+        return {
+          isValid: false,
+          errorMessage: new Error(
+            "Number must be below the last marked number"
+          ),
+        };
+      }
     }
 
-    if (
-      (player === this.activePlayer && player.submissionCount === 2) ||
-      (player !== this.activePlayer && player.submissionCount === 1)
-    ) {
-      player.markSubmitted();
+    return {
+      isValid: true,
+      errorMessage: null,
+    };
+  }
+
+  public validMoveAvailable(): Record<string, boolean> {
+    const playerMoveAvailable: Record<string, boolean> = {};
+
+    for (const player of this._playersArray) {
+      let hasValidMove = false;
+
+      for (let row of ["red", "yellow", "green", "blue"]) {
+        for (let num = 2; num <= 12; num++) {
+          const validationResult = this.validMove(player.name, row, num);
+          if (validationResult.isValid) {
+            hasValidMove = true;
+            break;
+          }
+        }
+        if (hasValidMove) break;
+      }
+      playerMoveAvailable[player.name] = hasValidMove;
     }
-
-    this.processPlayersSubmission();
-
-    return this.serialize();
+    return playerMoveAvailable;
   }
 
   public endTurn(playerName: string) {
@@ -167,6 +266,22 @@ export default class QwixxLogic {
     return this.serialize();
   }
 
+  public processPenalty(playerName: string) {
+    const player = this._playersArray.find(
+      (player) => player.name === playerName
+    );
+    if (!player) {
+      throw new Error("Player not found");
+    }
+
+    player.addPenalty();
+    player.markSubmitted();
+
+    this.processPlayersSubmission();
+
+    return this.serialize();
+  }
+
   // private get players() {
   //   return this._playersArray;
   // }
@@ -181,6 +296,7 @@ export default class QwixxLogic {
       players: serializedPlayers,
       dice: this._dice.serialize(),
       activePlayer: this.activePlayer.name,
+      hasRolled: this._hasRolled,
     };
   }
 }

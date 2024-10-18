@@ -1,6 +1,6 @@
 import Row from "./Row";
 import "./GameCard.css";
-import { ChangeEvent } from "react"; //add useState later
+//import { ChangeEvent } from "react"; //add useState later
 import { GameCardData } from "../../types/GameCardData";
 import { RowColour } from "../../types/enums";
 
@@ -19,17 +19,20 @@ const GameCard: React.FC<IGameCard> = ({ member, isOpponent, gameCardData, cellC
   //That can be used along with row colour + number to send to server
   // const [penalties, setPenalties] = useState<string[]>([]);
 
-  const handlePenaltyChange = (event: ChangeEvent<HTMLInputElement>) => {
+  //const handlePenaltyChange = (event: ChangeEvent<HTMLInputElement>) => {
     //const value = event.target.value;
     // setPenalties((prevPenalties) => [...prevPenalties, value]);
-    event.target.disabled = true;
-  };
+    //event.target.disabled = true;
+  //};
 
   const renderPenaltyCheckbox = (number: number) => {
+
+    const isPenaltyChecked = gameCardData.penalties.includes(number);
+
     return isOpponent ? (
       <li>
         <span
-          className={`penalty-checkbox ${gameCardData.penalties ? "checked" : ""}`}
+          className={`penalty-checkbox ${isPenaltyChecked ? "checked" : ""}`}
           aria-label="fake-checkbox"
         ></span>
         <label htmlFor="">{number}</label>
@@ -40,7 +43,8 @@ const GameCard: React.FC<IGameCard> = ({ member, isOpponent, gameCardData, cellC
           type="checkbox"
           id={`penalty${number}`}
           value={`Penalty_${number}`}
-          onChange={handlePenaltyChange}
+          checked={isPenaltyChecked}
+          disabled
           aria-label="penalty-checkbox"
         />
         <label htmlFor="">{number}</label>

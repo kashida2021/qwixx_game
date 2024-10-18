@@ -11,5 +11,9 @@ export interface GameCardData {
     green: boolean;
     blue: boolean;
   };
-  penalties: number;
+  penalties: number[];
+}
+
+export interface MoveAvailability {
+  [playerName: string]: boolean;
 }

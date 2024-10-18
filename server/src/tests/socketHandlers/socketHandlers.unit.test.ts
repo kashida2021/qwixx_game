@@ -34,7 +34,7 @@ const generateUniqueRoomIdMock = generateUniqueRoomId as jest.MockedFunction<
 
 /**
  * @param {ServerSocket | ClientSocket} socket
- * @param {string} event 
+ * @param {string} event
  * @returns {Promise<any>}
  * @description
  * We can use this utility funciton to make our test "act" more synchronous.
@@ -238,31 +238,31 @@ describe("socket event handler test", () => {
           gameStartedData.gameState.players["clientSocket1"]
         ).toBeDefined();
         expect(
-          gameStartedData.gameState.players["clientSocket1"].rows
+          gameStartedData.gameState.players["clientSocket1"].gamecard.rows
         ).toBeTruthy();
-        expect(gameStartedData.gameState.players["clientSocket1"].rows).toEqual(
-          {
-            red: [],
-            yellow: [],
-            green: [],
-            blue: [],
-          }
-        );
+        expect(
+          gameStartedData.gameState.players["clientSocket1"].gamecard.rows
+        ).toEqual({
+          red: [],
+          yellow: [],
+          green: [],
+          blue: [],
+        });
 
         expect(
           gameStartedData.gameState.players["clientSocket2"]
         ).toBeDefined();
         expect(
-          gameStartedData.gameState.players["clientSocket2"].rows
+          gameStartedData.gameState.players["clientSocket2"].gamecard.rows
         ).toBeTruthy();
-        expect(gameStartedData.gameState.players["clientSocket2"].rows).toEqual(
-          {
-            red: [],
-            yellow: [],
-            green: [],
-            blue: [],
-          }
-        );
+        expect(
+          gameStartedData.gameState.players["clientSocket2"].gamecard.rows
+        ).toEqual({
+          red: [],
+          yellow: [],
+          green: [],
+          blue: [],
+        });
       });
 
       test("can mark a number", async () => {
@@ -309,9 +309,12 @@ describe("socket event handler test", () => {
 
         const player2 = updatedGameState.gameState.players.clientSocket2;
         expect(player2).toEqual({
-          rows: { red: [10], yellow: [], green: [], blue: [] },
-          isLocked: { red: false, yellow: false, green: false, blue: false },
-          penalties: 0,
+          gamecard: {
+            rows: { red: [10], yellow: [], green: [], blue: [] },
+            isLocked: { red: false, yellow: false, green: false, blue: false },
+            penalties: [],
+          },
+          hasSubmittedChoice: true,
         });
       });
     });

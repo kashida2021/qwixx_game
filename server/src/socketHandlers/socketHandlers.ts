@@ -195,8 +195,10 @@ export default function initializeSocketHandler(io: Server) {
       try {
         const { row: rowColour, num } = playerChoice;
         const updatedGameState = gameLogic?.makeMove(userId, rowColour, num);
+        const moveAvailability = gameLogic?.validMoveAvailable();
+        console.log("move availability after move", moveAvailability);
 
-        const responseData = { gameState: updatedGameState };
+        const responseData = { gameState: updatedGameState, moveAvailability };
 
         io.to(lobbyId).emit("update_markedNumbers", responseData);
         console.log("Updated game state:", updatedGameState);
@@ -218,7 +220,51 @@ export default function initializeSocketHandler(io: Server) {
 
     socket.on("roll_dice", ({ lobbyId }) => {
       const diceResult = lobbiesMap[lobbyId].rollDice();
-      io.to(lobbyId).emit("dice_rolled", { dice: diceResult });
+      const hasRolled = lobbiesMap[lobbyId].gameLogic?.hasRolled;
+      const moveAvailability =
+        lobbiesMap[lobbyId].gameLogic?.validMoveAvailable();
+      io.to(lobbyId).emit("dice_rolled", {
+        dice: diceResult,
+        moveAvailability,
+        hasRolled,
+      });
+    });
+
+    socket.on("submit_penalty", ({ userId, lobbyId }) => {
+      if (!lobbyId || !userId) {
+        console.error("Missing data");
+        socket.emit("error_occured", {
+          message: "Missing data for marking penalties",
+        });
+        return;
+      }
+
+      const gameState = lobbiesMap[lobbyId].gameLogic;
+
+      if (!gameState) {
+        socket.emit("error_occured", { message: "Lobby or game not found" });
+        return;
+      }
+
+      const playerExists = gameState.playerExistsInLobby(userId);
+
+      if (!playerExists) {
+        socket.emit("error_occured", { message: "Player not found" });
+        return;
+      }
+
+      try {
+        const updatedGameState = gameState?.processPenalty(userId);
+        console.log("penalty processed gamedata:", updatedGameState);
+
+        io.to(lobbyId).emit("penalty_processed", {
+          responseData: updatedGameState,
+        });
+      } catch (err) {
+        if (err instanceof Error) {
+          socket.emit("error_occured", { message: err.message });
+        }
+      }
     });
   });
 }

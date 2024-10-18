@@ -30,7 +30,7 @@ export default class qwixxBaseGameCard {
     return {
       rows: this._rows,
       isLocked: this._isLocked,
-      penalties: this._penalties.length,
+      penalties: this._penalties,
     };
   }
 
@@ -57,5 +57,19 @@ export default class qwixxBaseGameCard {
 
   get penalties() {
     return this._penalties;
+  }
+
+  public addPenalty() {
+    this._penalties.push(this._penalties.length + 1);
+  }
+
+  public getHighestMarkedNumber(row: rowColour): number {
+    const markedNumbers = this._rows[row];
+    return markedNumbers.length ? Math.max(...markedNumbers) : 1;
+  }
+
+  public getLowestMarkedNumber(row: rowColour): number {
+    const markedNumbers = this._rows[row];
+    return markedNumbers.length ? Math.min(...markedNumbers) : 13;
   }
 }

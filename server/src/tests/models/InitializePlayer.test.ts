@@ -47,19 +47,22 @@ describe("initializePlayers tests", () => {
       expect(player).toBeDefined();
       expect(player.name).toBe(`player${i + 1}`);
       expect(player.serialize()).toEqual({
-        isLocked: {
-          blue: false,
-          green: false,
-          red: false,
-          yellow: false,
+        gamecard: {
+          rows: {
+            blue: [],
+            green: [],
+            red: [],
+            yellow: [],
+          },
+          isLocked: {
+            blue: false,
+            green: false,
+            red: false,
+            yellow: false,
+          },
+          penalties: [],
         },
-        penalties: 0,
-        rows: {
-          blue: [],
-          green: [],
-          red: [],
-          yellow: [],
-        },
+        hasSubmittedChoice: false,
       });
     }
   });

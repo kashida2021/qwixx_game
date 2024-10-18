@@ -56,13 +56,13 @@ describe("Qwixx Logic integration tests:", () => {
       if (typeof gameState === "object") {
         expect(gameState.players).toHaveProperty("test-player1");
         expect(gameState.players).toHaveProperty("test-player2");
-        expect(gameState.players["test-player1"]).toHaveProperty(
+        expect(gameState.players["test-player1"].gamecard).toHaveProperty(
           "penalties",
-          0
+          []
         );
-        expect(gameState.players["test-player2"]).toHaveProperty(
+        expect(gameState.players["test-player2"].gamecard).toHaveProperty(
           "penalties",
-          0
+          []
         );
 
         expect(gameState.dice).toMatchObject({
@@ -81,8 +81,6 @@ describe("Qwixx Logic integration tests:", () => {
       const initialGameState = testGame.serialize();
       console.log(result);
       expect(initialGameState.activePlayer).toBe("test-player1");
-
-      
 
       const firstMoveState = testGame.makeMove("test-player1", "red", 5);
       expect(firstMoveState.activePlayer).toBe("test-player1");

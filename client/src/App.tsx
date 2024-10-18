@@ -7,6 +7,7 @@ import { socket } from "./services/socketServices";
 // import GameBoard from "../../shared/GameBoard";
 import Game from "./pages/GamePage/GamePage";
 import { QwixxLogic } from "./types/qwixxLogic";
+import { MoveAvailability} from "./types/GameCardData";
 
 function App() {
   const [isConnected, setIsConnected] = useState(socket.connected);
@@ -17,6 +18,7 @@ function App() {
   const [notifications, setNotifications] = useState<string[]>([]);
   const [gameState, setGameState] = useState<QwixxLogic | null>(null);
   const [gamePath, setGamePath] = useState("");
+  const [availableMoves, setAvailableMoves] = useState<MoveAvailability>({});
 
   //Need to consier if this is overkill for our app as it's only being used in one place.
   //  const handleInputChange =
@@ -83,8 +85,9 @@ function App() {
       console.log(data.gameState);
     };
 
-    const updateMarkedNumbers = (data: { gameState: QwixxLogic }) => {
+    const updateMarkedNumbers = (data: { gameState: QwixxLogic, moveAvailability: MoveAvailability }) => {
       setGameState(data.gameState);
+      setAvailableMoves(data.moveAvailability);
       console.log("data received from backend", data);
     };
 
@@ -93,22 +96,33 @@ function App() {
       //console.log("turn ended", data );
     //}
 
-    const handleDiceRolled = (data: { dice: QwixxLogic['dice'] }) => {
+    const handleDiceRolled = (data: { dice: QwixxLogic['dice'], moveAvailability: MoveAvailability, hasRolled: boolean }) => {
       setGameState((prevState) => {
         if (!prevState) {
           return {
             players: {},
             dice: data.dice,
             activePlayer: "",
+            hasRolled: false
           };
         }
 
         return {
           ...prevState,
           dice: data.dice,
+          hasRolled: data.hasRolled
         };
       });
+      setAvailableMoves(data.moveAvailability);
+      console.log("move availability after dice roll", data.moveAvailability);
+      console.log("has dice been rolled", data.hasRolled);
+      console.log("data after dice roll", data);
     };
+
+    const updatePenalty = (data: {responseData: QwixxLogic}) => {
+      setGameState(data.responseData)
+      console.log("penalty data", data.responseData);
+    }
 
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
@@ -120,6 +134,7 @@ function App() {
     socket.on("game_initialised", onGameInitialised);
     socket.on("update_markedNumbers", updateMarkedNumbers);
     socket.on("dice_rolled", handleDiceRolled);
+    socket.on("penalty_processed", updatePenalty);
     //socket.on("turn_ended", endTurn);
 
     return () => {
@@ -133,6 +148,7 @@ function App() {
       socket.off("game_initialised");
       socket.off("update_markedNumbers");
       socket.off("dice_rolled");
+      socket.off("penalty_processed");
       //socket.off("turn_ended");
     };
   }, []);
@@ -178,6 +194,7 @@ function App() {
                 userId={userId}
                 members={members}
                 gameState={gameState}
+                availableMoves={availableMoves}
                 // setGameBoardState={setGameBoardState}
               />
             ) : (
