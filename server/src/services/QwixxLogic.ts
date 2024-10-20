@@ -81,9 +81,7 @@ export default class QwixxLogic {
       throw validationResult.errorMessage;
     }
 
-    const player = this._playersArray.find(
-      (player) => player.name === playerName
-    );
+    const player = this.playerExistsInLobby(playerName);
 
     if (player) {
       const markSuccess = player.markNumber(colourToMark, num);
@@ -123,9 +121,7 @@ export default class QwixxLogic {
       };
     }
 
-    const player = this._playersArray.find(
-      (player) => player.name === playerName
-    );
+    const player = this.playerExistsInLobby(playerName);
 
     if (!player) {
       return { isValid: false, errorMessage: new Error("Player not found.") };
@@ -241,9 +237,7 @@ export default class QwixxLogic {
   }
 
   public endTurn(playerName: string) {
-    const player = this._playersArray.find(
-      (player) => player.name === playerName
-    );
+    const player = this.playerExistsInLobby(playerName);
 
     if (!player) {
       throw new Error("Player not found.");
@@ -267,9 +261,7 @@ export default class QwixxLogic {
   }
 
   public processPenalty(playerName: string) {
-    const player = this._playersArray.find(
-      (player) => player.name === playerName
-    );
+    const player = this.playerExistsInLobby(playerName);
     if (!player) {
       throw new Error("Player not found");
     }
