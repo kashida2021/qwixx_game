@@ -29,7 +29,7 @@ export default class QwixxLogic {
     return this._playersArray[this._currentTurnIndex];
   }
 
-  public playerExistsInLobby(playerName: string): Player | undefined {
+  private playerExistsInLobby(playerName: string): Player | undefined {
     return this._playersArray.find((player) => player.name === playerName);
   }
 
