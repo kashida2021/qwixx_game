@@ -246,13 +246,6 @@ export default function initializeSocketHandler(io: Server) {
         return;
       }
 
-      const playerExists = gameState.playerExistsInLobby(userId);
-
-      if (!playerExists) {
-        socket.emit("error_occured", { message: "Player not found" });
-        return;
-      }
-
       try {
         const updatedGameState = gameState?.processPenalty(userId);
         console.log("penalty processed gamedata:", updatedGameState);
