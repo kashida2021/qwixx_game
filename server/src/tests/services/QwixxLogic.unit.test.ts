@@ -4,6 +4,7 @@ import qwixxBaseGameCard from "../../models/QwixxBaseGameCard";
 import Dice from "../../models/DiceClass";
 import { DiceColour } from "../../enums/DiceColours";
 import SixSidedDie from "../../models/SixSidedDieClass";
+import { rowColour } from "../../enums/rowColours";
 
 const MockedGameCardClass = qwixxBaseGameCard as jest.Mocked<
   typeof qwixxBaseGameCard
@@ -109,7 +110,7 @@ describe("Qwixx Logic tests", () => {
       );
     }
   );
-  
+
   test.each([
     ["red", 10],
     ["yellow", 10],
@@ -130,4 +131,13 @@ describe("Qwixx Logic tests", () => {
       );
     }
   );
+
+  test("moveAvailability should return true if gameCard is empty", () => {
+    const testGame = new QwixxLogic(playersArrayMock, fakeDice);
+    testGame.rollDice();
+    const isMoveAvailable = testGame.validMoveAvailable();
+
+    expect(isMoveAvailable["player1"]).toBe(true);
+    expect(isMoveAvailable["player2"]).toBe(true);
+  });
 });
