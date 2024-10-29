@@ -36,6 +36,24 @@ jest.spyOn(fakeDice, "validColouredNumbers", "get").mockReturnValue({
   [DiceColour.Blue]: [10, 10],
 });
 
+jest
+  .spyOn(gameCardMock1, "getHighestMarkedNumber")
+  .mockImplementation((row) => {
+    if (row === "red") return 9;
+    if (row === "yellow") return 8;
+    if (row === "green") return 8;
+    if (row === "blue") return 8;
+    return 2;
+  });
+
+jest.spyOn(gameCardMock1, "getLowestMarkedNumber").mockImplementation((row) => {
+  if (row === "red") return 2;
+  if (row === "yellow") return 2;
+  if (row === "green") return 5;
+  if (row === "blue") return 4;
+  return 12;
+});
+
 const playersArrayMock = [player1Mock, player2Mock];
 
 describe("Qwixx Logic tests", () => {
@@ -139,5 +157,30 @@ describe("Qwixx Logic tests", () => {
 
     expect(isMoveAvailable["player1"]).toBe(true);
     expect(isMoveAvailable["player2"]).toBe(true);
+  });
+
+  test("active-player marking a number that equals the sum of a white dice but lower than highest marked red row will throw an error", () => {
+    const originalImplementation = gameCardMock1.getHighestMarkedNumber;
+
+    jest
+      .spyOn(gameCardMock1, "getHighestMarkedNumber")
+      .mockImplementation((row) => {
+        if (row === "red") return 11;
+        if (row === "yellow") return 8;
+        if (row === "green") return 8;
+        if (row === "blue") return 8;
+        return 2;
+      });
+
+    const testGame = new QwixxLogic(playersArrayMock, fakeDice);
+    testGame.rollDice();
+
+    expect(() => {
+      testGame.makeMove("player1", "red", 10);
+    }).toThrow("Number must be above the last marked number");
+
+    jest
+      .spyOn(gameCardMock1, "getHighestMarkedNumber")
+      .mockImplementation(originalImplementation);
   });
 });
