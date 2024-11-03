@@ -183,4 +183,31 @@ describe("Qwixx Logic tests", () => {
       .spyOn(gameCardMock1, "getHighestMarkedNumber")
       .mockImplementation(originalImplementation);
   });
+
+  test("should throw error when trying to mark blue 10, if gamecard has no valid moves", () => {
+    jest
+      .spyOn(gameCardMock1, "getHighestMarkedNumber")
+      .mockImplementation((row) => {
+        if (row === "red" || row === "yellow") return 11;
+        return 10;
+      });
+
+    jest
+      .spyOn(gameCardMock1, "getLowestMarkedNumber")
+      .mockImplementation((row) => {
+        if (row === "green" || row === "blue") return 6;
+        return 4;
+      });
+
+    const testGame = new QwixxLogic(playersArrayMock, fakeDice);
+    testGame.rollDice();
+    const isMoveAvailable = testGame.validMoveAvailable();
+
+    expect(() => {
+      testGame.makeMove("player1", "blue", 10);
+    }).toThrow("Number must be below the last marked number");
+
+    expect(isMoveAvailable["player1"]).toBe(false);
+    expect(isMoveAvailable["player2"]).toBe(true);
+  });
 });
