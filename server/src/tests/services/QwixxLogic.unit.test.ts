@@ -210,4 +210,55 @@ describe("Qwixx Logic tests", () => {
     expect(isMoveAvailable["player1"]).toBe(false);
     expect(isMoveAvailable["player2"]).toBe(true);
   });
+
+  describe("processPenalthy method tests", () => {
+    it("should add a penalty to the player and mark them as submitted", () => {
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
+      const player1AddPenaltySpy = jest.spyOn(player1Mock, "addPenalty");
+      const player1MarkSubmittedSpy = jest.spyOn(player1Mock, "markSubmitted");
+
+      testGame.processPenalty("player1");
+
+      expect(player1AddPenaltySpy).toHaveBeenCalled();
+      expect(player1MarkSubmittedSpy).toHaveBeenCalled();
+    });
+
+    it("should throw an error if player not found", () => {
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
+      expect(() => testGame.processPenalty("player3")).toThrow(
+        "Player not found"
+      );
+    });
+
+    it("should add a penalty to the players gamecard", () => {
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
+
+      const serializedData = {
+        gamecard: {
+          rows: {
+            red: [],
+            yellow: [],
+            green: [],
+            blue: [],
+          },
+          isLocked: {
+            red: false,
+            yellow: false,
+            green: false,
+            blue: false,
+          },
+          penalties: [1],
+        },
+        hasSubmittedChoice: false,
+      };
+
+      jest.spyOn(player1Mock, "serialize").mockReturnValue(serializedData);
+
+      const addPenaltySpy = jest.spyOn(player1Mock.gameCard, "addPenalty");
+      const result = testGame.processPenalty("player1");
+
+      expect(addPenaltySpy).toHaveBeenCalled();
+      expect(player1Mock.serialize()).toEqual(serializedData);
+    });
+  });
 });
