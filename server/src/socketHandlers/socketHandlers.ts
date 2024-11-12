@@ -195,8 +195,8 @@ export default function initializeSocketHandler(io: Server) {
       try {
         const { row: rowColour, num } = playerChoice;
         const updatedGameState = gameLogic?.makeMove(userId, rowColour, num);
-        const moveAvailability = gameLogic?.validMoveAvailable();
-        console.log("move availability after move", moveAvailability);
+        //const moveAvailability = gameLogic?.validMoveAvailable();
+        //console.log("move availability after move", moveAvailability);
 
         const responseData = { gameState: updatedGameState, moveAvailability };
 

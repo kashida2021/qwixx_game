@@ -51,6 +51,35 @@ export default class Player {
     this._gameCard.addPenalty();
   }
 
+  //input: sum of white or sum of white and coloured
+  //Output: boolean;
+  public hasAvailableMoves(validColouredNumbers: any) {
+    const numbers = this.gameCard.getHighestLowestMarkedNumbers();
+    let flag = false;
+
+    for (const key in validColouredNumbers) {
+      if (key === "red" || key === "yellow") {
+        if (
+          validColouredNumbers[key][0] > numbers[key] ||
+          validColouredNumbers[key][1] > numbers[key]
+        ) {
+          flag = true;
+        }
+      }
+
+      if (key === "blue" || key === "green") {
+        if (
+          validColouredNumbers[key][0] < numbers[key] ||
+          validColouredNumbers[key][1] < numbers[key]
+        ) {
+          flag = true;
+        }
+      }
+    }
+
+    return flag;
+  }
+
   serialize() {
     return {
       gamecard: this._gameCard.serialize(),
