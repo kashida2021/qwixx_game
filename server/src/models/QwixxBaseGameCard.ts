@@ -72,4 +72,18 @@ export default class qwixxBaseGameCard {
     const markedNumbers = this._rows[row];
     return markedNumbers.length ? Math.min(...markedNumbers) : 13;
   }
+
+  public getHighestLowestMarkedNumbers() {
+    const redNumber = this.getHighestMarkedNumber(rowColour.Red);
+    const yellowNumber = this.getHighestMarkedNumber(rowColour.Yellow);
+    const blueNumber = this.getLowestMarkedNumber(rowColour.Blue);
+    const greenNumber = this.getLowestMarkedNumber(rowColour.Green);
+
+    return {
+      [rowColour.Red]: redNumber,
+      [rowColour.Yellow]: yellowNumber,
+      [rowColour.Blue]: blueNumber,
+      [rowColour.Green]: greenNumber,
+    };
+  }
 }
