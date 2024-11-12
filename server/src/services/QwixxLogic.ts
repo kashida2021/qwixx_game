@@ -22,7 +22,14 @@ export default class QwixxLogic {
 
   public rollDice(): Record<DiceColour, number> {
     this._hasRolled = true;
-    return this._dice.rollAllDice();
+    const hasRolled = this.hasRolled;
+    const validColouredNumbers = this._dice.validColouredNumbers;
+    const hasAvailableMoves = this.activePlayer.hasAvailableMoves(validColouredNumbers);
+
+    return {
+      hasRolled,
+      hasAvailableMoves,
+      diceValues: this._dice.rollAllDice()
   }
 
   private get activePlayer() {
@@ -215,26 +222,26 @@ export default class QwixxLogic {
     };
   }
 
-  public validMoveAvailable(): Record<string, boolean> {
-    const playerMoveAvailable: Record<string, boolean> = {};
+  //public validMoveAvailable(): Record<string, boolean> {
+    //const playerMoveAvailable: Record<string, boolean> = {};
 
-    for (const player of this._playersArray) {
-      let hasValidMove = false;
+    //for (const player of this._playersArray) {
+      //let hasValidMove = false;
 
-      for (let row of ["red", "yellow", "green", "blue"]) {
-        for (let num = 2; num <= 12; num++) {
-          const validationResult = this.validMove(player.name, row, num);
-          if (validationResult.isValid) {
-            hasValidMove = true;
-            break;
-          }
-        }
-        if (hasValidMove) break;
-      }
-      playerMoveAvailable[player.name] = hasValidMove;
-    }
-    return playerMoveAvailable;
-  }
+      //for (let row of ["red", "yellow", "green", "blue"]) {
+       // for (let num = 2; num <= 12; num++) {
+         // const validationResult = this.validMove(player.name, row, num);
+          //if (validationResult.isValid) {
+  //           hasValidMove = true;
+  //           break;
+  //         }
+  //       }
+  //       if (hasValidMove) break;
+  //     }
+  //     playerMoveAvailable[player.name] = hasValidMove;
+  //   }
+  //   return playerMoveAvailable;
+  // }
 
   public endTurn(playerName: string) {
     const player = this.playerExistsInLobby(playerName);
