@@ -1,5 +1,6 @@
 import SixSidedDie from "./SixSidedDieClass";
 import { DiceColour } from "../enums/DiceColours";
+import { rowColour } from "../enums/rowColours";
 
 export default class Dice {
   private _dice: Record<DiceColour, SixSidedDie>;
@@ -52,15 +53,16 @@ export default class Dice {
 
   get validColouredNumbers() {
     const { white1, white2, ...colouredValues } = this._diceValues;
-    const result: { [key in DiceColour]?: number[] } = {};
-    
+    //const result: { [key in rowColour]?: number[] } = {};
+    const result: Partial<Record<rowColour, number[]>> = {};
+
     for (const [colour, value] of Object.entries(colouredValues)) {
-      const colourKey = colour as DiceColour;
+      const colourKey = colour as rowColour;
       if (value > 0) {
         result[colourKey] = [value + white1, value + white2];
       }
     }
-    
+
     return result;
   }
 
