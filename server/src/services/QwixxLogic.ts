@@ -7,6 +7,12 @@ interface ValidationResult {
   isValid: boolean;
   errorMessage: Error | null;
 }
+
+interface rollDiceResults {
+  hasRolled: boolean;
+  hasAvailableMoves: boolean;
+  diceValues: Record<DiceColour, number>;
+}
 export default class QwixxLogic {
   private _playersArray: Player[];
   private _dice: Dice;
@@ -20,16 +26,18 @@ export default class QwixxLogic {
     this._hasRolled = false;
   }
 
-  public rollDice(): Record<DiceColour, number> {
+  public rollDice(): rollDiceResults {
     this._hasRolled = true;
     const hasRolled = this.hasRolled;
     const validColouredNumbers = this._dice.validColouredNumbers;
-    const hasAvailableMoves = this.activePlayer.hasAvailableMoves(validColouredNumbers);
+    const hasAvailableMoves =
+      this.activePlayer.gameCard.hasAvailableMoves(validColouredNumbers);
 
     return {
       hasRolled,
       hasAvailableMoves,
-      diceValues: this._dice.rollAllDice()
+      diceValues: this._dice.rollAllDice(),
+    };
   }
 
   private get activePlayer() {
@@ -223,15 +231,15 @@ export default class QwixxLogic {
   }
 
   //public validMoveAvailable(): Record<string, boolean> {
-    //const playerMoveAvailable: Record<string, boolean> = {};
+  //const playerMoveAvailable: Record<string, boolean> = {};
 
-    //for (const player of this._playersArray) {
-      //let hasValidMove = false;
+  //for (const player of this._playersArray) {
+  //let hasValidMove = false;
 
-      //for (let row of ["red", "yellow", "green", "blue"]) {
-       // for (let num = 2; num <= 12; num++) {
-         // const validationResult = this.validMove(player.name, row, num);
-          //if (validationResult.isValid) {
+  //for (let row of ["red", "yellow", "green", "blue"]) {
+  // for (let num = 2; num <= 12; num++) {
+  // const validationResult = this.validMove(player.name, row, num);
+  //if (validationResult.isValid) {
   //           hasValidMove = true;
   //           break;
   //         }

@@ -84,13 +84,17 @@ export default class qwixxBaseGameCard {
     return false;
   }
 
-  public hasAvailableMoves(diceValues: Record<rowColour, number[]>): boolean {
+  public hasAvailableMoves(
+    diceValues: Partial<Record<rowColour, number[]>>
+  ): boolean {
     for (const row in diceValues) {
       const colour = row as rowColour;
-      const [num1, num2] = diceValues[colour];
+      const [num1, num2] = diceValues[colour] ?? [];
 
-      if (this.isValidMove(colour, num1) || this.isValidMove(colour, num2)) {
-        return true;
+      if (num1 !== undefined && num2 !== undefined) {
+        if (this.isValidMove(colour, num1) || this.isValidMove(colour, num2)) {
+          return true;
+        }
       }
     }
     return false;
