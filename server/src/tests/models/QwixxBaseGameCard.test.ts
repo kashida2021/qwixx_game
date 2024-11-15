@@ -37,9 +37,15 @@ describe("gameboard temp test", () => {
     expect(rows).toEqual({ red: [5], yellow: [], green: [], blue: [] });
   });
 
-  test.only("get back highest and lowest marked numbers", () => {
-    testGameCard.markNumbers(rowColour.Red, 5);
-    const numbers = testGameCard.getHighestLowestMarkedNumbers();
-    expect(numbers).toEqual({ red: 5, yellow: 1, blue: 13, green: 13 });
+  test("return true if there are available moves based on current gamecard", () => {
+    const obj = {
+      [rowColour.Red]: [4, 8],
+      [rowColour.Yellow]: [5, 10],
+      [rowColour.Blue]: [10, 6],
+      [rowColour.Green]: [11, 7],
+    };
+
+    const res = testGameCard.hasAvailableMoves(obj);
+    expect(res).toBeTruthy();
   });
 });

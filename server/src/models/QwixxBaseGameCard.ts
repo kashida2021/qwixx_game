@@ -73,17 +73,26 @@ export default class qwixxBaseGameCard {
     return markedNumbers.length ? Math.min(...markedNumbers) : 13;
   }
 
-  public getHighestLowestMarkedNumbers() {
-    const redNumber = this.getHighestMarkedNumber(rowColour.Red);
-    const yellowNumber = this.getHighestMarkedNumber(rowColour.Yellow);
-    const blueNumber = this.getLowestMarkedNumber(rowColour.Blue);
-    const greenNumber = this.getLowestMarkedNumber(rowColour.Green);
+  private isValidMove(colour: rowColour, num: number): boolean {
+    if (colour === rowColour.Red || colour === rowColour.Yellow) {
+      return this.getHighestMarkedNumber(colour) < num;
+    }
 
-    return {
-      [rowColour.Red]: redNumber,
-      [rowColour.Yellow]: yellowNumber,
-      [rowColour.Blue]: blueNumber,
-      [rowColour.Green]: greenNumber,
-    };
+    if (colour === rowColour.Blue || colour === rowColour.Green) {
+      return this.getLowestMarkedNumber(colour) > num;
+    }
+    return false;
+  }
+
+  public hasAvailableMoves(diceValues: Record<rowColour, number[]>): boolean {
+    for (const row in diceValues) {
+      const colour = row as rowColour;
+      const [num1, num2] = diceValues[colour];
+
+      if (this.isValidMove(colour, num1) || this.isValidMove(colour, num2)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
