@@ -3,16 +3,34 @@ import Dice from "../models/DiceClass";
 import { rowColour } from "../enums/rowColours";
 import { DiceColour } from "../enums/DiceColours";
 
-interface ValidationResult {
-  isValid: boolean;
-  errorMessage: Error | null;
-}
-
 interface rollDiceResults {
   hasRolled: boolean;
   hasAvailableMoves: boolean;
   diceValues: Record<DiceColour, number>;
 }
+
+interface MoveValidationSuccess {
+  isValid: true;
+}
+
+interface MoveValidationFailure {
+  isValid: false;
+  errorMessage: string
+}
+
+type ValidationResult = MoveValidationSuccess | MoveValidationFailure
+
+interface SerializedGameState {
+  players: { [playerName: string]: { gameCard: object; hasSubmittedChoice: boolean } };
+  dice: { [key: string]: number };
+  activePlayer: string;
+  hasRolled: boolean;
+}
+
+type MakeMoveResult =
+  | { success: true; data: SerializedGameState }
+  | { success: false; error: string }
+
 export default class QwixxLogic {
   private _playersArray: Player[];
   private _dice: Dice;
@@ -48,6 +66,7 @@ export default class QwixxLogic {
     return this._playersArray.find((player) => player.name === playerName);
   }
 
+  //TOOD make it private
   public get hasRolled() {
     return this._hasRolled;
   }
@@ -88,24 +107,32 @@ export default class QwixxLogic {
     }
   }
 
-  public makeMove(playerName: string, row: string, num: number) {
+  public makeMove(playerName: string, row: string, num: number): MakeMoveResult {
     const colourToMark = this.getColourFromRow(row);
     const player = this.playerExistsInLobby(playerName);
-
+    // Moved this check up to here and early return
+    // Only throw error here because critical error and not game-rule violation
     if (!player) {
-      return { isValid: false, errorMessage: new Error("Player not found.") };
+      //return { isValid: false, errorMessage: new Error("Player not found.") };
+      throw new Error("Player not found.")
     }
 
+    //Passed the player object to validMove instead of playerName
     const validationResult = this.validMove(player, row, num);
 
+    // returning an object literal because it is a game-rule violation
     if (!validationResult.isValid) {
-      throw validationResult.errorMessage;
+      //throw validationResult.errorMessage;
+      return { success: false, error: validationResult.errorMessage }
     }
 
-    const markSuccess = player.markNumber(colourToMark, num);
+    const markNumberResult = player.markNumber(colourToMark, num);
 
-    if (!markSuccess) {
-      throw new Error("Invalid move: cannot mark this number.");
+    // returning an object literal because it is a game-rule violation
+    if (!markNumberResult) {
+      //throw new Error("Invalid move: cannot mark this number.");
+      //TODO: Update return of markNumber
+      return { success: false, error: markNumberResult.errorMessage }
     }
 
     if (
@@ -116,7 +143,7 @@ export default class QwixxLogic {
       this.processPlayersSubmission();
     }
 
-    return this.serialize();
+    return { success: true, data: this.serialize() };
   }
 
   private validMove(
@@ -128,29 +155,30 @@ export default class QwixxLogic {
     if (!this.hasRolled) {
       return {
         isValid: false,
-        errorMessage: new Error("Dice hasn't been rolled yet."),
+        errorMessage: "Dice hasn't been rolled yet.",
       };
     }
 
     if (num < 2 || num > 12) {
       return {
         isValid: false,
-        errorMessage: new Error("Dice number is out of range."),
+        errorMessage: "Dice number is out of range.",
       };
     }
 
     if (player.hasSubmittedChoice) {
       return {
         isValid: false,
-        errorMessage: new Error("Player already finished their turn."),
+        errorMessage: "Player already finished their turn.",
       };
     }
 
-    // TODO Should this check be done in the game card class?
-    const highestMarkedNumber =
-      player.gameCard.getHighestMarkedNumber(colourToMark);
-    const lowestMarkedNumber =
-      player.gameCard.getLowestMarkedNumber(colourToMark);
+    // TODO: Should this check be done in the game card class?
+    //
+    //    const highestMarkedNumber =
+    //      player.gameCard.getHighestMarkedNumber(colourToMark);
+    //    const lowestMarkedNumber =
+    //      player.gameCard.getLowestMarkedNumber(colourToMark);
 
     /*
      * Checks the non-active player's number selection.
@@ -161,9 +189,7 @@ export default class QwixxLogic {
     ) {
       return {
         isValid: false,
-        errorMessage: new Error(
-          "Number selected doesn't equal to sum of white dice."
-        ),
+        errorMessage: "Number selected doesn't equal to sum of white dice."
       };
     }
 
@@ -178,9 +204,7 @@ export default class QwixxLogic {
     ) {
       return {
         isValid: false,
-        errorMessage: new Error(
-          "Number selected doesn't equal to sum of white dice."
-        ),
+        errorMessage: "Number selected doesn't equal to sum of white dice."
       };
     }
 
@@ -195,33 +219,32 @@ export default class QwixxLogic {
     ) {
       return {
         isValid: false,
-        errorMessage: new Error(
-          "Number selected doesn't equal to sum of white die and coloured die."
-        ),
+        errorMessage: "Number selected doesn't equal to sum of white die and coloured die."
       };
     }
 
-    // TODO - This should be done in the Game Card class
+    // TODO: - This should be done in the Game Card class
+    //
     /*add check for number being lower or higher than last checked number */
-    if (colourToMark === "red" || colourToMark === "yellow") {
-      if (num <= highestMarkedNumber) {
-        return {
-          isValid: false,
-          errorMessage: new Error(
-            "Number must be above the last marked number"
-          ),
-        };
-      }
-    } else if (colourToMark === "green" || colourToMark === "blue") {
-      if (num >= lowestMarkedNumber) {
-        return {
-          isValid: false,
-          errorMessage: new Error(
-            "Number must be below the last marked number"
-          ),
-        };
-      }
-    }
+    //    if (colourToMark === "red" || colourToMark === "yellow") {
+    //      if (num <= highestMarkedNumber) {
+    //        return {
+    //          isValid: false,
+    //          errorMessage: new Error(
+    //            "Number must be above the last marked number"
+    //          ),
+    //        };
+    //      }
+    //    } else if (colourToMark === "green" || colourToMark === "blue") {
+    //      if (num >= lowestMarkedNumber) {
+    //        return {
+    //          isValid: false,
+    //          errorMessage: new Error(
+    //            "Number must be below the last marked number"
+    //          ),
+    //        };
+    //      }
+    //    }
 
     return {
       isValid: true,
@@ -259,6 +282,7 @@ export default class QwixxLogic {
       throw new Error("Player not found");
     }
 
+    //TODO: call the method directly from game card class instead of through player class
     player.addPenalty();
     player.markSubmitted();
 
@@ -271,7 +295,9 @@ export default class QwixxLogic {
   //   return this._playersArray;
   // }
 
-  public serialize() {
+  //Do we need a type of player.serialize? It contains the result of gameCard.serialize.
+  //then we would need to update the type of qwixxLogic.serialize
+  public serialize(): SerializedGameState {
     const serializedPlayers = this._playersArray.reduce((acc, player) => {
       acc[player.name] = player.serialize();
       return acc;
