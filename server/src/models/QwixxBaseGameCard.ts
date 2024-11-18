@@ -42,13 +42,26 @@ export default class qwixxBaseGameCard {
     return this._numbers;
   }
 
+  private addNumberToRow(row: rowColour, number: number) {
+    this._rows[row].push(number)
+  }
+
   public markNumbers(row: rowColour, number: number) {
-    if (!this._rows[row].includes(number)) {
-      this._rows[row].push(number);
-      return true;
-    } else {
-      return false;
+    if (!this.isValidMove(row, number) || this._rows[row].includes(number)) {
+      return false
     }
+
+    this.addNumberToRow(row, number)
+    return true
+
+    //    this._rows[row].push(number)
+
+    //    if (!this._rows[row].includes(number)) {
+    //      this._rows[row].push(number);
+    //      return true;
+    //    } else {
+    //      return false;
+    //    }
   }
 
   get isLocked() {
@@ -63,11 +76,13 @@ export default class qwixxBaseGameCard {
     this._penalties.push(this._penalties.length + 1);
   }
 
+  //TODO maybe change to private
   public getHighestMarkedNumber(row: rowColour): number {
     const markedNumbers = this._rows[row];
     return markedNumbers.length ? Math.max(...markedNumbers) : 1;
   }
 
+  //TOOD maybe change to private
   public getLowestMarkedNumber(row: rowColour): number {
     const markedNumbers = this._rows[row];
     return markedNumbers.length ? Math.min(...markedNumbers) : 13;
