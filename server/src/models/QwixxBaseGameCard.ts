@@ -1,9 +1,18 @@
 import { rowColour } from "../enums/rowColours";
 
+type RowValues = Record<rowColour, number[]>
+type RowLocks = Record<rowColour, boolean>
+
+interface SerializeGameCard {
+  rows: RowValues;
+  isLocked: RowLocks;
+  penalties: number[];
+}
+
 export default class qwixxBaseGameCard {
-  private _rows: { [key in rowColour]: number[] };
+  private _rows: RowValues;
   private _numbers: number[];
-  private _isLocked: { [key in rowColour]: boolean };
+  private _isLocked: RowLocks;
   private _penalties: number[];
 
   constructor() {
@@ -26,7 +35,7 @@ export default class qwixxBaseGameCard {
     this._penalties = [];
   }
 
-  serialize() {
+  public serialize(): SerializeGameCard {
     return {
       rows: this._rows,
       isLocked: this._isLocked,
