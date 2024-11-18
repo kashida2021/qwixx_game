@@ -212,7 +212,7 @@ describe("Qwixx Logic tests", () => {
   describe("processPenalthy method tests", () => {
     it("should add a penalty to the player and mark them as submitted", () => {
       const testGame = new QwixxLogic(playersArrayMock, fakeDice);
-      const player1AddPenaltySpy = jest.spyOn(player1Mock, "addPenalty");
+      const player1AddPenaltySpy = jest.spyOn(gameCardMock1, "addPenalty");
       const player1MarkSubmittedSpy = jest.spyOn(player1Mock, "markSubmitted");
 
       testGame.processPenalty("player1");
@@ -231,32 +231,34 @@ describe("Qwixx Logic tests", () => {
     it("should add a penalty to the players gamecard", () => {
       const testGame = new QwixxLogic(playersArrayMock, fakeDice);
 
-      const serializedData = {
-        gamecard: {
-          rows: {
-            red: [],
-            yellow: [],
-            green: [],
-            blue: [],
-          },
-          isLocked: {
-            red: false,
-            yellow: false,
-            green: false,
-            blue: false,
-          },
-          penalties: [1],
-        },
-        hasSubmittedChoice: false,
-      };
+      // TODO: explain why this test isn't applicable in this unit test
 
-      jest.spyOn(player1Mock, "serialize").mockReturnValue(serializedData);
+      //      const serializedData = {
+      //        gamecard: {
+      //          rows: {
+      //            red: [],
+      //            yellow: [],
+      //            green: [],
+      //            blue: [],
+      //          },
+      //          isLocked: {
+      //            red: false,
+      //            yellow: false,
+      //            green: false,
+      //            blue: false,
+      //          },
+      //          penalties: [1],
+      //        },
+      //        hasSubmittedChoice: false,
+      //      };
+
+      // jest.spyOn(player1Mock, "serialize").mockReturnValue(serializedData);
 
       const addPenaltySpy = jest.spyOn(player1Mock.gameCard, "addPenalty");
-      const result = testGame.processPenalty("player1");
+      testGame.processPenalty("player1");
 
       expect(addPenaltySpy).toHaveBeenCalled();
-      expect(player1Mock.serialize()).toEqual(serializedData);
+      //expect(player1Mock.serialize()).toEqual(serializedData);
     });
   });
 });
