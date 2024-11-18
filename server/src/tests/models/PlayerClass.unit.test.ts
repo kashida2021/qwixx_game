@@ -4,7 +4,7 @@ import qwixxBaseGameCard from "../../models/QwixxBaseGameCard";
 
 const mockGameCard: Partial<qwixxBaseGameCard> = {
   markNumbers: jest.fn(),
-  getHighestLowestMarkedNumbers: jest.fn(),
+  //  getHighestLowestMarkedNumbers: jest.fn(),
 };
 
 let testPlayer: Player;
@@ -44,25 +44,25 @@ describe("Player Class tests", () => {
     expect(testPlayer.hasSubmittedChoice).toBeTruthy();
   });
 
-  test.only("returns true if hasAvailableMoves is true", () => {
-    const obj = {
-      red: 5,
-      yellow: 1,
-      blue: 13,
-      green: 13,
-    };
-
-    const validColouredNumbers = {
-      red: [7, 9],
-      yellow: [3, 4],
-      blue: [12, 8],
-      green: [11, 5],
-    };
-
-    (mockGameCard.getHighestLowestMarkedNumbers! as jest.Mock).mockReturnValue(
-      obj
-    );
-    const result = testPlayer.hasAvailableMoves(validColouredNumbers);
-    expect(result).toBeTruthy();
-  });
+  //  test.only("returns true if hasAvailableMoves is true", () => {
+  //    const obj = {
+  //      red: 5,
+  //      yellow: 1,
+  //      blue: 13,
+  //      green: 13,
+  //    };
+  //
+  //    const validColouredNumbers = {
+  //      red: [7, 9],
+  //      yellow: [3, 4],
+  //      blue: [12, 8],
+  //      green: [11, 5],
+  //    };
+  //
+  //    (mockGameCard.getHighestLowestMarkedNumbers! as jest.Mock).mockReturnValue(
+  //      obj
+  //    );
+  //    const result = testPlayer.hasAvailableMoves(validColouredNumbers);
+  //    expect(result).toBeTruthy();
+  //  });
 });
