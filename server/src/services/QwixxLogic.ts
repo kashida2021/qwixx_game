@@ -1,7 +1,6 @@
 import Player from "../models/PlayerClass";
 import Dice from "../models/DiceClass";
 import { rowColour } from "../enums/rowColours";
-import { DiceColour } from "../enums/DiceColours";
 import { SerializePlayer } from "../models/PlayerClass";
 import { TDiceValues } from "../models/DiceClass";
 
@@ -131,10 +130,9 @@ export default class QwixxLogic {
     const markNumberResult = player.markNumber(colourToMark, num);
 
     // returning an object literal because it is a game-rule violation
-    if (!markNumberResult) {
+    if (!markNumberResult.success) {
       //throw new Error("Invalid move: cannot mark this number.");
-      //TODO: Update return of markNumber
-      return { success: false, error: markNumberResult.errorMessage }
+      return { success: markNumberResult.success, error: markNumberResult.errorMessage }
     }
 
     if (
