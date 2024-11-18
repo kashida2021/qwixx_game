@@ -173,13 +173,6 @@ export default class QwixxLogic {
       };
     }
 
-    // TODO: Should this check be done in the game card class?
-    //
-    //    const highestMarkedNumber =
-    //      player.gameCard.getHighestMarkedNumber(colourToMark);
-    //    const lowestMarkedNumber =
-    //      player.gameCard.getLowestMarkedNumber(colourToMark);
-
     /*
      * Checks the non-active player's number selection.
      */
@@ -223,29 +216,6 @@ export default class QwixxLogic {
       };
     }
 
-    // TODO: - This should be done in the Game Card class
-    //
-    /*add check for number being lower or higher than last checked number */
-    //    if (colourToMark === "red" || colourToMark === "yellow") {
-    //      if (num <= highestMarkedNumber) {
-    //        return {
-    //          isValid: false,
-    //          errorMessage: new Error(
-    //            "Number must be above the last marked number"
-    //          ),
-    //        };
-    //      }
-    //    } else if (colourToMark === "green" || colourToMark === "blue") {
-    //      if (num >= lowestMarkedNumber) {
-    //        return {
-    //          isValid: false,
-    //          errorMessage: new Error(
-    //            "Number must be below the last marked number"
-    //          ),
-    //        };
-    //      }
-    //    }
-
     return {
       isValid: true,
     };
@@ -281,8 +251,7 @@ export default class QwixxLogic {
       throw new Error("Player not found");
     }
 
-    //TODO: call the method directly from game card class instead of through player class
-    player.addPenalty();
+    player.gameCard.addPenalty()
     player.markSubmitted();
 
     this.processPlayersSubmission();
