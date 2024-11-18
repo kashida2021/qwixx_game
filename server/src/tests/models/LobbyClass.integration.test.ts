@@ -1,22 +1,56 @@
 import Lobby from "../../models/LobbyClass";
 
 describe("Lobby Class integration tests", () => {
-  it("should roll dice and return dice values", () => {
-    const testLobby = new Lobby("1234");
-    testLobby.addPlayer("John");
-    testLobby.addPlayer("Fred");
+  describe("Dice roll tests", () => {
+    it("should roll dice and return dice value", () => {
+      const testLobby = new Lobby("1234");
+      testLobby.addPlayer("John");
+      testLobby.addPlayer("Fred");
 
-    testLobby.startGame();
+      testLobby.startGame();
 
-    const diceValues = testLobby.rollDice();
+      const res = testLobby.gameLogic?.rollDice();
 
-    if (!diceValues) {
-      throw new Error("Dice is undefined.");
-    }
+      if (!res) {
+        throw new Error("Dice is undefined.");
+      }
 
-    Object.values(diceValues).forEach((value) => {
-      expect(value).toBeGreaterThanOrEqual(1);
-      expect(value).toBeLessThanOrEqual(6);
+      Object.values(res.diceValues).forEach((value) => {
+        expect(value).toBeGreaterThanOrEqual(1);
+        expect(value).toBeLessThanOrEqual(6);
+      });
     });
+
+    test("hasRolled state should be true after rolling the dice", () => {
+      const testLobby = new Lobby("1234");
+      testLobby.addPlayer("John");
+      testLobby.addPlayer("Fred");
+
+      testLobby.startGame();
+
+      const res = testLobby.gameLogic?.rollDice();
+
+      if (!res) {
+        throw new Error("Dice is undefined.");
+      }
+
+      expect(res.hasRolled).toBeTruthy()
+    })
+
+    it("should return whether the active player has available moves or not", () => {
+      const testLobby = new Lobby("1234");
+      testLobby.addPlayer("John");
+      testLobby.addPlayer("Fred");
+
+      testLobby.startGame();
+
+      const res = testLobby.gameLogic?.rollDice();
+
+      if (!res) {
+        throw new Error("Dice is undefined.");
+      }
+
+      expect(res.hasAvailableMoves).toBeTruthy()
+    })
   });
 });
