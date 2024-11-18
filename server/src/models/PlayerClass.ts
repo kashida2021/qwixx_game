@@ -47,6 +47,7 @@ export default class Player {
     return true;
   }
 
+  //TODO can remove this and just call the method from game card class directly
   public addPenalty() {
     this._gameCard.addPenalty();
   }
