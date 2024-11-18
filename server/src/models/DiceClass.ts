@@ -26,23 +26,27 @@ export default class Dice {
     };
   }
 
-  rollAllDice(): Record<DiceColour, number> {
+  public rollAllDice(): Record<DiceColour, number> {
     let diceColours = Object.keys(this._dice) as DiceColour[];
     diceColours.forEach((colour) => {
       const dieColour = colour as DiceColour;
       if (this._dice[dieColour].active === false) {
-        this._diceValues[dieColour] = 0;
+        this.diceValues[dieColour] = 0;
       } else {
         // this._dice[dieColour].rollDie();
         // this._diceValues[dieColour] = this._dice[dieColour].value;
-        this._diceValues[dieColour] = this._dice[dieColour].rollDie();
+        this.diceValues[dieColour] = this._dice[dieColour].rollDie();
       }
     });
-    return this._diceValues;
+    return this.diceValues;
   }
 
   get diceValues(): Record<DiceColour, number> {
     return this._diceValues;
+  }
+
+  public get whiteDiceSum() {
+    return this.diceValues.white1 + this.diceValues.white2
   }
 
   // get validColouredNumbers(): number[] {
@@ -51,8 +55,8 @@ export default class Dice {
   //   return whiteValues.flatMap(white => colouredValues.filter(value => value > 0).map(value => value + white));
   // }
 
-  get validColouredNumbers() {
-    const { white1, white2, ...colouredValues } = this._diceValues;
+  public get validColouredNumbers() {
+    const { white1, white2, ...colouredValues } = this.diceValues;
     //const result: { [key in rowColour]?: number[] } = {};
     const result: Partial<Record<rowColour, number[]>> = {};
 
