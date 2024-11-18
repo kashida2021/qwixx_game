@@ -1,5 +1,12 @@
 import qwixxBaseGameCard from "./QwixxBaseGameCard";
 import { rowColour } from "../enums/rowColours";
+import { SerializeGameCard } from "./QwixxBaseGameCard";
+
+export interface SerializePlayer {
+  gameCard: SerializeGameCard;
+  hasSubmittedChoice: boolean;
+}
+
 export default class Player {
   private _name;
   private _gameCard: qwixxBaseGameCard;
@@ -47,14 +54,14 @@ export default class Player {
     return true;
   }
 
-  //TODO can remove this and just call the method from game card class directly
+  // TODO: can remove this and just call the method from game card class directly
   public addPenalty() {
     this._gameCard.addPenalty();
   }
 
-  serialize() {
+  serialize(): SerializePlayer {
     return {
-      gamecard: this._gameCard.serialize(),
+      gameCard: this._gameCard.serialize(),
       hasSubmittedChoice: this._hasSubmittedChoice,
     };
   }

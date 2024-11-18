@@ -3,7 +3,7 @@ import { rowColour } from "../enums/rowColours";
 type RowValues = Record<rowColour, number[]>
 type RowLocks = Record<rowColour, boolean>
 
-interface SerializeGameCard {
+export interface SerializeGameCard {
   rows: RowValues;
   isLocked: RowLocks;
   penalties: number[];
