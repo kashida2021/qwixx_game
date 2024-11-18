@@ -24,6 +24,8 @@ jest.spyOn(Dice.prototype, "diceValues", "get").mockReturnValue({
   blue: 5,
 });
 
+jest.spyOn(Dice.prototype, "whiteDiceSum", "get").mockReturnValue(10);
+
 /*
  * Mock the generateUniqueRoomId function to return controlled values for tests.
  * This ensures that tests using this mock do not generate random values.
@@ -238,10 +240,10 @@ describe("socket event handler test", () => {
           gameStartedData.gameState.players["clientSocket1"]
         ).toBeDefined();
         expect(
-          gameStartedData.gameState.players["clientSocket1"].gamecard.rows
+          gameStartedData.gameState.players["clientSocket1"].gameCard.rows
         ).toBeTruthy();
         expect(
-          gameStartedData.gameState.players["clientSocket1"].gamecard.rows
+          gameStartedData.gameState.players["clientSocket1"].gameCard.rows
         ).toEqual({
           red: [],
           yellow: [],
@@ -253,10 +255,10 @@ describe("socket event handler test", () => {
           gameStartedData.gameState.players["clientSocket2"]
         ).toBeDefined();
         expect(
-          gameStartedData.gameState.players["clientSocket2"].gamecard.rows
+          gameStartedData.gameState.players["clientSocket2"].gameCard.rows
         ).toBeTruthy();
         expect(
-          gameStartedData.gameState.players["clientSocket2"].gamecard.rows
+          gameStartedData.gameState.players["clientSocket2"].gameCard.rows
         ).toEqual({
           red: [],
           yellow: [],
@@ -309,7 +311,7 @@ describe("socket event handler test", () => {
 
         const player2 = updatedGameState.gameState.players.clientSocket2;
         expect(player2).toEqual({
-          gamecard: {
+          gameCard: {
             rows: { red: [10], yellow: [], green: [], blue: [] },
             isLocked: { red: false, yellow: false, green: false, blue: false },
             penalties: [],
