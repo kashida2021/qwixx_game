@@ -194,14 +194,20 @@ export default function initializeSocketHandler(io: Server) {
 
       try {
         const { row: rowColour, num } = playerChoice;
-        const updatedGameState = gameLogic?.makeMove(userId, rowColour, num);
-        //const moveAvailability = gameLogic?.validMoveAvailable();
-        //console.log("move availability after move", moveAvailability);
+        const res = gameLogic?.makeMove(userId, rowColour, num);
 
-        const responseData = { gameState: updatedGameState, moveAvailability };
+        console.log("Updated game state:", res);
 
-        io.to(lobbyId).emit("update_markedNumbers", responseData);
-        console.log("Updated game state:", updatedGameState);
+        if (!res?.success) {
+          const responseData = { message: res?.error }
+          socket.emit("error_occured", { message: responseData })
+        }
+
+        if (res?.success) {
+          const responseData = { gameState: res.data }
+          io.to(lobbyId).emit("update_markedNumbers", responseData);
+        }
+
       } catch (err) {
         if (err instanceof Error) {
           socket.emit("error_occured", { message: err.message });
