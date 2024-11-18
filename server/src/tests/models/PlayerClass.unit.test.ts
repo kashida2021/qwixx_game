@@ -4,7 +4,6 @@ import qwixxBaseGameCard from "../../models/QwixxBaseGameCard";
 
 const mockGameCard: Partial<qwixxBaseGameCard> = {
   markNumbers: jest.fn(),
-  //  getHighestLowestMarkedNumbers: jest.fn(),
 };
 
 let testPlayer: Player;
@@ -18,15 +17,25 @@ describe("Player Class tests", () => {
     expect(testPlayer.name).toEqual("testPlayer");
   });
 
-  test("submission count should increment when incrementSubmissionCount is called", () => {
-    (mockGameCard.markNumbers! as jest.Mock).mockReturnValue(true);
+  test("submission count should increment when marking a number is successful", () => {
+    (mockGameCard.markNumbers! as jest.Mock).mockReturnValue({ success: true });
 
     testPlayer.markNumber(rowColour.Red, 2);
     expect(testPlayer.submissionCount).toBe(1);
   });
 
+  test("should return an error message when marking a number is unsuccessful", () => {
+    (mockGameCard.markNumbers! as jest.Mock).mockReturnValue({
+      success: false,
+      errorMessage: "Invalid move."
+    });
+
+    const res = testPlayer.markNumber(rowColour.Red, 2);
+    expect(res).toEqual({ success: false, errorMessage: "Invalid move." })
+  })
+
   test("submission count should return to 0 after markSubmitted() call", () => {
-    (mockGameCard.markNumbers! as jest.Mock).mockReturnValue(true);
+    (mockGameCard.markNumbers! as jest.Mock).mockReturnValue({ success: true });
 
     testPlayer.markNumber(rowColour.Red, 2);
     testPlayer.markNumber(rowColour.Red, 3);
@@ -43,26 +52,4 @@ describe("Player Class tests", () => {
 
     expect(testPlayer.hasSubmittedChoice).toBeTruthy();
   });
-
-  //  test.only("returns true if hasAvailableMoves is true", () => {
-  //    const obj = {
-  //      red: 5,
-  //      yellow: 1,
-  //      blue: 13,
-  //      green: 13,
-  //    };
-  //
-  //    const validColouredNumbers = {
-  //      red: [7, 9],
-  //      yellow: [3, 4],
-  //      blue: [12, 8],
-  //      green: [11, 5],
-  //    };
-  //
-  //    (mockGameCard.getHighestLowestMarkedNumbers! as jest.Mock).mockReturnValue(
-  //      obj
-  //    );
-  //    const result = testPlayer.hasAvailableMoves(validColouredNumbers);
-  //    expect(result).toBeTruthy();
-  //  });
 });
