@@ -38,7 +38,7 @@ export default function initializeSocketHandler(io: Server) {
   const userIdList: { [key: string]: string } = {};
 
   io.on("connection", (socket) => {
-    console.log(`A user connected: ${socket.id}`);
+    //console.log(`A user connected: ${socket.id}`);
 
     socket.on("create_lobby", (userId, callback) => {
       const rooms = Array.from(io.sockets.adapter.rooms.keys());
@@ -53,9 +53,9 @@ export default function initializeSocketHandler(io: Server) {
       roomSockets[socket.id] = room;
       lobbiesMap[room].addPlayer(userId);
       callback(room);
-      console.log(
-        `Server: create_lobby_success: Client "${userId}" created ${room}`
-      );
+      //console.log(
+      //  `Server: create_lobby_success: Client "${userId}" created ${room}`
+      //);
     });
 
     socket.on("join_lobby", ({ localLobbyId, userId }, callback) => {
@@ -91,7 +91,7 @@ export default function initializeSocketHandler(io: Server) {
         const currentLobby = roomSockets[socket.id];
         socket.leave(currentLobby);
         io.to(currentLobby).emit("user_left", { userId: socket.id });
-        console.log("socket left room");
+        //console.log("socket left room");
       }
 
       //Join lobby
@@ -110,8 +110,8 @@ export default function initializeSocketHandler(io: Server) {
         error: "",
         lobbyMembers: lobbiesMap[localLobbyId].players,
       });
-      console.log(`Client "${userId}" joined: ${roomSockets[socket.id]}`);
-      console.log(lobbiesMap[localLobbyId].players);
+      //console.log(`Client "${userId}" joined: ${roomSockets[socket.id]}`);
+      //console.log(lobbiesMap[localLobbyId].players);
     });
 
     // When a player explicity leaves a room - checks if roomId is already in roomSockets object. Then it will leave the currentRoom and also remove from roomSockets object.
@@ -171,7 +171,7 @@ export default function initializeSocketHandler(io: Server) {
         };
 
         io.to(lobbyId).emit("game_initialised", responseData);
-        console.log("initialGameState:", initialGameState);
+        //console.log("initialGameState:", initialGameState);
       }
     });
 
@@ -196,7 +196,7 @@ export default function initializeSocketHandler(io: Server) {
         const { row: rowColour, num } = playerChoice;
         const res = gameLogic?.makeMove(userId, rowColour, num);
 
-        console.log("Updated game state:", res);
+        //console.log("Updated game state:", res);
 
         if (!res?.success) {
           const responseData = { message: res?.error }
@@ -213,6 +213,9 @@ export default function initializeSocketHandler(io: Server) {
           socket.emit("error_occured", { message: err.message });
         }
       }
+
+      // TODO: Delete commented out code
+
       //if (gameLogic?.haveAllPlayersSubmitted()) {
       //gameLogic.resetAllPlayersSubmission();
       //gameLogic.nextTurn();
@@ -252,7 +255,7 @@ export default function initializeSocketHandler(io: Server) {
 
       try {
         const updatedGameState = gameState?.processPenalty(userId);
-        console.log("penalty processed gamedata:", updatedGameState);
+        //console.log("penalty processed gamedata:", updatedGameState);
 
         io.to(lobbyId).emit("penalty_processed", {
           responseData: updatedGameState,
