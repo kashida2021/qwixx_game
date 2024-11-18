@@ -2,11 +2,13 @@ import Player from "../models/PlayerClass";
 import Dice from "../models/DiceClass";
 import { rowColour } from "../enums/rowColours";
 import { DiceColour } from "../enums/DiceColours";
+import { SerializePlayer } from "../models/PlayerClass";
+import { TDiceValues } from "../models/DiceClass";
 
 interface rollDiceResults {
   hasRolled: boolean;
   hasAvailableMoves: boolean;
-  diceValues: Record<DiceColour, number>;
+  diceValues: TDiceValues;
 }
 
 interface MoveValidationSuccess {
@@ -21,8 +23,8 @@ interface MoveValidationFailure {
 type ValidationResult = MoveValidationSuccess | MoveValidationFailure
 
 interface SerializedGameState {
-  players: { [playerName: string]: { gameCard: object; hasSubmittedChoice: boolean } };
-  dice: { [key: string]: number };
+  players: Record<string, SerializePlayer>;
+  dice: TDiceValues;
   activePlayer: string;
   hasRolled: boolean;
 }
@@ -117,8 +119,8 @@ export default class QwixxLogic {
       throw new Error("Player not found.")
     }
 
-    //Passed the player object to validMove instead of playerName
-    const validationResult = this.validMove(player, row, num);
+    //Passed the player object to validateMove instead of playerName
+    const validationResult = this.validateMove(player, row, num);
 
     // returning an object literal because it is a game-rule violation
     if (!validationResult.isValid) {
@@ -146,7 +148,7 @@ export default class QwixxLogic {
     return { success: true, data: this.serialize() };
   }
 
-  private validMove(
+  private validateMove(
     player: Player,
     row: string,
     num: number
@@ -248,7 +250,6 @@ export default class QwixxLogic {
 
     return {
       isValid: true,
-      errorMessage: null,
     };
   }
 
@@ -295,13 +296,11 @@ export default class QwixxLogic {
   //   return this._playersArray;
   // }
 
-  //Do we need a type of player.serialize? It contains the result of gameCard.serialize.
-  //then we would need to update the type of qwixxLogic.serialize
   public serialize(): SerializedGameState {
     const serializedPlayers = this._playersArray.reduce((acc, player) => {
       acc[player.name] = player.serialize();
       return acc;
-    }, {} as Record<string, any>);
+    }, {} as Record<string, SerializePlayer>);
 
     return {
       players: serializedPlayers,
