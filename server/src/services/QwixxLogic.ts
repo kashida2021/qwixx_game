@@ -90,34 +90,37 @@ export default class QwixxLogic {
 
   public makeMove(playerName: string, row: string, num: number) {
     const colourToMark = this.getColourFromRow(row);
-    const validationResult = this.validMove(playerName, row, num);
+    const player = this.playerExistsInLobby(playerName);
+
+    if (!player) {
+      return { isValid: false, errorMessage: new Error("Player not found.") };
+    }
+
+    const validationResult = this.validMove(player, row, num);
 
     if (!validationResult.isValid) {
       throw validationResult.errorMessage;
     }
 
-    const player = this.playerExistsInLobby(playerName);
+    const markSuccess = player.markNumber(colourToMark, num);
 
-    if (player) {
-      const markSuccess = player.markNumber(colourToMark, num);
-      if (!markSuccess) {
-        throw new Error("Invalid move: cannot mark this number.");
-      }
+    if (!markSuccess) {
+      throw new Error("Invalid move: cannot mark this number.");
+    }
 
-      if (
-        (player === this.activePlayer && player.submissionCount === 2) ||
-        (player !== this.activePlayer && player.submissionCount === 1)
-      ) {
-        player.markSubmitted();
-        this.processPlayersSubmission();
-      }
+    if (
+      (player === this.activePlayer && player.submissionCount === 2) ||
+      (player !== this.activePlayer && player.submissionCount === 1)
+    ) {
+      player.markSubmitted();
+      this.processPlayersSubmission();
     }
 
     return this.serialize();
   }
 
-  public validMove(
-    playerName: string,
+  private validMove(
+    player: Player,
     row: string,
     num: number
   ): ValidationResult {
@@ -136,12 +139,6 @@ export default class QwixxLogic {
       };
     }
 
-    const player = this.playerExistsInLobby(playerName);
-
-    if (!player) {
-      return { isValid: false, errorMessage: new Error("Player not found.") };
-    }
-
     if (player.hasSubmittedChoice) {
       return {
         isValid: false,
@@ -149,6 +146,7 @@ export default class QwixxLogic {
       };
     }
 
+    // TODO Should this check be done in the game card class?
     const highestMarkedNumber =
       player.gameCard.getHighestMarkedNumber(colourToMark);
     const lowestMarkedNumber =
@@ -159,7 +157,7 @@ export default class QwixxLogic {
      */
     if (
       player !== this.activePlayer &&
-      num !== this._dice.diceValues.white1 + this._dice.diceValues.white2
+      num !== this._dice.whiteDiceSum
     ) {
       return {
         isValid: false,
@@ -176,7 +174,7 @@ export default class QwixxLogic {
     if (
       player === this.activePlayer &&
       player.submissionCount === 0 &&
-      num !== this._dice.diceValues.white1 + this._dice.diceValues.white2
+      num !== this._dice.whiteDiceSum
     ) {
       return {
         isValid: false,
@@ -203,6 +201,7 @@ export default class QwixxLogic {
       };
     }
 
+    // TODO - This should be done in the Game Card class
     /*add check for number being lower or higher than last checked number */
     if (colourToMark === "red" || colourToMark === "yellow") {
       if (num <= highestMarkedNumber) {
@@ -229,27 +228,6 @@ export default class QwixxLogic {
       errorMessage: null,
     };
   }
-
-  //public validMoveAvailable(): Record<string, boolean> {
-  //const playerMoveAvailable: Record<string, boolean> = {};
-
-  //for (const player of this._playersArray) {
-  //let hasValidMove = false;
-
-  //for (let row of ["red", "yellow", "green", "blue"]) {
-  // for (let num = 2; num <= 12; num++) {
-  // const validationResult = this.validMove(player.name, row, num);
-  //if (validationResult.isValid) {
-  //           hasValidMove = true;
-  //           break;
-  //         }
-  //       }
-  //       if (hasValidMove) break;
-  //     }
-  //     playerMoveAvailable[player.name] = hasValidMove;
-  //   }
-  //   return playerMoveAvailable;
-  // }
 
   public endTurn(playerName: string) {
     const player = this.playerExistsInLobby(playerName);
