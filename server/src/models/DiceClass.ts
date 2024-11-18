@@ -2,9 +2,12 @@ import SixSidedDie from "./SixSidedDieClass";
 import { DiceColour } from "../enums/DiceColours";
 import { rowColour } from "../enums/rowColours";
 
+type TDice = Record<DiceColour, SixSidedDie>
+export type TDiceValues = Record<DiceColour, number>
+
 export default class Dice {
-  private _dice: Record<DiceColour, SixSidedDie>;
-  private _diceValues: Record<DiceColour, number>;
+  private _dice: TDice;
+  private _diceValues: TDiceValues;
 
   constructor(die: typeof SixSidedDie) {
     this._dice = {
@@ -26,7 +29,7 @@ export default class Dice {
     };
   }
 
-  public rollAllDice(): Record<DiceColour, number> {
+  public rollAllDice(): TDiceValues {
     let diceColours = Object.keys(this._dice) as DiceColour[];
     diceColours.forEach((colour) => {
       const dieColour = colour as DiceColour;
@@ -41,7 +44,7 @@ export default class Dice {
     return this.diceValues;
   }
 
-  get diceValues(): Record<DiceColour, number> {
+  get diceValues(): TDiceValues {
     return this._diceValues;
   }
 
@@ -78,7 +81,7 @@ export default class Dice {
     }
   }
 
-  serialize() {
-    return this._diceValues;
+  serialize(): TDiceValues {
+    return this.diceValues;
   }
 }
