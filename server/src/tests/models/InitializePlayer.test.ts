@@ -47,7 +47,7 @@ describe("initializePlayers tests", () => {
       expect(player).toBeDefined();
       expect(player.name).toBe(`player${i + 1}`);
       expect(player.serialize()).toEqual({
-        gamecard: {
+        gameCard: {
           rows: {
             blue: [],
             green: [],
