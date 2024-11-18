@@ -2,6 +2,17 @@ import qwixxBaseGameCard from "./QwixxBaseGameCard";
 import { rowColour } from "../enums/rowColours";
 import { SerializeGameCard } from "./QwixxBaseGameCard";
 
+interface MarkNumberSuccess {
+  success: true;
+}
+
+interface MarkNumberFailure {
+  success: false;
+  errorMessage: string
+}
+
+type MarkNumberResult = MarkNumberSuccess | MarkNumberFailure
+
 export interface SerializePlayer {
   gameCard: SerializeGameCard;
   hasSubmittedChoice: boolean;
@@ -45,13 +56,15 @@ export default class Player {
     return this._submissionCount;
   }
 
-  public markNumber(colour: rowColour, num: number) {
-    if (!this._gameCard.markNumbers(colour, num)) {
-      return false;
+  public markNumber(colour: rowColour, num: number): MarkNumberResult {
+    const res = this.gameCard.markNumbers(colour, num);
+
+    if (!res.success) {
+      return { success: res.success, errorMessage: res.errorMessage }
     }
 
     this._submissionCount++;
-    return true;
+    return { success: true };
   }
 
   // TODO: can remove this and just call the method from game card class directly

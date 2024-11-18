@@ -1,5 +1,16 @@
 import { rowColour } from "../enums/rowColours";
 
+interface MarkNumbersSuccess {
+  success: true;
+}
+
+interface MarkNumbersFailre {
+  success: false;
+  errorMessage: string;
+}
+
+type MarkNumbersResult = MarkNumbersSuccess | MarkNumbersFailre
+
 type RowValues = Record<rowColour, number[]>
 type RowLocks = Record<rowColour, boolean>
 
@@ -55,13 +66,20 @@ export default class qwixxBaseGameCard {
     this._rows[row].push(number)
   }
 
-  public markNumbers(row: rowColour, number: number) {
-    if (!this.isValidMove(row, number) || this._rows[row].includes(number)) {
-      return false
+  public markNumbers(row: rowColour, number: number): MarkNumbersResult {
+    if (this._rows[row].includes(number)) {
+      return { success: false, errorMessage: `Number ${number} is already marked in ${row} row.` }
+    }
+
+    if (!this.isValidMove(row, number)) {
+      return {
+        success: false, errorMessage:
+          "Invalid move. Number is not higher/lower than previous marked number"
+      }
     }
 
     this.addNumberToRow(row, number)
-    return true
+    return { success: true }
 
     //    this._rows[row].push(number)
 
@@ -85,18 +103,20 @@ export default class qwixxBaseGameCard {
     this._penalties.push(this._penalties.length + 1);
   }
 
-  //TODO maybe change to private
+  //TODO: maybe change to private
   public getHighestMarkedNumber(row: rowColour): number {
     const markedNumbers = this._rows[row];
     return markedNumbers.length ? Math.max(...markedNumbers) : 1;
   }
 
-  //TOOD maybe change to private
+  //TODO: maybe change to private
   public getLowestMarkedNumber(row: rowColour): number {
     const markedNumbers = this._rows[row];
     return markedNumbers.length ? Math.min(...markedNumbers) : 13;
   }
 
+  // TODO: Better error handling for when colour is invalid.
+  // It should already be validated in QwixxLogic but it is also being handled here.
   private isValidMove(colour: rowColour, num: number): boolean {
     if (colour === rowColour.Red || colour === rowColour.Yellow) {
       return this.getHighestMarkedNumber(colour) < num;
