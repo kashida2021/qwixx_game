@@ -115,7 +115,7 @@ describe("socket event handler test", () => {
         (data: { path: string; gameState: any }) => {
           expect(data.path).toBe("/game/1234");
           expect(data.gameState.players.clientSocket1).toEqual({
-            gamecard: {
+            gameCard: {
               rows: { red: [], yellow: [], green: [], blue: [] },
               isLocked: {
                 red: false,
@@ -128,7 +128,7 @@ describe("socket event handler test", () => {
             hasSubmittedChoice: false,
           });
           expect(data.gameState.players.clientSocket2).toEqual({
-            gamecard: {
+            gameCard: {
               rows: { red: [], yellow: [], green: [], blue: [] },
               isLocked: {
                 red: false,
