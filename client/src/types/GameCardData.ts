@@ -15,5 +15,5 @@ export interface GameCardData {
 }
 
 export interface MoveAvailability {
-  [playerName: string]: boolean;
+  string: boolean;
 }
