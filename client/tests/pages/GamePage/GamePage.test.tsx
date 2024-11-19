@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, test, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 //import { userEvent } from "@testing-library/user-event";
 import React from "react";
@@ -10,11 +10,10 @@ import { socket } from "../../../src/services/socketServices";
 
 const lobbyIdMock = "1234";
 const membersArrayMock = ["testUser1", "testUser2", "testUser3"];
-const mockAvailableMoves = {testUser1: true, testUser2: true, testUser3: true}
 const gameState = {
   players: {
     testUser1: {
-      gamecard: {
+      gameCard: {
         rows: {
           red: [],
           yellow: [],
@@ -32,7 +31,7 @@ const gameState = {
       hasSubmittedChoice: false,
     },
     testUser2: {
-      gamecard: {
+      gameCard: {
         rows: {
           red: [],
           yellow: [],
@@ -50,7 +49,7 @@ const gameState = {
       hasSubmittedChoice: false,
     },
     testUser3: {
-      gamecard: {
+      gameCard: {
         rows: {
           red: [],
           yellow: [],
@@ -65,10 +64,10 @@ const gameState = {
         },
         penalties: [],
       },
-      hasSubmittedChoice: false, 
+      hasSubmittedChoice: false,
     },
   },
-  dice:{
+  dice: {
     white1: 1,
     white2: 2,
     red: 3,
@@ -77,7 +76,7 @@ const gameState = {
     blue: 6,
   },
   activePlayer: "testUser1",
-  hasRolled: false,
+  hasRolled: true,
 };
 
 describe("Game Page Unit Test:", () => {
@@ -89,7 +88,7 @@ describe("Game Page Unit Test:", () => {
         members={membersArrayMock}
         lobbyId={lobbyIdMock}
         gameState={gameState}
-        availableMoves={mockAvailableMoves}
+        availableMoves={true}
       />
     );
 
@@ -98,17 +97,52 @@ describe("Game Page Unit Test:", () => {
 
     const user1 = screen.getByText("testUser1");
     const user2 = screen.getByText("testUser2");
-    const user3 = screen.getByText("testUser3"); 
+    const user3 = screen.getByText("testUser3");
     expect(user1).toBeVisible();
     expect(user2).toBeVisible();
-    expect(user3).toBeVisible(); 
+    expect(user3).toBeVisible();
 
     const opponentZone = screen.getByLabelText("opponent-zone");
-    const opponentGameCards = opponentZone.querySelectorAll(".game-card");  
+    const opponentGameCards = opponentZone.querySelectorAll(".game-card");
     expect(opponentGameCards.length).toBe(2);
 
     const playerZone = screen.getByLabelText("player-zone")
-    const playerGameCard = playerZone.querySelectorAll(".game-card"); 
-    expect(playerGameCard.length).toBe(1); 
+    const playerGameCard = playerZone.querySelectorAll(".game-card");
+    expect(playerGameCard.length).toBe(1);
   });
+
+  test("confirm button should render if there is an available move", () => {
+    render(
+      <GamePage
+        socket={socket}
+        userId={"testUser1"}
+        members={membersArrayMock}
+        lobbyId={lobbyIdMock}
+        gameState={gameState}
+        availableMoves={true}
+      />
+    );
+
+    const confirmBtn = screen.getByText("Confirm");
+    expect(confirmBtn).toBeVisible()
+  })
+
+  test("Accept Penalty button should render if there are no available moves", () => {
+    render(
+      <GamePage
+        socket={socket}
+        userId={"testUser1"}
+        members={membersArrayMock}
+        lobbyId={lobbyIdMock}
+        gameState={gameState}
+        availableMoves={false}
+      />
+    );
+
+    const acceptPenaltyBtc = screen.getByText("Accept Penalty");
+    expect(acceptPenaltyBtc).toBeVisible()
+  })
+
+  test.todo("When hasSubmited choice is true, confirm button is disabled")
+  test.todo("When a player confirms their selected number, that number cell becomes disabled")
 });
