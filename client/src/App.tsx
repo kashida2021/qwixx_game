@@ -7,7 +7,7 @@ import { socket } from "./services/socketServices";
 // import GameBoard from "../../shared/GameBoard";
 import Game from "./pages/GamePage/GamePage";
 import { QwixxLogic } from "./types/qwixxLogic";
-import { MoveAvailability} from "./types/GameCardData";
+import { MoveAvailability } from "./types/GameCardData";
 
 function App() {
   const [isConnected, setIsConnected] = useState(socket.connected);
@@ -18,7 +18,7 @@ function App() {
   const [notifications, setNotifications] = useState<string[]>([]);
   const [gameState, setGameState] = useState<QwixxLogic | null>(null);
   const [gamePath, setGamePath] = useState("");
-  const [availableMoves, setAvailableMoves] = useState<MoveAvailability>({});
+  const [availableMoves, setAvailableMoves] = useState<boolean>(false);
 
   //Need to consier if this is overkill for our app as it's only being used in one place.
   //  const handleInputChange =
@@ -92,16 +92,16 @@ function App() {
     };
 
     //const endTurn = (data: {gameState: QwixxLogic}) => {
-      //setGameState(data.gameState);
-      //console.log("turn ended", data );
+    //setGameState(data.gameState);
+    //console.log("turn ended", data );
     //}
 
-    const handleDiceRolled = (data: { dice: QwixxLogic['dice'], moveAvailability: MoveAvailability, hasRolled: boolean }) => {
+    const handleDiceRolled = (data: { diceValues: any, hasAvailableMoves: boolean, hasRolled: boolean }) => {
       setGameState((prevState) => {
         if (!prevState) {
           return {
             players: {},
-            dice: data.dice,
+            dice: data.diceValues,
             activePlayer: "",
             hasRolled: false
           };
@@ -109,17 +109,17 @@ function App() {
 
         return {
           ...prevState,
-          dice: data.dice,
+          dice: data.diceValues,
           hasRolled: data.hasRolled
         };
       });
-      setAvailableMoves(data.moveAvailability);
-      console.log("move availability after dice roll", data.moveAvailability);
+      setAvailableMoves(data.hasAvailableMoves);
+      console.log("move availability after dice roll", data.hasAvailableMoves);
       console.log("has dice been rolled", data.hasRolled);
       console.log("data after dice roll", data);
     };
 
-    const updatePenalty = (data: {responseData: QwixxLogic}) => {
+    const updatePenalty = (data: { responseData: QwixxLogic }) => {
       setGameState(data.responseData)
       console.log("penalty data", data.responseData);
     }
@@ -195,7 +195,7 @@ function App() {
                 members={members}
                 gameState={gameState}
                 availableMoves={availableMoves}
-                // setGameBoardState={setGameBoardState}
+              // setGameBoardState={setGameBoardState}
               />
             ) : (
               <div>Loading...</div>

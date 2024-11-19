@@ -229,12 +229,8 @@ export default function initializeSocketHandler(io: Server) {
 
     socket.on("roll_dice", ({ lobbyId }) => {
       const diceResult = lobbiesMap[lobbyId].gameLogic?.rollDice();
-
-      io.to(lobbyId).emit("dice_rolled", {
-        dice: diceResult?.diceValues,
-        moveAvailability: diceResult?.hasAvailableMoves,
-        hasRolled: diceResult?.hasRolled,
-      });
+      console.log(diceResult)
+      io.to(lobbyId).emit("dice_rolled", diceResult);
     });
 
     socket.on("submit_penalty", ({ userId, lobbyId }) => {
