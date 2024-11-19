@@ -37,6 +37,7 @@ export const Game: React.FC<IGameProps> = ({
     row: string;
     num: number;
   } | null>(null);
+
   const handleCellClick = (rowColour: string, num: number) => {
     setPlayerChoice({ row: rowColour, num });
   };
@@ -76,6 +77,8 @@ export const Game: React.FC<IGameProps> = ({
   const hasSubmitted = gameState.players[userId].hasSubmittedChoice;
   const hasAvailableMoves = availableMoves;
   const hasRolled = gameState.hasRolled;
+  const activePlayer = gameState.activePlayer;
+
   console.log("player has moves:", hasAvailableMoves);
 
 
@@ -117,7 +120,7 @@ export const Game: React.FC<IGameProps> = ({
             gameCardData={gameState.players[userId].gameCard}
             cellClick={handleCellClick}
           />
-          {!hasAvailableMoves && !hasSubmitted && hasRolled ? (
+          {!hasAvailableMoves && !hasSubmitted && hasRolled && activePlayer ? (
             <button className="penalty-btn" onClick={handlePenalty}>Accept Penalty</button>
           ) :
             (<button onClick={handleNumberSelection} disabled={hasSubmitted}>Confirm</button>)

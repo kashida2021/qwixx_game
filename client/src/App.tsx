@@ -85,9 +85,8 @@ function App() {
       console.log(data.gameState);
     };
 
-    const updateMarkedNumbers = (data: { gameState: QwixxLogic, moveAvailability: MoveAvailability }) => {
+    const updateMarkedNumbers = (data: { gameState: QwixxLogic }) => {
       setGameState(data.gameState);
-      setAvailableMoves(data.moveAvailability);
       console.log("data received from backend", data);
     };
 

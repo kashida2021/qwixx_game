@@ -128,6 +128,7 @@ export default class qwixxBaseGameCard {
     return false;
   }
 
+  // TODO: Doesn't check valid moves for white1 + white2
   public hasAvailableMoves(
     diceValues: Partial<Record<rowColour, number[]>>
   ): boolean {
