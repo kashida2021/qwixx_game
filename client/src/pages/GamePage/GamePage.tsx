@@ -21,7 +21,7 @@ interface IGameProps {
   userId: string;
   members: string[];
   gameState: QwixxLogic;
-  availableMoves: MoveAvailability;
+  availableMoves: boolean;
   // setGameBoardState: Dispatch<SetStateAction<GameBoard | null>>;
 }
 
@@ -65,16 +65,16 @@ export const Game: React.FC<IGameProps> = ({
   const filteredMembers = members.filter((member) => member !== userId);
 
   const handleNumberSelection = () => {
-    socket.emit("mark_numbers", {lobbyId, userId, playerChoice});
+    socket.emit("mark_numbers", { lobbyId, userId, playerChoice });
     console.log("player's choice:", playerChoice);
   }
 
   const handlePenalty = () => {
-    socket.emit("submit_penalty", {userId, lobbyId});
+    socket.emit("submit_penalty", { userId, lobbyId });
   }
 
   const hasSubmitted = gameState.players[userId].hasSubmittedChoice;
-  const hasAvailableMoves = availableMoves[userId];
+  const hasAvailableMoves = availableMoves;
   const hasRolled = gameState.hasRolled;
   console.log("player has moves:", hasAvailableMoves);
 
@@ -89,7 +89,7 @@ export const Game: React.FC<IGameProps> = ({
           socket={socket}
           lobbyId={lobbyId}
           gameState={gameState}
-          userId= {userId}
+          userId={userId}
         />
       </div>
       <div className="game-card-container">
@@ -104,7 +104,7 @@ export const Game: React.FC<IGameProps> = ({
               key={index}
               member={member}
               isOpponent={true}
-              gameCardData={gameState.players[member].gamecard}
+              gameCardData={gameState.players[member].gameCard}
               cellClick={handleCellClick}
             />
           ))}
@@ -114,15 +114,15 @@ export const Game: React.FC<IGameProps> = ({
           <GameCard
             member={userId}
             isOpponent={false}
-            gameCardData={gameState.players[userId].gamecard}
+            gameCardData={gameState.players[userId].gameCard}
             cellClick={handleCellClick}
           />
           {!hasAvailableMoves && !hasSubmitted && hasRolled ? (
             <button className="penalty-btn" onClick={handlePenalty}>Accept Penalty</button>
-          ):
-          (<button onClick={handleNumberSelection} disabled={hasSubmitted}>Confirm</button>)
+          ) :
+            (<button onClick={handleNumberSelection} disabled={hasSubmitted}>Confirm</button>)
           }
-          
+
         </div>
       </div>
     </div>
