@@ -1,7 +1,7 @@
 export interface QwixxLogic {
   players: {
     [name: string]: {
-      gamecard: {
+      gameCard: {
         rows: {
           red: number[];
           yellow: number[];

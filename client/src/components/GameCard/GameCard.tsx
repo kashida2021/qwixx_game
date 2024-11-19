@@ -20,14 +20,14 @@ const GameCard: React.FC<IGameCard> = ({ member, isOpponent, gameCardData, cellC
   // const [penalties, setPenalties] = useState<string[]>([]);
 
   //const handlePenaltyChange = (event: ChangeEvent<HTMLInputElement>) => {
-    //const value = event.target.value;
-    // setPenalties((prevPenalties) => [...prevPenalties, value]);
-    //event.target.disabled = true;
+  //const value = event.target.value;
+  // setPenalties((prevPenalties) => [...prevPenalties, value]);
+  //event.target.disabled = true;
   //};
 
   const renderPenaltyCheckbox = (number: number) => {
-
-    const isPenaltyChecked = gameCardData.penalties.includes(number);
+    console.log(gameCardData)
+    const isPenaltyChecked = gameCardData.penalties?.includes(number);
 
     return isOpponent ? (
       <li>
