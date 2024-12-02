@@ -91,10 +91,10 @@ describe("DiceClass unit test", () => {
       .mockReturnValueOnce(4);
 
     const expectedNumbers = {
-      red: [7, 7], 
+      red: [7, 7],
       yellow: [6, 6],
-      green: [7, 7], 
-      blue: [6, 6], 
+      green: [7, 7],
+      blue: [6, 6],
     }
     testDice.rollAllDice();
 

@@ -73,7 +73,7 @@ export default class Dice {
     return result;
   }
 
-  disableDie(colour: DiceColour): void {
+  public disableDie(colour: DiceColour): void {
     if (this._dice[colour]) {
       this._dice[colour].disable();
     } else {
