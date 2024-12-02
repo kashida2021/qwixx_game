@@ -41,12 +41,14 @@ export default class QwixxLogic {
   private _dice: Dice;
   private _currentTurnIndex: number;
   private _hasRolled: boolean;
+  private _lockedRows: rowColour[]
 
   constructor(players: Player[], dice: Dice) {
     this._playersArray = players;
     this._dice = dice;
     this._currentTurnIndex = 0;
     this._hasRolled = false;
+    this._lockedRows = []
   }
 
   public rollDice(): rollDiceResults {
@@ -71,8 +73,7 @@ export default class QwixxLogic {
     return this._playersArray.find((player) => player.name === playerName);
   }
 
-  //TOOD make it private
-  public get hasRolled() {
+  private get hasRolled() {
     return this._hasRolled;
   }
 
@@ -90,9 +91,14 @@ export default class QwixxLogic {
     return this._playersArray.every((player) => player.hasSubmittedChoice);
   }
 
+  private normaliseLockedRows() {
+    this._playersArray.forEach((player) => player.gameCard.normaliseRows(this._lockedRows))
+  }
+  // TODO: Need to add a check for any locked rows and normalise  
   private processPlayersSubmission() {
     if (this.haveAllPlayersSubmitted()) {
       this.resetAllPlayersSubmission();
+      this.normaliseLockedRows();
       this.nextTurn();
     }
   }
@@ -306,6 +312,24 @@ export default class QwixxLogic {
     return this.serialize();
   }
 
+  public lockRow(playerName: string, row: rowColour) {
+    const player = this.playerExistsInLobby(playerName)
+    if (!player) {
+      throw new Error("Player not found")
+    }
+
+    const res = player.gameCard.lockRow(row)
+
+    if (!res.success) {
+      return res
+    }
+
+    if (res.lockedRow && !this._lockedRows.includes(res.lockedRow)) {
+      this._lockedRows.push(res.lockedRow)
+    }
+
+    return this.serialize()
+  }
   // private get players() {
   //   return this._playersArray;
   // }
