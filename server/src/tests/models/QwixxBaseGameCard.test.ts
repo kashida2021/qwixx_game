@@ -192,8 +192,9 @@ describe("Base Game Card test", () => {
         ],
       ])("Can lock %s row", (row, numbers, expected) => {
         numbers.forEach((num) => testGameCard.markNumbers(row, num));
-        testGameCard.lockRow(row);
+        const res = testGameCard.lockRow(row);
 
+        expect(res).toEqual({ success: true, lockedRow: row });
         const lockedRows = testGameCard.isLocked;
         expect(lockedRows).toEqual(expected);
       });
@@ -234,6 +235,18 @@ describe("Base Game Card test", () => {
           expect(lockedRows).toEqual(expected);
         }
       );
+
+      test("Can normalise rows", () => {
+        testGameCard.normaliseRows([rowColour.Red, rowColour.Blue]);
+
+        const lockedRows = testGameCard.isLocked;
+        expect(lockedRows).toEqual({
+          red: true,
+          yellow: false,
+          green: false,
+          blue: true,
+        });
+      });
     });
   });
 });
