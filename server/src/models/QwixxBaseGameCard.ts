@@ -103,6 +103,7 @@ export default class qwixxBaseGameCard {
     //  }
     //}
 
+    // TODO: Is it better to move this check into 'isValidMove'?
     if (this.isLocked[row]) {
       return { success: false, errorMessage: `${row} row is already locked.` }
     }
