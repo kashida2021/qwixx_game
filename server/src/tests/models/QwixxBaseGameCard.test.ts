@@ -39,6 +39,13 @@ describe("gameboard temp test", () => {
       const rows = testGameCard.MarkedNumbers;
       expect(rows).toEqual({ red: [5], yellow: [], green: [], blue: [] });
     });
+
+    test("can't mark a number on a row that's already locked", () => {
+      testGameCard.normaliseRows([rowColour.Red]);
+
+      const res = testGameCard.markNumbers(rowColour.Red, 5);
+      expect(res).toEqual({ success: false, errorMessage: "red row is already locked." })
+    })
   });
 
   describe("Check rolled dice values against game card state", () => {
@@ -95,8 +102,9 @@ describe("gameboard temp test", () => {
       [rowColour.Blue, [12, 11, 10, 9, 8, 2], { red: false, yellow: false, green: false, blue: true }],
     ])("Can lock %s row", (row, numbers, expected) => {
       numbers.forEach(num => testGameCard.markNumbers(row, num))
-      testGameCard.lockRow(row)
+      const res = testGameCard.lockRow(row)
 
+      expect(res).toEqual({ success: true, lockedRow: row })
       const lockedRows = testGameCard.isLocked;
       expect(lockedRows).toEqual(expected)
     })
@@ -114,6 +122,13 @@ describe("gameboard temp test", () => {
 
       const lockedRows = testGameCard.isLocked;
       expect(lockedRows).toEqual(expected)
+    })
+
+    test("Can normalise rows", () => {
+      testGameCard.normaliseRows([rowColour.Red, rowColour.Blue])
+
+      const lockedRows = testGameCard.isLocked;
+      expect(lockedRows).toEqual({ red: true, yellow: false, green: false, blue: true })
     })
   });
 });
