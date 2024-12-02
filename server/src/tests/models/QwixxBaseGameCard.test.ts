@@ -87,4 +87,34 @@ describe("Base Game Card test", () => {
     const penalties = testGameCard.penalties
     expect(penalties).toEqual([1,])
   })
+
+  test.each([
+    [rowColour.Red, [2, 3, 4, 5, 6, 12], { red: [2, 3, 4, 5, 6, 12], yellow: [], green: [], blue: [] }],
+    [rowColour.Yellow, [2, 3, 4, 5, 6, 12], { red: [], yellow: [2, 3, 4, 5, 6, 12], green: [], blue: [] }],
+    [rowColour.Green, [12, 11, 10, 9, 8, 2], { red: [], yellow: [], green: [12, 11, 10, 9, 8, 2], blue: [] }],
+    [rowColour.Blue, [12, 11, 10, 9, 8, 2], { red: [], yellow: [], green: [], blue: [12, 11, 10, 9, 8, 2] }],
+  ])("can mark final number on %s row if atleast 5 numbers in row", (row, numbers, expected) => {
+    numbers.forEach(num => testGameCard.markNumbers(row, num))
+
+    const rows = testGameCard.MarkedNumbers;
+    expect(rows).toEqual(expected)
+  })
+
+  const redYellowRowErrMsg = "Number 12 can't be marked. 5 lower values numbers haven't been marked yet";
+  test.each([
+    [rowColour.Red, 12, { success: false, errorMessage: redYellowRowErrMsg }],
+    [rowColour.Yellow, 12, { success: false, errorMessage: redYellowRowErrMsg }],
+  ])("can't mark %s 12 if row doesn't have atleast 5 numbers in it", (row, number, expected) => {
+    const res = testGameCard.markNumbers(row, number)
+    expect(res).toEqual(expected)
+  })
+
+  const greenBlueRowErrMsg = "Number 2 can't be marked. 5 higher values numbers haven't been marked yet";
+  test.each([
+    [rowColour.Green, 2, { success: false, errorMessage: greenBlueRowErrMsg }],
+    [rowColour.Blue, 2, { success: false, errorMessage: greenBlueRowErrMsg }],
+  ])("can't mark %s 12 if row doesn't have atleast 5 numbers in it", (row, number, expected) => {
+    const res = testGameCard.markNumbers(row, number)
+    expect(res).toEqual(expected)
+  })
 });
