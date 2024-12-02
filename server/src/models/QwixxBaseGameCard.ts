@@ -67,7 +67,21 @@ export default class qwixxBaseGameCard {
     this._rows[row].push(number)
   }
 
-  private lockRow(row: rowColour) {
+  public lockRow(row: rowColour) {
+    if (row === rowColour.Red || row === rowColour.Yellow) {
+      if (this._rows[row].length < 6 && this.getHighestMarkedNumber(row) !== 12) {
+        return { success: false, errorMessage: "Didn't satisfy conditions to lock a row." }
+      }
+      this.addNumberToRow(row, 13)
+    }
+
+    if (row === rowColour.Green || row === rowColour.Blue) {
+      if (this._rows[row].length < 6 && this.getLowestMarkedNumber(row) !== 2) {
+        return { success: false, errorMessage: "Didn't satisfy conditions to lock a row." }
+      }
+      this.addNumberToRow(row, 1)
+    }
+
     this._isLocked[row] = true
   }
 
