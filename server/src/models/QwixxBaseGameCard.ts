@@ -4,12 +4,13 @@ interface MarkNumbersSuccess {
   success: true;
 }
 
-interface MarkNumbersFailre {
+interface MarkNumbersFailure {
   success: false;
   errorMessage: string;
 }
 
-type MarkNumbersResult = MarkNumbersSuccess | MarkNumbersFailre
+type MarkNumbersResult = MarkNumbersSuccess | MarkNumbersFailure
+type IsValidMoveResult = MarkNumbersSuccess | MarkNumbersFailure
 
 type RowValues = Record<rowColour, number[]>
 type RowLocks = Record<rowColour, boolean>
@@ -66,19 +67,30 @@ export default class qwixxBaseGameCard {
     this._rows[row].push(number)
   }
 
+  private lockRow(row: rowColour) {
+    this._isLocked[row] = true
+  }
+
   public markNumbers(row: rowColour, number: number): MarkNumbersResult {
     if (this._rows[row].includes(number)) {
       return { success: false, errorMessage: `Number ${number} is already marked in ${row} row.` }
     }
 
-    if (!this.isValidMove(row, number)) {
-      return {
-        success: false, errorMessage:
-          "Invalid move. Number is not higher/lower than previous marked number"
-      }
+    //if (!this.isValidMove(row, number)) {
+    //  return {
+    //    success: false, errorMessage:
+    //      "Invalid move. Number is not higher/lower than previous marked number"
+    //  }
+    //}
+
+    const res = this.isValidMove(row, number)
+
+    if (!res.success) {
+      return { success: res.success, errorMessage: res.errorMessage }
     }
 
     this.addNumberToRow(row, number)
+
     return { success: true }
 
     //    this._rows[row].push(number)
@@ -117,15 +129,44 @@ export default class qwixxBaseGameCard {
 
   // TODO: Better error handling for when colour is invalid.
   // It should already be validated in QwixxLogic but it is also being handled here.
-  private isValidMove(colour: rowColour, num: number): boolean {
+  private isValidMove(colour: rowColour, num: number): IsValidMoveResult {
     if (colour === rowColour.Red || colour === rowColour.Yellow) {
-      return this.getHighestMarkedNumber(colour) < num;
+      if (num < 12 && this.getHighestMarkedNumber(colour) > num) {
+        //return this.getHighestMarkedNumber(colour) < num;
+        return {
+          success: false,
+          errorMessage:
+            "Invalid move. Number is not greater than previous marked number"
+        }
+      }
+      if (num === 12 && this.MarkedNumbers[colour].length < 5) {
+        //return this.MarkedNumbers[colour].length >= 5
+        return {
+          success: false,
+          errorMessage:
+            "Number 12 can't be marked. 5 lower values numbers haven't been marked yet"
+        }
+      }
     }
 
     if (colour === rowColour.Blue || colour === rowColour.Green) {
-      return this.getLowestMarkedNumber(colour) > num;
+      //      return this.getLowestMarkedNumber(colour) > num;
+      if (num > 2 && this.getLowestMarkedNumber(colour) < num) {
+        return {
+          success: false,
+          errorMessage:
+            "Invalid move. Number is not less than previous marked number"
+        }
+      }
+      if (num === 2 && this.MarkedNumbers[colour].length! < 5) {
+        return {
+          success: false,
+          errorMessage:
+            "Number 2 can't be marked. 5 higher values numbers haven't been marked yet"
+        }
+      }
     }
-    return false;
+    return { success: true };
   }
 
   // TODO: Doesn't check valid moves for white1 + white2
