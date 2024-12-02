@@ -3,6 +3,7 @@ import Dice from "../models/DiceClass";
 import { rowColour } from "../enums/rowColours";
 import { SerializePlayer } from "../models/PlayerClass";
 import { TDiceValues } from "../models/DiceClass";
+import { DiceColour } from "../enums/DiceColours";
 
 interface rollDiceResults {
   hasRolled: boolean;
@@ -94,12 +95,33 @@ export default class QwixxLogic {
   private normaliseLockedRows() {
     this._playersArray.forEach((player) => player.gameCard.normaliseRows(this._lockedRows))
   }
-  // TODO: Need to add a check for any locked rows and normalise  
+
   private processPlayersSubmission() {
     if (this.haveAllPlayersSubmitted()) {
       this.resetAllPlayersSubmission();
-      this.normaliseLockedRows();
+
+      if (this._lockedRows) {
+        this.normaliseLockedRows();
+        this._lockedRows.forEach(row => {
+          const diceColour = this.getDiceColourFromLockedRow(row)
+          this._dice.disableDie(diceColour)
+        })
+      }
+
       this.nextTurn();
+    }
+  }
+
+  private getDiceColourFromLockedRow(row: rowColour): DiceColour {
+    switch (row) {
+      case rowColour.Red:
+        return DiceColour.Red;
+      case rowColour.Yellow:
+        return DiceColour.Yellow;
+      case rowColour.Green:
+        return DiceColour.Green;
+      case rowColour.Blue:
+        return DiceColour.Blue;
     }
   }
 
