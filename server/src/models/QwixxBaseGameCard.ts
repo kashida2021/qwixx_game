@@ -67,6 +67,11 @@ export default class qwixxBaseGameCard {
     this._rows[row].push(number)
   }
 
+  public normaliseRows(rows: rowColour[]) {
+    //    this._isLocked[row] = true
+    rows.forEach(row => this._isLocked[row] = true)
+  }
+
   public lockRow(row: rowColour) {
     if (row === rowColour.Red || row === rowColour.Yellow) {
       if (this._rows[row].length < 6 && this.getHighestMarkedNumber(row) !== 12) {
@@ -83,6 +88,7 @@ export default class qwixxBaseGameCard {
     }
 
     this._isLocked[row] = true
+    return { success: true, lockedRow: row }
   }
 
   public markNumbers(row: rowColour, number: number): MarkNumbersResult {
@@ -96,6 +102,10 @@ export default class qwixxBaseGameCard {
     //      "Invalid move. Number is not higher/lower than previous marked number"
     //  }
     //}
+
+    if (this.isLocked[row]) {
+      return { success: false, errorMessage: `${row} row is already locked.` }
+    }
 
     const res = this.isValidMove(row, number)
 
