@@ -86,6 +86,7 @@ const Row: React.FC<RowProps> = ({
           colour={rowColour}
           isOpponent={isOpponent}
           handleLockRow={handleLockRow}
+          isLocked={gameCardData.isLocked[rowColour]}
         // lockRow={setLocked}
         />
       </ol>
