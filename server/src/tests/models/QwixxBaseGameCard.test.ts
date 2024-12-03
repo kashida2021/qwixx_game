@@ -3,7 +3,7 @@ import qwixxBaseGameCard from "../../models/QwixxBaseGameCard";
 
 let testGameCard: qwixxBaseGameCard;
 
-describe("gameboard temp test", () => {
+describe("Base Game Card test", () => {
   beforeEach(() => {
     testGameCard = new qwixxBaseGameCard();
   });
@@ -30,12 +30,45 @@ describe("gameboard temp test", () => {
     expect(rows).toEqual(expected);
   });
 
-  test("mark numbers already on board", () => {
+  test("Can't mark numbers already on board", () => {
     testGameCard.markNumbers(rowColour.Red, 5);
-    testGameCard.markNumbers(rowColour.Red, 5);
+    const result = testGameCard.markNumbers(rowColour.Red, 5);
+    expect(result.success).toBeFalsy()
+    if (!result.success) {
+      expect(result.errorMessage).toBe("Number 5 is already marked in red row.")
+    }
+
     const rows = testGameCard.MarkedNumbers;
     expect(rows).toEqual({ red: [5], yellow: [], green: [], blue: [] });
   });
+
+  test("Can't mark a number that is lower than previous number on red row", () => {
+    testGameCard.markNumbers(rowColour.Red, 5);
+    const result = testGameCard.markNumbers(rowColour.Red, 4);
+    expect(result.success).toBeFalsy()
+    if (!result.success) {
+      expect(result.errorMessage).toBe(
+        "Invalid move. Number is not higher/lower than previous marked number"
+      )
+    }
+
+    const rows = testGameCard.MarkedNumbers;
+    expect(rows).toEqual({ red: [5], yellow: [], green: [], blue: [] });
+  })
+
+  test("Can't mark a number that is higher than previous number on blue row", () => {
+    testGameCard.markNumbers(rowColour.Blue, 5);
+    const result = testGameCard.markNumbers(rowColour.Blue, 6);
+    expect(result.success).toBeFalsy()
+    if (!result.success) {
+      expect(result.errorMessage).toBe(
+        "Invalid move. Number is not higher/lower than previous marked number"
+      )
+    }
+
+    const rows = testGameCard.MarkedNumbers;
+    expect(rows).toEqual({ red: [], yellow: [], green: [], blue: [5] });
+  })
 
   test("return true if there are available moves based on current gamecard", () => {
     const obj = {
