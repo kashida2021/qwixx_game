@@ -129,9 +129,8 @@ export const Game: React.FC<IGameProps> = ({
           ) :
             (<button onClick={handleNumberSelection} disabled={hasSubmitted}>Confirm</button>)
           }
-          {/* Disable button when dice hasn't been rolled*/}
-          {/* Disable button after player has submitted*/}
-          <button className="" onClick={handleEndTurn}>End Turn</button>
+          {/* For ending a turn even if there are available moves */}
+          <button className="" onClick={handleEndTurn} disabled={hasSubmitted || !hasRolled}>End Turn</button>
         </div>
       </div>
     </div>

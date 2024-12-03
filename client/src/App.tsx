@@ -91,8 +91,8 @@ function App() {
     };
 
     const onTurnEnded = (data: { gameState: QwixxLogic }) => {
+      console.log(gameState?.players)
       setGameState(data.gameState);
-      //console.log("turn ended", data );
     }
 
     const handleDiceRolled = (data: { diceValues: any, hasAvailableMoves: boolean, hasRolled: boolean }) => {
