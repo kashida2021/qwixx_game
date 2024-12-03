@@ -263,5 +263,29 @@ describe("Qwixx Logic tests", () => {
 
       expect(res.data?.players.player1.hasSubmittedChoice).toBeTruthy()
     });
+
+    test.only("Can't end a turn if a dice hasn't been rolled", () => {
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice)
+      const res = testGame.endTurn("player1");
+
+      expect(res.success).toBeFalsy()
+      expect(res.errorMessage).toBe("Dice hasn't been rolled yet.")
+    })
+
+    test.only("should throw an error if player not found", () => {
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice)
+      testGame.rollDice()
+      expect(() => testGame.endTurn("player3")).toThrow("Player not found.")
+    })
+
+    test.only("Player can't end a turn if they've already finished their turn", () => {
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
+      testGame.rollDice()
+      testGame.endTurn("player1");
+      const res = testGame.endTurn("player1");
+
+      expect(res.success).toBeFalsy()
+      expect(res.errorMessage).toBe("Player has already ended their turn.")
+    })
   })
 });
