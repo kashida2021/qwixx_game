@@ -123,6 +123,11 @@ function App() {
       console.log("penalty data", data.responseData);
     }
 
+    const onRowLocked = (data: { gameState: QwixxLogic }) => {
+      setGameState(data.gameState)
+      console.log("Data after locking a row", data)
+    }
+
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
     socket.on("player_joined", handlePlayerJoined);
@@ -134,6 +139,7 @@ function App() {
     socket.on("update_markedNumbers", updateMarkedNumbers);
     socket.on("dice_rolled", handleDiceRolled);
     socket.on("penalty_processed", updatePenalty);
+    socket.on("row_locked", onRowLocked)
     socket.on("turn_ended", onTurnEnded);
 
     return () => {
