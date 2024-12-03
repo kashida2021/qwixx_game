@@ -123,6 +123,10 @@ function App() {
       console.log("penalty data", data.responseData);
     }
 
+    const handlePassMove = ( data: {result: QwixxLogic} ) => {
+      setGameState(data.result);
+    }
+
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
     socket.on("player_joined", handlePlayerJoined);
@@ -135,6 +139,7 @@ function App() {
     socket.on("dice_rolled", handleDiceRolled);
     socket.on("penalty_processed", updatePenalty);
     socket.on("turn_ended", onTurnEnded);
+    socket.on("passMoveProcessed", handlePassMove);
 
     return () => {
       socket.off("connect");
@@ -149,6 +154,7 @@ function App() {
       socket.off("dice_rolled");
       socket.off("penalty_processed");
       socket.off("turn_ended");
+      socket.off("passMoveProcessed");
     };
   }, []);
 
