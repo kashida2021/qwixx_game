@@ -220,7 +220,9 @@ export default class QwixxLogic {
       isValid: true,
     };
   }
-
+  // TODO: 
+  // Do we need a check to see if active player has made a move before ending a turn?
+  // If we do, do we need to process penalty?
   public endTurn(playerName: string) {
     const player = this.playerExistsInLobby(playerName);
 
