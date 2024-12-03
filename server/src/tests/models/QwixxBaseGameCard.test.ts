@@ -81,4 +81,10 @@ describe("Base Game Card test", () => {
     const res = testGameCard.hasAvailableMoves(obj);
     expect(res).toBeTruthy();
   });
+
+  it("can add penalty to game card", () => {
+    testGameCard.addPenalty()
+    const penalties = testGameCard.penalties
+    expect(penalties).toEqual([1,])
+  })
 });
