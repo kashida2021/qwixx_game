@@ -360,7 +360,7 @@ export default function initializeSocketHandler(io: Server) {
         }
 
         if (res?.success) {
-          io.to(lobbyId).emit("update_markedNumbers", res.data);
+          io.to(lobbyId).emit("row_locked", { gameState: res.data });
         }
 
       } catch (err) {
