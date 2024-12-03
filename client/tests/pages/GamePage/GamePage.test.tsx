@@ -111,6 +111,21 @@ describe("Game Page Unit Test:", () => {
     expect(playerGameCard.length).toBe(1);
   });
 
+  test.only("renders end turn button", () => {
+    render(
+      <GamePage
+        socket={socket}
+        userId={"testUser1"}
+        members={membersArrayMock}
+        lobbyId={lobbyIdMock}
+        gameState={gameState}
+        availableMoves={true}
+      />
+    );
+
+    const endTurnBtn = screen.getByText("End Turn")
+    expect(endTurnBtn).toBeVisible()
+  })
   test("confirm button should render if there is an available move", () => {
     render(
       <GamePage
