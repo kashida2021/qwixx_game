@@ -223,7 +223,13 @@ export default class QwixxLogic {
   // TODO: 
   // Do we need a check to see if active player has made a move before ending a turn?
   // If we do, do we need to process penalty?
+  // Maybe add a check to see if the dice has already been rolled to stop a player from ending a turn
+  // before rolling a dice
   public endTurn(playerName: string) {
+    if (!this.hasRolled) {
+      return { success: false, errorMessage: "Dice hasn't been rolled yet." }
+    }
+
     const player = this.playerExistsInLobby(playerName);
 
     if (!player) {
@@ -231,9 +237,11 @@ export default class QwixxLogic {
     }
 
     if (player.hasSubmittedChoice) {
-      throw new Error("Player already finished their turn.");
+      return { success: false, errorMessage: "Player has already ended their turn." }
     }
 
+    // ISSUE: 
+    // These two snippets do the same thing. Is there something that needs to be handled differently?
     if (player !== this.activePlayer) {
       player.markSubmitted();
     }
@@ -244,7 +252,7 @@ export default class QwixxLogic {
 
     this.processPlayersSubmission();
 
-    return this.serialize();
+    return { success: true, data: this.serialize() };
   }
 
   public processPenalty(playerName: string) {
