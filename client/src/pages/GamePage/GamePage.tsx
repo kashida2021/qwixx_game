@@ -42,9 +42,9 @@ export const Game: React.FC<IGameProps> = ({
     setPlayerChoice({ row: rowColour, num });
   };
 
-  useEffect(() => {
-    console.log(playerChoice);
-  }, [playerChoice]);
+  //  useEffect(() => {
+  //    console.log(playerChoice);
+  //  }, [playerChoice]);
   // if(!gameState){
   //     return <div>Loading...</div>;
   // }
@@ -67,7 +67,7 @@ export const Game: React.FC<IGameProps> = ({
 
   const handleNumberSelection = () => {
     socket.emit("mark_numbers", { lobbyId, userId, playerChoice });
-    console.log("player's choice:", playerChoice);
+    //console.log("player's choice:", playerChoice);
   }
 
   const handlePenalty = () => {
@@ -83,6 +83,8 @@ export const Game: React.FC<IGameProps> = ({
   const hasRolled = gameState.hasRolled;
   const activePlayer = gameState.activePlayer;
 
+  console.log("active player:", activePlayer)
+  console.log("has rolled:", hasRolled)
   console.log("player has moves:", hasAvailableMoves);
 
 
@@ -124,7 +126,7 @@ export const Game: React.FC<IGameProps> = ({
             gameCardData={gameState.players[userId].gameCard}
             cellClick={handleCellClick}
           />
-          {!hasAvailableMoves && !hasSubmitted && hasRolled && activePlayer ? (
+          {!hasAvailableMoves && !hasSubmitted && hasRolled && activePlayer === userId ? (
             <button className="penalty-btn" onClick={handlePenalty}>Accept Penalty</button>
           ) :
             (<button onClick={handleNumberSelection} disabled={hasSubmitted}>Confirm</button>)
