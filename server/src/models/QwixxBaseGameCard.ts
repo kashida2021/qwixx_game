@@ -11,6 +11,9 @@ interface MarkNumbersFailure {
 
 type MarkNumbersResult = MarkNumbersSuccess | MarkNumbersFailure
 type IsValidMoveResult = MarkNumbersSuccess | MarkNumbersFailure
+type LockRowResult =
+  | { success: true; lockedRow: rowColour }
+  | { success: false; errorMessage: string }
 
 type RowValues = Record<rowColour, number[]>
 type RowLocks = Record<rowColour, boolean>
@@ -72,7 +75,7 @@ export default class qwixxBaseGameCard {
     rows.forEach(row => this._isLocked[row] = true)
   }
 
-  public lockRow(row: rowColour) {
+  public lockRow(row: rowColour): LockRowResult {
     if (row === rowColour.Red || row === rowColour.Yellow) {
       if (this._rows[row].length < 6 && this.getHighestMarkedNumber(row) !== 12) {
         return { success: false, errorMessage: "Didn't satisfy conditions to lock a row." }

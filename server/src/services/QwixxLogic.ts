@@ -33,6 +33,10 @@ type MakeMoveResult =
   | { success: true; data: SerializedGameState }
   | { success: false; error: string }
 
+type LockRowResult =
+  | { success: true; data: SerializedGameState }
+  | { success: false; errorMessage: string }
+
 export default class QwixxLogic {
   private _playersArray: Player[];
   private _dice: Dice;
@@ -293,13 +297,16 @@ export default class QwixxLogic {
     return this.serialize();
   }
 
-  public lockRow(playerName: string, row: rowColour) {
+  // TODO: returns aren't standard format
+  public lockRow(playerName: string, row: string): LockRowResult {
+    const colourToLock = this.getColourFromRow(row)
+
     const player = this.playerExistsInLobby(playerName)
     if (!player) {
       throw new Error("Player not found")
     }
 
-    const res = player.gameCard.lockRow(row)
+    const res = player.gameCard.lockRow(colourToLock)
 
     if (!res.success) {
       return res
@@ -309,7 +316,7 @@ export default class QwixxLogic {
       this._lockedRows.push(res.lockedRow)
     }
 
-    return this.serialize()
+    return { success: true, data: this.serialize() }
   }
   // private get players() {
   //   return this._playersArray;
