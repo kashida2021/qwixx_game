@@ -117,7 +117,7 @@ export default class QwixxLogic {
       throw new Error("Player not found.");
     }
     // Check if active player
-    if (player === this.activePlayer) {
+    if (player !== this.activePlayer) {
       throw new Error("Unable to pass if not active player");
     }
 
