@@ -338,7 +338,6 @@ export default class QwixxLogic {
     return this.serialize();
   }
 
-  // TODO: returns aren't standard format
   public lockRow(playerName: string, row: string): LockRowResult {
     const colourToLock = this.getColourFromRow(row)
 
