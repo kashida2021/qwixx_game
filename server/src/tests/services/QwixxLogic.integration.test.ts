@@ -284,4 +284,50 @@ describe("Qwixx Logic integration tests:", () => {
       expect(mockPlayer2.hasSubmittedChoice).toBeTruthy();
     });
   });
+
+  describe("end turn tests", () => {
+    test("active player can end their turn", () => {
+      testGame.rollDice()
+      const result = testGame.endTurn("test-player1")
+      expect(result.success).toBeTruthy()
+      if (result.success) {
+        const player1State = result.data?.players["test-player1"]
+        expect(player1State?.hasSubmittedChoice).toBeTruthy()
+      }
+    })
+
+    it("doesn't add a penalty to the active player when they marked a number and end their turn", () => {
+      testGame.rollDice()
+      const diceResult = testGame.rollDice();
+      const whiteDiceSum = diceResult.diceValues.white1 + diceResult.diceValues.white2;
+      testGame.makeMove("test-player1", "red", whiteDiceSum);
+
+      const result = testGame.endTurn("test-player1")
+      expect(result.success).toBeTruthy()
+      if (result.success) {
+        const player1State = result.data?.players["test-player1"]
+        expect(player1State?.gameCard.penalties).not.toEqual([1,])
+      }
+    })
+
+    it("adds a penalty to the active player if they end turn without marking a number", () => {
+      testGame.rollDice()
+      const result = testGame.endTurn("test-player1")
+      expect(result.success).toBeTruthy()
+      if (result.success) {
+        const player1State = result.data?.players["test-player1"]
+        expect(player1State?.gameCard.penalties).toEqual([1,])
+      }
+    })
+
+    it("returns an error if player has already end their turn", () => {
+      testGame.rollDice()
+      testGame.endTurn("test-player1")
+      const result = testGame.endTurn("test-player1")
+      expect(result.success).toBeFalsy()
+      if (!result.success) {
+        expect(result.errorMessage).toBe("Player has already ended their turn.")
+      }
+    })
+  })
 });

@@ -68,7 +68,7 @@ describe("Qwixx Logic tests", () => {
     it("should call the markNumber method with correct args", () => {
       const testGame = new QwixxLogic(playersArrayMock, fakeDice);
       testGame.rollDice();
-      console.log(testGame.makeMove("player1", "red", 10));
+      testGame.makeMove("player1", "red", 10);
 
       expect(player1Mock.markNumber).toHaveBeenCalledWith("red", 10);
       expect(player1Mock.markNumber).toHaveBeenCalledTimes(1);
@@ -256,15 +256,15 @@ describe("Qwixx Logic tests", () => {
   });
 
   describe("endTurn method tests", () => {
-    test.only("A player can end their turn", () => {
+    test("A player can end their turn", () => {
       const testGame = new QwixxLogic(playersArrayMock, fakeDice);
       testGame.rollDice()
       const res = testGame.endTurn("player1");
-
+      console.log(res)
       expect(res.data?.players.player1.hasSubmittedChoice).toBeTruthy()
     });
 
-    test.only("Can't end a turn if a dice hasn't been rolled", () => {
+    test("Can't end a turn if a dice hasn't been rolled", () => {
       const testGame = new QwixxLogic(playersArrayMock, fakeDice)
       const res = testGame.endTurn("player1");
 
@@ -272,13 +272,13 @@ describe("Qwixx Logic tests", () => {
       expect(res.errorMessage).toBe("Dice hasn't been rolled yet.")
     })
 
-    test.only("should throw an error if player not found", () => {
+    test("should throw an error if player not found", () => {
       const testGame = new QwixxLogic(playersArrayMock, fakeDice)
       testGame.rollDice()
       expect(() => testGame.endTurn("player3")).toThrow("Player not found.")
     })
 
-    test.only("Player can't end a turn if they've already finished their turn", () => {
+    test("Player can't end a turn if they've already finished their turn", () => {
       const testGame = new QwixxLogic(playersArrayMock, fakeDice);
       testGame.rollDice()
       testGame.endTurn("player1");
@@ -286,6 +286,15 @@ describe("Qwixx Logic tests", () => {
 
       expect(res.success).toBeFalsy()
       expect(res.errorMessage).toBe("Player has already ended their turn.")
+    })
+
+    test.skip("Active player receives a penalty if they end their turn without marking a number", () => {
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
+      testGame.rollDice()
+      const res = testGame.endTurn("player1");
+
+      //      expect(res.data?.players.player1.gameCard.penalties).toEqual([])
+      expect(gameCardMock1.addPenalty).toHaveBeenCalledTimes(1)
     })
   })
 });
