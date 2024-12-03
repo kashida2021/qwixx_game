@@ -126,8 +126,9 @@ export default class QwixxLogic {
       throw new Error("Cannot pass on second choice");
     }
 
-    player.markSubmitted();
-    this.processPlayersSubmission();
+    //add player method to update submission count for passmove
+
+    player.passMove();
 
     return this.serialize();
   }
