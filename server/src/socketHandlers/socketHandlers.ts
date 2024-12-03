@@ -334,6 +334,40 @@ export default function initializeSocketHandler(io: Server) {
           socket.emit("error_occured", { message: err.message });
         }
       }
-    });
+
+    })
+
+    socket.on("lock_row", ({ userId, lobbyId, rowColour }) => {
+      if (!lobbyId || !userId) {
+        socket.emit("error_occured", {
+          message: "Missing userId or lobbyId for locking a row",
+        });
+        return;
+      }
+
+      const game = lobbiesMap[lobbyId].gameLogic;
+
+      if (!game) {
+        socket.emit("error_occured", { message: "Lobby or game not found" });
+        return;
+      }
+
+      try {
+        const res = game.lockRow(userId, rowColour)
+
+        if (!res.success) {
+          socket.emit("error_occured", { message: res.errorMessage })
+        }
+
+        if (res?.success) {
+          io.to(lobbyId).emit("update_markedNumbers", res.data);
+        }
+
+      } catch (err) {
+        if (err instanceof Error) {
+          socket.emit("error_occured", { message: err.message });
+        }
+      }
+    })
   });
 }
