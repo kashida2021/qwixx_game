@@ -74,6 +74,10 @@ export const Game: React.FC<IGameProps> = ({
     socket.emit("submit_penalty", { userId, lobbyId });
   }
 
+  const handlePassMove = () => {
+    socket.emit("pass_move", {lobbyId, userId});
+  }
+
   const handleEndTurn = () => {
     socket.emit("end_turn", { lobbyId, userId })
   }
@@ -132,7 +136,10 @@ export const Game: React.FC<IGameProps> = ({
             (<button onClick={handleNumberSelection} disabled={hasSubmitted}>Confirm</button>)
           }
           {/* For ending a turn even if there are available moves */}
-          <button className="" onClick={handleEndTurn} disabled={hasSubmitted || !hasRolled}>End Turn</button>
+          <button className="" onClick={handleEndTurn} disabled={hasSubmitted || !hasRolled}>End Turn</button>          
+          {/* Need to disable if not active player or players second choice */}
+          <button className="" onClick={handlePassMove}>Pass Move</button>
+
         </div>
       </div>
     </div>
