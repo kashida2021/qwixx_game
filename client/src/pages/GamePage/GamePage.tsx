@@ -74,6 +74,10 @@ export const Game: React.FC<IGameProps> = ({
     socket.emit("submit_penalty", { userId, lobbyId });
   }
 
+  const handleEndTurn = () => {
+    socket.emit("end_turn", { lobbyId, userId })
+  }
+
   const hasSubmitted = gameState.players[userId].hasSubmittedChoice;
   const hasAvailableMoves = availableMoves;
   const hasRolled = gameState.hasRolled;
@@ -125,7 +129,9 @@ export const Game: React.FC<IGameProps> = ({
           ) :
             (<button onClick={handleNumberSelection} disabled={hasSubmitted}>Confirm</button>)
           }
-
+          {/* Disable button when dice hasn't been rolled*/}
+          {/* Disable button after player has submitted*/}
+          <button className="" onClick={handleEndTurn}>End Turn</button>
         </div>
       </div>
     </div>
