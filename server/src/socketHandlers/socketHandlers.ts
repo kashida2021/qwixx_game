@@ -205,7 +205,7 @@ export default function initializeSocketHandler(io: Server) {
 
         if (res?.success) {
           const responseData = { gameState: res.data }
-          io.to(lobbyId).emit("update_markedNumbers", responseData);
+          io.to(lobbyId).emit("update_marked_numbers", responseData);
         }
 
       } catch (err) {
