@@ -16,10 +16,10 @@ interface MoveValidationSuccess {
 
 interface MoveValidationFailure {
   isValid: false;
-  errorMessage: string
+  errorMessage: string;
 }
 
-type ValidationResult = MoveValidationSuccess | MoveValidationFailure
+type ValidationResult = MoveValidationSuccess | MoveValidationFailure;
 
 interface SerializedGameState {
   players: Record<string, SerializePlayer>;
@@ -30,7 +30,7 @@ interface SerializedGameState {
 
 type MakeMoveResult =
   | { success: true; data: SerializedGameState }
-  | { success: false; error: string }
+  | { success: false; error: string };
 
 export default class QwixxLogic {
   private _playersArray: Player[];
@@ -108,14 +108,42 @@ export default class QwixxLogic {
     }
   }
 
-  public makeMove(playerName: string, row: string, num: number): MakeMoveResult {
+  public passMove(playerName: string) {
+    // Call Player Method add submission to player
+    const player = this.playerExistsInLobby(playerName);
+
+    if (!player) {
+      //return { isValid: false, errorMessage: new Error("Player not found.") };
+      throw new Error("Player not found.");
+    }
+    // Check if active player
+    if (player === this.activePlayer) {
+      throw new Error("Unable to pass if not active player");
+    }
+
+    // Check submission count is 0
+    if (player?.submissionCount === 1) {
+      throw new Error("Cannot pass on second choice");
+    }
+
+    player.markSubmitted();
+    this.processPlayersSubmission();
+
+    return this.serialize();
+  }
+
+  public makeMove(
+    playerName: string,
+    row: string,
+    num: number
+  ): MakeMoveResult {
     const colourToMark = this.getColourFromRow(row);
     const player = this.playerExistsInLobby(playerName);
     // Moved this check up to here and early return
     // Only throw error here because critical error and not game-rule violation
     if (!player) {
       //return { isValid: false, errorMessage: new Error("Player not found.") };
-      throw new Error("Player not found.")
+      throw new Error("Player not found.");
     }
 
     //Passed the player object to validateMove instead of playerName
@@ -124,7 +152,7 @@ export default class QwixxLogic {
     // returning an object literal because it is a game-rule violation
     if (!validationResult.isValid) {
       //throw validationResult.errorMessage;
-      return { success: false, error: validationResult.errorMessage }
+      return { success: false, error: validationResult.errorMessage };
     }
 
     const markNumberResult = player.markNumber(colourToMark, num);
@@ -132,7 +160,10 @@ export default class QwixxLogic {
     // returning an object literal because it is a game-rule violation
     if (!markNumberResult.success) {
       //throw new Error("Invalid move: cannot mark this number.");
-      return { success: markNumberResult.success, error: markNumberResult.errorMessage }
+      return {
+        success: markNumberResult.success,
+        error: markNumberResult.errorMessage,
+      };
     }
 
     if (
@@ -176,13 +207,10 @@ export default class QwixxLogic {
     /*
      * Checks the non-active player's number selection.
      */
-    if (
-      player !== this.activePlayer &&
-      num !== this._dice.whiteDiceSum
-    ) {
+    if (player !== this.activePlayer && num !== this._dice.whiteDiceSum) {
       return {
         isValid: false,
-        errorMessage: "Number selected doesn't equal to sum of white dice."
+        errorMessage: "Number selected doesn't equal to sum of white dice.",
       };
     }
 
@@ -197,7 +225,7 @@ export default class QwixxLogic {
     ) {
       return {
         isValid: false,
-        errorMessage: "Number selected doesn't equal to sum of white dice."
+        errorMessage: "Number selected doesn't equal to sum of white dice.",
       };
     }
 
@@ -212,7 +240,8 @@ export default class QwixxLogic {
     ) {
       return {
         isValid: false,
-        errorMessage: "Number selected doesn't equal to sum of white die and coloured die."
+        errorMessage:
+          "Number selected doesn't equal to sum of white die and coloured die.",
       };
     }
 
@@ -258,7 +287,7 @@ export default class QwixxLogic {
       throw new Error("Player not found");
     }
 
-    player.gameCard.addPenalty()
+    player.gameCard.addPenalty();
     player.markSubmitted();
     this.processPlayersSubmission();
 
