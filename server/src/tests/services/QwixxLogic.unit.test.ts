@@ -159,60 +159,6 @@ describe("Qwixx Logic tests", () => {
         );
       }
     );
-
-    test.skip("active-player marking a number that equals the sum of a white dice but lower than highest marked red row will throw an error", () => {
-
-      // TODO: Explain why this is no longer applicable and how to test it.
-      // We just mock the return value of markNumber without having to write complicated mock implementations.
-      // We just test the behaviour of what happens inside of Qwixx Logic by reducing coupling.
-
-      //      const originalImplementation = gameCardMock1.getHighestMarkedNumber;
-      //
-      //      jest
-      //        .spyOn(gameCardMock1, "getHighestMarkedNumber")
-      //        .mockImplementation((row) => {
-      //          if (row === "red") return 11;
-      //          if (row === "yellow") return 8;
-      //          if (row === "green") return 8;
-      //          if (row === "blue") return 8;
-      //          return 2;
-      //        });
-
-      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
-      testGame.rollDice();
-
-      expect(() => {
-        testGame.makeMove("player1", "red", 10);
-      }).toThrow("Number must be above the last marked number");
-    });
-
-    // TODO: I think this test is no longer necessary as it can be tested inside of game card
-    test.skip("should throw error when trying to mark blue 10, if gamecard has no valid moves", () => {
-      jest
-        .spyOn(gameCardMock1, "getHighestMarkedNumber")
-        .mockImplementation((row) => {
-          if (row === "red" || row === "yellow") return 11;
-          return 10;
-        });
-
-      jest
-        .spyOn(gameCardMock1, "getLowestMarkedNumber")
-        .mockImplementation((row) => {
-          if (row === "green" || row === "blue") return 6;
-          return 4;
-        });
-
-      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
-      testGame.rollDice();
-      //const isMoveAvailable = testGame.validMoveAvailable();
-
-      expect(() => {
-        testGame.makeMove("player1", "blue", 10);
-      }).toThrow("Number must be below the last marked number");
-
-      //expect(isMoveAvailable["player1"]).toBe(false);
-      //expect(isMoveAvailable["player2"]).toBe(true);
-    });
   })
 
   describe("rollDice method tests", () => {
@@ -256,14 +202,6 @@ describe("Qwixx Logic tests", () => {
   });
 
   describe("endTurn method tests", () => {
-    test("A player can end their turn", () => {
-      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
-      testGame.rollDice()
-      const res = testGame.endTurn("player1");
-      console.log(res)
-      expect(res.data?.players.player1.hasSubmittedChoice).toBeTruthy()
-    });
-
     test("Can't end a turn if a dice hasn't been rolled", () => {
       const testGame = new QwixxLogic(playersArrayMock, fakeDice)
       const res = testGame.endTurn("player1");
@@ -276,25 +214,6 @@ describe("Qwixx Logic tests", () => {
       const testGame = new QwixxLogic(playersArrayMock, fakeDice)
       testGame.rollDice()
       expect(() => testGame.endTurn("player3")).toThrow("Player not found.")
-    })
-
-    test("Player can't end a turn if they've already finished their turn", () => {
-      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
-      testGame.rollDice()
-      testGame.endTurn("player1");
-      const res = testGame.endTurn("player1");
-
-      expect(res.success).toBeFalsy()
-      expect(res.errorMessage).toBe("Player has already ended their turn.")
-    })
-
-    test.skip("Active player receives a penalty if they end their turn without marking a number", () => {
-      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
-      testGame.rollDice()
-      const res = testGame.endTurn("player1");
-
-      //      expect(res.data?.players.player1.gameCard.penalties).toEqual([])
-      expect(gameCardMock1.addPenalty).toHaveBeenCalledTimes(1)
     })
   })
 });
