@@ -5,24 +5,30 @@ interface ICellLockButton {
   colour: string;
   isOpponent: boolean;
   // lockRow: React.Dispatch<React.SetStateAction<boolean>>;
+  handleLockRow: (rowColour: string) => void;
 }
 
 export const LockButton: React.FC<ICellLockButton> = ({
   // locked,
   colour,
   isOpponent,
+  handleLockRow,
   // lockRow,
 }) => {
   // const [isLocked, setIsLocked] = useState(locked);
-  
+
   // const handleClick = () => {
   //   lockRow(true);
   // };
 
+  // TODO: Pass in prop to handle locking roll event?
   // useEffect(() => {
   //   setIsLocked(!locked);
   // }, [locked]);
 
+  const handleClick = () => {
+    handleLockRow(colour)
+  }
   return (
     <li>
       {isOpponent ? (
@@ -39,7 +45,7 @@ export const LockButton: React.FC<ICellLockButton> = ({
           className={`lock-btn ${colour}`}
           aria-label="interactive-lock-button"
           // disabled={isLocked}
-          // onClick={handleClick}
+          onClick={handleClick}
         >
           🔒
         </button>
