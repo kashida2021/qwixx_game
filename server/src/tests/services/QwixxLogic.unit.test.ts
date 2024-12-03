@@ -184,12 +184,6 @@ describe("Qwixx Logic tests", () => {
       expect(() => {
         testGame.makeMove("player1", "red", 10);
       }).toThrow("Number must be above the last marked number");
-
-      // TODO: Explain why this isn't necessary
-
-      //      jest
-      //        .spyOn(gameCardMock1, "getHighestMarkedNumber")
-      //        .mockImplementation(originalImplementation);
     });
 
     // TODO: I think this test is no longer necessary as it can be tested inside of game card
@@ -253,34 +247,21 @@ describe("Qwixx Logic tests", () => {
     it("should add a penalty to the players gamecard", () => {
       const testGame = new QwixxLogic(playersArrayMock, fakeDice);
 
-      // TODO: explain why this test isn't applicable in this unit test
-
-      //      const serializedData = {
-      //        gamecard: {
-      //          rows: {
-      //            red: [],
-      //            yellow: [],
-      //            green: [],
-      //            blue: [],
-      //          },
-      //          isLocked: {
-      //            red: false,
-      //            yellow: false,
-      //            green: false,
-      //            blue: false,
-      //          },
-      //          penalties: [1],
-      //        },
-      //        hasSubmittedChoice: false,
-      //      };
-
-      // jest.spyOn(player1Mock, "serialize").mockReturnValue(serializedData);
 
       const addPenaltySpy = jest.spyOn(player1Mock.gameCard, "addPenalty");
       testGame.processPenalty("player1");
 
       expect(addPenaltySpy).toHaveBeenCalled();
-      //expect(player1Mock.serialize()).toEqual(serializedData);
     });
   });
+
+  describe("endTurn method tests", () => {
+    test.only("A player can end their turn", () => {
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
+      testGame.rollDice()
+      const res = testGame.endTurn("player1");
+
+      expect(res.data?.players.player1.hasSubmittedChoice).toBeTruthy()
+    });
+  })
 });
