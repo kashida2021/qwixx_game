@@ -44,12 +44,15 @@ describe("Qwixx Logic integration tests:", () => {
 
   describe("Game logic tests", () => {
     test("making a move before rolling dice throws an error", () => {
-      expect(() => testGame.makeMove("test-player1", "red", 2)).toThrow(
-        "Dice hasn't been rolled yet."
-      );
+      const res = testGame.makeMove("test-player1", "red", 2)
+
+      expect(res.success).toBeFalsy()
+      if (!res.success) {
+        expect(res.error).toBe("Dice hasn't been rolled yet.")
+      }
     });
 
-    it.only("should make a move and return the correct result", () => {
+    it("should make a move and return the correct result", () => {
       const result = testGame.rollDice();
       const whiteDiceSum = result.diceValues.white1 + result.diceValues.white2;
 
@@ -127,12 +130,22 @@ describe("Qwixx Logic integration tests:", () => {
     });
 
     it("should roll all dice and return a value", () => {
-      const diceValues = testGame.rollDice();
-      Object.values(diceValues).forEach((value) => {
+      const result = testGame.rollDice();
+      Object.values(result.diceValues).forEach((value) => {
         expect(value).toBeGreaterThanOrEqual(1);
         expect(value).toBeLessThanOrEqual(6);
       });
     });
+
+    it("should roll all dice and return whether active player has available moves", () => {
+      const result = testGame.rollDice();
+      expect(result.hasAvailableMoves).toBeTruthy()
+    })
+
+    it("should roll all the dice and return the value of hasRolled as true", () => {
+      const result = testGame.rollDice();
+      expect(result.hasRolled).toBeTruthy()
+    })
   });
 
   describe("active player tests", () => {
@@ -149,10 +162,11 @@ describe("Qwixx Logic integration tests:", () => {
       testGame.rollDice();
       testGame.makeMove("test-player1", "red", 5);
       testGame.makeMove("test-player1", "red", 7);
-
-      expect(() => {
-        testGame.makeMove("test-player1", "yellow", 7);
-      }).toThrow("Player already finished their turn");
+      const result = testGame.makeMove("test-player1", "yellow", 7)
+      expect(result.success).toBeFalsy()
+      if (!result.success) {
+        expect(result.error)
+      }
     });
 
     test("current player's hasSubmittedChoice is updated after submitting 2 moves", () => {
@@ -177,9 +191,11 @@ describe("Qwixx Logic integration tests:", () => {
 
       testGame.rollDice();
 
-      expect(() => {
-        testGame.makeMove("test-player1", "red", 9);
-      }).toThrow("Number selected doesn't equal to sum of white dice.");
+      const result = testGame.makeMove("test-player1", "red", 9)
+      expect(result.success).toBeFalsy()
+      if (!result.success) {
+        expect(result.error).toBe("Number selected doesn't equal to sum of white dice.")
+      }
     });
 
     test.each([
@@ -203,31 +219,32 @@ describe("Qwixx Logic integration tests:", () => {
           });
 
         testGame.rollDice();
-        expect(() => {
-          testGame.makeMove("test-player1", row, num);
-        }).toThrow(
-          "Number selected doesn't equal to sum of white die and coloured die."
-        );
+
+        const result = testGame.makeMove("test-player1", row, num);
+        expect(result.success).toBeFalsy()
+        if (!result.success) {
+          expect(result.error).toBe("Number selected doesn't equal to sum of white die and coloured die.")
+        }
       }
     );
 
-    //test("active-player can mark a number that equals the sum of a white and a coloured die", () => {
-    //  const diceResults = testGame.rollDice();
-    //  const firstNumber = diceResults.white1 + diceResults.white2;
-    //  testGame.makeMove("test-player1", "blue", firstNumber);
+    test("active-player can mark a number that equals the sum of a white and a coloured die", () => {
+      const diceResults = testGame.rollDice();
+      const firstNumber = diceResults.diceValues.white1 + diceResults.diceValues.white2;
+      testGame.makeMove("test-player1", "blue", firstNumber);
 
-    //  const secondNumber = diceResults.white1 + diceResults.red;
+      const secondNumber = diceResults.diceValues.white1 + diceResults.diceValues.red;
 
-    //  const validNumbers = mockDice.validColouredNumbers;
+      const validNumbers = mockDice.validColouredNumbers;
 
-    //  expect(validNumbers["red"]?.includes(secondNumber)).toBeTruthy;
+      expect(validNumbers["red"]?.includes(secondNumber)).toBeTruthy;
 
-    //  expect(() =>
-    //    testGame.makeMove("test-player1", "red", secondNumber)
-    //  ).not.toThrow(
-    //    "Number selected doesn't equal to sum of white die and coloured die."
-    //  );
-    //});
+      expect(() =>
+        testGame.makeMove("test-player1", "red", secondNumber)
+      ).not.toThrow(
+        "Number selected doesn't equal to sum of white die and coloured die."
+      );
+    });
 
     test("current player can end their turn without submitting a move", () => {
       testGame.rollDice();
@@ -247,9 +264,11 @@ describe("Qwixx Logic integration tests:", () => {
       testGame.rollDice();
       testGame.makeMove("test-player2", "red", 5);
 
-      expect(() => {
-        testGame.makeMove("test-player2", "red", 7);
-      }).toThrow("Player already finished their turn");
+      const result = testGame.makeMove("test-player2", "red", 7);
+      expect(result.success).toBeFalsy()
+      if (!result.success) {
+        expect(result.error).toBe("Player already finished their turn.")
+      }
     });
 
     test("non-current player's hasSubmittedChoice is updated after submitting 1 move", () => {
