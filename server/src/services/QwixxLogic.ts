@@ -338,6 +338,13 @@ export default class QwixxLogic {
     return this.serialize();
   }
 
+  // ISSUE: 
+  // What should be the result of locking a row?
+  // When a player successfully locks a row, that row's buttons should all be disabled
+  // It should be visible to all players that the player's row is locked
+  // Does returning "this.serialize()" achieve this?
+  // The game card serialize method does return the "isLocked" field.
+  // So can we use that to disable buttons and "lock" rows on the frontend?
   public lockRow(playerName: string, row: string): LockRowResult {
     const colourToLock = this.getColourFromRow(row)
 
