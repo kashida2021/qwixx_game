@@ -199,15 +199,14 @@ export default function initializeSocketHandler(io: Server) {
         //console.log("Updated game state:", res);
 
         if (!res?.success) {
-          const responseData = { message: res?.error }
-          socket.emit("error_occured", { message: responseData })
+          const responseData = { message: res?.error };
+          socket.emit("error_occured", { message: responseData });
         }
 
         if (res?.success) {
-          const responseData = { gameState: res.data }
+          const responseData = { gameState: res.data };
           io.to(lobbyId).emit("update_markedNumbers", responseData);
         }
-
       } catch (err) {
         if (err instanceof Error) {
           socket.emit("error_occured", { message: err.message });
@@ -229,7 +228,7 @@ export default function initializeSocketHandler(io: Server) {
 
     socket.on("roll_dice", ({ lobbyId }) => {
       const diceResult = lobbiesMap[lobbyId].gameLogic?.rollDice();
-      console.log(diceResult)
+      console.log(diceResult);
       io.to(lobbyId).emit("dice_rolled", diceResult);
     });
 
@@ -263,6 +262,32 @@ export default function initializeSocketHandler(io: Server) {
       }
     });
 
+    socket.on("pass_move", ({ lobbyId, userId }) => {
+      if (!lobbyId || !userId) {
+        console.error("Missing data");
+        socket.emit("error_occured", {
+          message: "Missing data for marking penalties",
+        });
+        return;
+      }
+
+      const gameState = lobbiesMap[lobbyId].gameLogic;
+
+      if (!gameState) {
+        socket.emit("error_occured", { message: "Lobby or game not found" });
+        return;
+      }
+
+      try {
+        const result = gameState.passMove(userId);
+        io.to(lobbyId).emit("passMoveProcessed", { result });
+      } catch (err) {
+        if (err instanceof Error) {
+          socket.emit("error_occured", { message: err.message });
+        }
+      }
+    });
+
     socket.on("end_turn", ({ lobbyId, userId }) => {
       if (!lobbyId || !userId) {
         console.error("Missing data");
@@ -280,22 +305,21 @@ export default function initializeSocketHandler(io: Server) {
       }
 
       try {
-        const res = gameState.endTurn(userId)
+        const res = gameState.endTurn(userId);
 
         if (!res.success) {
-          console.log(res.errorMessage)
-          socket.emit("error_occured", { message: res.errorMessage })
+          console.log(res.errorMessage);
+          socket.emit("error_occured", { message: res.errorMessage });
         }
         if (res.success) {
-          console.log(res.data)
-          io.to(lobbyId).emit("turn_ended", { gameState: res.data })
+          console.log(res.data);
+          io.to(lobbyId).emit("turn_ended", { gameState: res.data });
         }
       } catch (err) {
         if (err instanceof Error) {
-          socket.emit("error_occured", { message: err.message })
+          socket.emit("error_occured", { message: err.message });
         }
       }
-
-    })
+    });
   });
 }
