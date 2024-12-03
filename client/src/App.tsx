@@ -90,10 +90,10 @@ function App() {
       console.log("data received from backend", data);
     };
 
-    //const endTurn = (data: {gameState: QwixxLogic}) => {
-    //setGameState(data.gameState);
-    //console.log("turn ended", data );
-    //}
+    const onTurnEnded = (data: { gameState: QwixxLogic }) => {
+      setGameState(data.gameState);
+      //console.log("turn ended", data );
+    }
 
     const handleDiceRolled = (data: { diceValues: any, hasAvailableMoves: boolean, hasRolled: boolean }) => {
       setGameState((prevState) => {
@@ -134,7 +134,7 @@ function App() {
     socket.on("update_markedNumbers", updateMarkedNumbers);
     socket.on("dice_rolled", handleDiceRolled);
     socket.on("penalty_processed", updatePenalty);
-    //socket.on("turn_ended", endTurn);
+    socket.on("turn_ended", onTurnEnded);
 
     return () => {
       socket.off("connect");
@@ -148,7 +148,7 @@ function App() {
       socket.off("update_markedNumbers");
       socket.off("dice_rolled");
       socket.off("penalty_processed");
-      //socket.off("turn_ended");
+      socket.off("turn_ended");
     };
   }, []);
 
