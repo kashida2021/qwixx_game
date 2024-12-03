@@ -283,11 +283,12 @@ export default function initializeSocketHandler(io: Server) {
         const res = gameState.endTurn(userId)
 
         if (!res.success) {
+          console.log(res.errorMessage)
           socket.emit("error_occured", { message: res.errorMessage })
         }
-
         if (res.success) {
-          socket.emit("turn_ended", { gameState: res.data })
+          console.log(res.data)
+          io.to(lobbyId).emit("turn_ended", { gameState: res.data })
         }
       } catch (err) {
         if (err instanceof Error) {
