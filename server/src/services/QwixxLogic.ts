@@ -220,7 +220,7 @@ export default class QwixxLogic {
       isValid: true,
     };
   }
-  // TODO: 
+
   public endTurn(playerName: string) {
     if (!this.hasRolled) {
       return { success: false, errorMessage: "Dice hasn't been rolled yet." }

@@ -82,19 +82,27 @@ describe("Qwixx Logic integration tests:", () => {
     });
 
     test("when all players have submitted a move, it should go to the next turn by making the next player the active player", () => {
-      const result = testGame.rollDice();
+      testGame.rollDice();
       const initialGameState = testGame.serialize();
-      console.log(result);
       expect(initialGameState.activePlayer).toBe("test-player1");
 
-      //  const firstMoveState = testGame.makeMove("test-player1", "red", 5);
-      //  expect(firstMoveState.activePlayer).toBe("test-player1");
+      const firstMoveState = testGame.makeMove("test-player1", "red", 5);
+      expect(firstMoveState.success).toBeTruthy()
+      if (firstMoveState.success) {
+        expect(firstMoveState.data.activePlayer).toBe("test-player1");
+      }
 
-      //  const secondMoveState = testGame.makeMove("test-player1", "red", 7);
-      //  expect(secondMoveState.activePlayer).toBe("test-player1");
+      const secondMoveState = testGame.makeMove("test-player1", "red", 7);
+      expect(secondMoveState.success).toBeTruthy()
+      if (secondMoveState.success) {
+        expect(secondMoveState.data.activePlayer).toBe("test-player1");
+      }
 
-      //  const finalMoveState = testGame.makeMove("test-player2", "blue", 5);
-      //  expect(finalMoveState.activePlayer).toBe("test-player2");
+      const finalMoveState = testGame.makeMove("test-player2", "blue", 5);
+      expect(finalMoveState).toBeTruthy()
+      if (finalMoveState.success) {
+        expect(finalMoveState.data.activePlayer).toBe("test-player2");
+      }
     });
 
     test("when the game goes to the next turn, all players' submission state is reset", () => {
@@ -293,6 +301,17 @@ describe("Qwixx Logic integration tests:", () => {
       if (result.success) {
         const player1State = result.data?.players["test-player1"]
         expect(player1State?.hasSubmittedChoice).toBeTruthy()
+      }
+    })
+
+    test("non-active player can end their turn without penalty", () => {
+      testGame.rollDice()
+      const result = testGame.endTurn("test-player2")
+      expect(result.success).toBeTruthy()
+      if (result.success) {
+        const player2State = result.data?.players["test-player2"]
+        expect(player2State?.hasSubmittedChoice).toBeTruthy()
+        expect(player2State?.gameCard.penalties).not.toEqual([1,])
       }
     })
 
