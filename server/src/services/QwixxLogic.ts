@@ -221,10 +221,6 @@ export default class QwixxLogic {
     };
   }
   // TODO: 
-  // Do we need a check to see if active player has made a move before ending a turn?
-  // If we do, do we need to process penalty?
-  // Maybe add a check to see if the dice has already been rolled to stop a player from ending a turn
-  // before rolling a dice
   public endTurn(playerName: string) {
     if (!this.hasRolled) {
       return { success: false, errorMessage: "Dice hasn't been rolled yet." }
@@ -240,13 +236,14 @@ export default class QwixxLogic {
       return { success: false, errorMessage: "Player has already ended their turn." }
     }
 
-    // ISSUE: 
-    // These two snippets do the same thing. Is there something that needs to be handled differently?
     if (player !== this.activePlayer) {
       player.markSubmitted();
     }
 
     if (player === this.activePlayer) {
+      if (player.submissionCount === 0) {
+        player.gameCard.addPenalty()
+      }
       player.markSubmitted();
     }
 
@@ -263,7 +260,6 @@ export default class QwixxLogic {
 
     player.gameCard.addPenalty()
     player.markSubmitted();
-
     this.processPlayersSubmission();
 
     return this.serialize();
