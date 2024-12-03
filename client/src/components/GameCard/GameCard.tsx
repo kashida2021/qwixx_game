@@ -12,9 +12,10 @@ interface IGameCard {
   isOpponent: boolean;
   gameCardData: GameCardData;
   cellClick: (rowColour: string, num: number) => void;
+  handleLockRow: (rowColour: string) => void;
 }
 
-const GameCard: React.FC<IGameCard> = ({ member, isOpponent, gameCardData, cellClick }) => {
+const GameCard: React.FC<IGameCard> = ({ member, isOpponent, gameCardData, cellClick, handleLockRow }) => {
   //PLAYER ID ASSOCIATED TO EACH GAME CARD
   //That can be used along with row colour + number to send to server
   // const [penalties, setPenalties] = useState<string[]>([]);
@@ -64,6 +65,7 @@ const GameCard: React.FC<IGameCard> = ({ member, isOpponent, gameCardData, cellC
           isOpponent={isOpponent}
           gameCardData={gameCardData}
           cellClick={cellClick}
+          handleLockRow={handleLockRow}
         />
       ))}
       <div className="penalties-container">

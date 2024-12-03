@@ -1,9 +1,9 @@
 //import React, {
-  //ChangeEvent,
-  //ChangeEventHandler,
-  //MouseEvent,
-  //useEffect,
-  //useState,
+//ChangeEvent,
+//ChangeEventHandler,
+//MouseEvent,
+//useEffect,
+//useState,
 //} from "react";
 import { GameCardData } from "../../types/GameCardData";
 import { RowColour } from "../../types/enums";
@@ -17,6 +17,7 @@ interface RowProps {
   isOpponent: boolean;
   gameCardData: GameCardData;
   cellClick: (rowColour: string, num: number) => void;
+  handleLockRow: (rowColour: string) => void;
 }
 
 //locked button is always disabled.
@@ -30,6 +31,7 @@ const Row: React.FC<RowProps> = ({
   isOpponent,
   cellClick,
   gameCardData,
+  handleLockRow,
 }) => {
   // const [locked, setLocked] = useState(false);
 
@@ -56,16 +58,16 @@ const Row: React.FC<RowProps> = ({
         {buttonNumbers.map((num, numIndex) => {
           // const isDisabled = gameCardData[rowColour].includes(num) || locked;
           const isDisabled = gameCardData.rows[rowColour].includes(num);
-          
+
           let notValid = false;
 
-          if(rowIndex < 2) {
+          if (rowIndex < 2) {
             notValid = maxMarkedNumber !== undefined && num < maxMarkedNumber;
           } else {
             notValid = minMarkedNumber !== undefined && num > minMarkedNumber;
           }
 
-          const classAttributes = isDisabled ? "clicked" : notValid ? "disabled" : "" ;
+          const classAttributes = isDisabled ? "clicked" : notValid ? "disabled" : "";
 
           return (
             <CellButton
@@ -83,7 +85,8 @@ const Row: React.FC<RowProps> = ({
           // locked={locked}
           colour={rowColour}
           isOpponent={isOpponent}
-          // lockRow={setLocked}
+          handleLockRow={handleLockRow}
+        // lockRow={setLocked}
         />
       </ol>
     );
