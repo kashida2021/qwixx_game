@@ -222,6 +222,10 @@ export default class QwixxLogic {
   }
 
   public endTurn(playerName: string) {
+    if (!this.hasRolled) {
+      return { success: false, errorMessage: "Dice hasn't been rolled yet." }
+    }
+
     const player = this.playerExistsInLobby(playerName);
 
     if (!player) {
@@ -229,7 +233,7 @@ export default class QwixxLogic {
     }
 
     if (player.hasSubmittedChoice) {
-      throw new Error("Player already finished their turn.");
+      return { success: false, errorMessage: "Player has already ended their turn." }
     }
 
     if (player !== this.activePlayer) {
@@ -237,12 +241,15 @@ export default class QwixxLogic {
     }
 
     if (player === this.activePlayer) {
+      if (player.submissionCount === 0) {
+        player.gameCard.addPenalty()
+      }
       player.markSubmitted();
     }
 
     this.processPlayersSubmission();
 
-    return this.serialize();
+    return { success: true, data: this.serialize() };
   }
 
   public processPenalty(playerName: string) {
@@ -253,7 +260,6 @@ export default class QwixxLogic {
 
     player.gameCard.addPenalty()
     player.markSubmitted();
-
     this.processPlayersSubmission();
 
     return this.serialize();

@@ -26,7 +26,7 @@ const GameCard: React.FC<IGameCard> = ({ member, isOpponent, gameCardData, cellC
   //};
 
   const renderPenaltyCheckbox = (number: number) => {
-    console.log(gameCardData)
+    //console.log(gameCardData)
     const isPenaltyChecked = gameCardData.penalties?.includes(number);
 
     return isOpponent ? (

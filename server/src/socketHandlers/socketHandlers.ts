@@ -262,5 +262,40 @@ export default function initializeSocketHandler(io: Server) {
         }
       }
     });
+
+    socket.on("end_turn", ({ lobbyId, userId }) => {
+      if (!lobbyId || !userId) {
+        console.error("Missing data");
+        socket.emit("error_occured", {
+          message: "Missing data for marking penalties",
+        });
+        return;
+      }
+
+      const gameState = lobbiesMap[lobbyId].gameLogic;
+
+      if (!gameState) {
+        socket.emit("error_occured", { message: "Lobby or game not found" });
+        return;
+      }
+
+      try {
+        const res = gameState.endTurn(userId)
+
+        if (!res.success) {
+          console.log(res.errorMessage)
+          socket.emit("error_occured", { message: res.errorMessage })
+        }
+        if (res.success) {
+          console.log(res.data)
+          io.to(lobbyId).emit("turn_ended", { gameState: res.data })
+        }
+      } catch (err) {
+        if (err instanceof Error) {
+          socket.emit("error_occured", { message: err.message })
+        }
+      }
+
+    })
   });
 }
