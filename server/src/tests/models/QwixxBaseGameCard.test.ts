@@ -51,7 +51,7 @@ describe("Base Game Card test", () => {
       expect(result.success).toBeFalsy();
       if (!result.success) {
         expect(result.errorMessage).toBe(
-          "Invalid move. Number is not higher/lower than previous marked number"
+          "Invalid move. Number is not greater than previous marked number"
         );
       }
 
@@ -65,7 +65,7 @@ describe("Base Game Card test", () => {
       expect(result.success).toBeFalsy();
       if (!result.success) {
         expect(result.errorMessage).toBe(
-          "Invalid move. Number is not higher/lower than previous marked number"
+          "Invalid move. Number is not less than previous marked number"
         );
       }
 
