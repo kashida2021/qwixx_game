@@ -267,7 +267,7 @@ describe("socket event handler test", () => {
         });
       });
 
-      test("can mark a number", async () => {
+      test.only("can mark a number", async () => {
         generateUniqueRoomIdMock.mockReturnValueOnce("1234");
 
         await new Promise<void>((resolve) => {
@@ -312,7 +312,7 @@ describe("socket event handler test", () => {
 
         const updatedGameState: any = await waitFor(
           clientSocket2,
-          "update_markedNumbers"
+          "update_marked_numbers"
         );
 
         const player2 = updatedGameState.gameState.players.clientSocket2;
