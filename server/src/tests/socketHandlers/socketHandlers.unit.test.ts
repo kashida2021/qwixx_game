@@ -267,7 +267,7 @@ describe("socket event handler test", () => {
         });
       });
 
-      test.only("can mark a number", async () => {
+      test("can mark a number", async () => {
         generateUniqueRoomIdMock.mockReturnValueOnce("1234");
 
         await new Promise<void>((resolve) => {
