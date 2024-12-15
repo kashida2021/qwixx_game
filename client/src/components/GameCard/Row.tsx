@@ -20,10 +20,6 @@ interface RowProps {
   handleLockRow: (rowColour: string) => void;
 }
 
-//locked button is always disabled.
-//It's enabled when 12 is clicked.
-//When lock is clicked, all buttons of the row become disabled.
-
 const Row: React.FC<RowProps> = ({
   rowColour,
   rowIndex,
@@ -33,31 +29,33 @@ const Row: React.FC<RowProps> = ({
   gameCardData,
   handleLockRow,
 }) => {
-  // const [locked, setLocked] = useState(false);
 
   const buttonNumbers =
     rowIndex < 2
       ? Array.from({ length: numbers }, (_, i) => i + 2) // 11 -> [2,3,4,5,6,7,8,9,10,11,12][lock btn]
       : Array.from({ length: numbers }, (_, i) => numbers + 1 - i); // 11 -> [12,11,10,9,8,7,6,5,4,3,2]
 
-  //If game state dictates that the row is locked
-  // useEffect(() => {
-  //   if (gameCardData.isLocked[rowColour]) {
-  //     setLocked(true);
-  //   }
-  // }, [gameCardData, rowColour]);
-
   const renderRow = () => {
 
     const markedNumbers = gameCardData.rows[rowColour] || [];
     const maxMarkedNumber = markedNumbers.length > 0 ? Math.max(...markedNumbers) : undefined
     const minMarkedNumber = markedNumbers.length > 0 ? Math.min(...markedNumbers) : undefined
+    // TODO:
+    // When a round is finished (all players have submitted), the locked rows state is
+    // normalised across all players' game cards.
+    // Pass in this boolean to the cell button and lock button component
+    // Use that to disable the button
+    const isLocked = gameCardData.isLocked[rowColour]
 
     return (
       <ol className={`row ${rowColour}`} aria-label={`row-${rowColour}`}>
         {buttonNumbers.map((num, numIndex) => {
           // const isDisabled = gameCardData[rowColour].includes(num) || locked;
-          const isDisabled = gameCardData.rows[rowColour].includes(num);
+          // TODO: 
+          // Maybe it is more appropriate to rename this as "isClicked" rather than "isDisabled"
+          // to distinguish between a button that is disabled because it has been clicked
+          // and disabled because it is no longer valid or the row is locked
+          const isClicked = gameCardData.rows[rowColour].includes(num);
 
           let notValid = false;
 
@@ -67,7 +65,17 @@ const Row: React.FC<RowProps> = ({
             notValid = minMarkedNumber !== undefined && num > minMarkedNumber;
           }
 
-          const classAttributes = isDisabled ? "clicked" : notValid ? "disabled" : "";
+          // TODO: 
+          // We are currently passing in the CSS class attribute from this row component 
+          // to the button components. Is this a good way to do it?
+          // If we are doing it here, then we would need to add the "isLocked" boolean to the list
+          // ": isLocked ? "disabled
+          // or we change "isClicked" to "isDisabled" and it's prop as { isDisabled || notValid || isLocked }
+          // but we still need to distinguish whether the button was clicked or is diabled because it is no longer valid
+          // 2 states / styles
+          // clicked - clicked style
+          // disabled - isLocked || notValid - disabled style
+          const classAttributes = isClicked ? "clicked" : notValid ? "disabled" : isClicked ? "disabled" : "";
 
           return (
             <CellButton
@@ -76,7 +84,7 @@ const Row: React.FC<RowProps> = ({
               clickAttributes={classAttributes}
               isOpponent={isOpponent}
               num={num}
-              isClicked={isDisabled}
+              isClicked={isClicked}
               cellClick={cellClick}
             />
           );
@@ -86,7 +94,7 @@ const Row: React.FC<RowProps> = ({
           colour={rowColour}
           isOpponent={isOpponent}
           handleLockRow={handleLockRow}
-          isLocked={gameCardData.isLocked[rowColour]}
+          isLocked={isLocked}
         // lockRow={setLocked}
         />
       </ol>
