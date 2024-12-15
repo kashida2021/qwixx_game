@@ -28,6 +28,10 @@ interface SerializedGameState {
   hasRolled: boolean;
 }
 
+type PassMoveResult =
+  | { isValid: true; data: SerializedGameState }
+  | { isValid: false; errorMessage: string };
+
 type MakeMoveResult =
   | { success: true; data: SerializedGameState }
   | { success: false; error: string };
@@ -108,29 +112,29 @@ export default class QwixxLogic {
     }
   }
 
-  public passMove(playerName: string) {
+  public passMove(playerName: string): PassMoveResult {
     // Call Player Method add submission to player
     const player = this.playerExistsInLobby(playerName);
 
     if (!player) {
-      //return { isValid: false, errorMessage: new Error("Player not found.") };
       throw new Error("Player not found.");
     }
     // Check if active player
     if (player !== this.activePlayer) {
-      throw new Error("Unable to pass if not active player");
+      return {
+        isValid: false,
+        errorMessage: "Unable to pass if not active player.",
+      };
     }
 
     // Check submission count is 0
     if (player?.submissionCount === 1) {
-      throw new Error("Cannot pass on second choice");
+      return { isValid: false, errorMessage: "Cannot pass on second choice." };
     }
 
     //add player method to update submission count for passmove
-
     player.passMove();
-
-    return this.serialize();
+    return { isValid: true, data: this.serialize() };
   }
 
   public makeMove(
@@ -253,7 +257,7 @@ export default class QwixxLogic {
 
   public endTurn(playerName: string) {
     if (!this.hasRolled) {
-      return { success: false, errorMessage: "Dice hasn't been rolled yet." }
+      return { success: false, errorMessage: "Dice hasn't been rolled yet." };
     }
 
     const player = this.playerExistsInLobby(playerName);
@@ -263,7 +267,10 @@ export default class QwixxLogic {
     }
 
     if (player.hasSubmittedChoice) {
-      return { success: false, errorMessage: "Player has already ended their turn." }
+      return {
+        success: false,
+        errorMessage: "Player has already ended their turn.",
+      };
     }
 
     if (player !== this.activePlayer) {
@@ -272,7 +279,7 @@ export default class QwixxLogic {
 
     if (player === this.activePlayer) {
       if (player.submissionCount === 0) {
-        player.gameCard.addPenalty()
+        player.gameCard.addPenalty();
       }
       player.markSubmitted();
     }

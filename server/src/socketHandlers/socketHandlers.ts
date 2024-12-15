@@ -280,7 +280,15 @@ export default function initializeSocketHandler(io: Server) {
 
       try {
         const result = gameState.passMove(userId);
-        io.to(lobbyId).emit("passMoveProcessed", { result });
+
+        if (!result.isValid) {
+          console.log(result.errorMessage);
+          socket.emit("error_occurred", { message: result.errorMessage });
+        }
+
+        if (result.isValid) {
+          io.to(lobbyId).emit("passMoveProcessed", { gameState: result.data });
+        }
       } catch (err) {
         if (err instanceof Error) {
           socket.emit("error_occured", { message: err.message });
