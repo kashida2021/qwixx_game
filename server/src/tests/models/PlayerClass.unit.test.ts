@@ -27,12 +27,12 @@ describe("Player Class tests", () => {
   test("should return an error message when marking a number is unsuccessful", () => {
     (mockGameCard.markNumbers! as jest.Mock).mockReturnValue({
       success: false,
-      errorMessage: "Invalid move."
+      errorMessage: "Invalid move.",
     });
 
     const res = testPlayer.markNumber(rowColour.Red, 2);
-    expect(res).toEqual({ success: false, errorMessage: "Invalid move." })
-  })
+    expect(res).toEqual({ success: false, errorMessage: "Invalid move." });
+  });
 
   test("submission count should return to 0 after markSubmitted() call", () => {
     (mockGameCard.markNumbers! as jest.Mock).mockReturnValue({ success: true });
@@ -51,5 +51,10 @@ describe("Player Class tests", () => {
     testPlayer.markSubmitted();
 
     expect(testPlayer.hasSubmittedChoice).toBeTruthy();
+  });
+
+  test("when passMove method is called the submission count should increment", () => {
+    testPlayer.passMove();
+    expect(testPlayer.submissionCount).toBe(1);
   });
 });
