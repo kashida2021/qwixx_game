@@ -119,6 +119,10 @@ export default class QwixxLogic {
     if (!player) {
       throw new Error("Player not found.");
     }
+
+    if (!this.hasRolled) {
+      return { isValid: false, errorMessage: "Dice hasn't been rolled yet." };
+    }
     // Check if active player
     if (player !== this.activePlayer) {
       return {
