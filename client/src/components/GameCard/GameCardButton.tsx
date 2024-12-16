@@ -1,10 +1,10 @@
 // NOTE:
 // Button states:
-//  -enabled: Can be clicked - disabled = false, empty CSS class
-//  -clicked: Clicked by a player - disabled = true, clicked CSS class
-//  -disabled: - disabled = true, disabled CSS class
-//    1. The row has been locked
-//    2. Another clicked number makes this number inactive.
+//  1. Enabled: Can be clicked - disabled = false, empty CSS class
+//  2. Clicked: Clicked by a player - disabled = true, 'clicked' CSS class
+//  3. Disabled: - disabled = true, 'disabled' CSS class
+//    - Happens when a row has been locked
+//    - A higher marked number makes it disabled.
 
 type NumberButtonProps = {
   type: "num-btn";
@@ -60,7 +60,7 @@ export const GameCardButton: React.FC<ButtonProps> = ({
       ) : (
         <button
           className={`${buttonType} ${rowColour} ${classAttributes}`}
-          aria-label="interactive-lock-button"
+          aria-label="interactive-button"
           disabled={isDisabled}
           onClick={handleClick}
         >
