@@ -16,16 +16,6 @@ interface IGameCard {
 }
 
 const GameCard: React.FC<IGameCard> = ({ member, isOpponent, gameCardData, cellClick, handleLockRow }) => {
-  //PLAYER ID ASSOCIATED TO EACH GAME CARD
-  //That can be used along with row colour + number to send to server
-  // const [penalties, setPenalties] = useState<string[]>([]);
-
-  //const handlePenaltyChange = (event: ChangeEvent<HTMLInputElement>) => {
-  //const value = event.target.value;
-  // setPenalties((prevPenalties) => [...prevPenalties, value]);
-  //event.target.disabled = true;
-  //};
-
   const renderPenaltyCheckbox = (number: number) => {
     //console.log(gameCardData)
     const isPenaltyChecked = gameCardData.penalties?.includes(number);
