@@ -1,219 +1,502 @@
-import { describe, expect, test, vi} from "vitest"; // it - add later
-import { render, screen, waitFor } from "@testing-library/react"; // waitFor, within add later
+import { describe, expect, test, it, vi } from "vitest"; // it - add later
+import { render, screen } from "@testing-library/react"; // waitFor, within add later
 import { userEvent } from "@testing-library/user-event";
 import React from "react";
 import Row from "../../../src/components/GameCard/Row";
 import "@testing-library/jest-dom";
-import { QwixxLogic } from "../../../src/types/qwixxLogic";
 import { RowColour } from "../../../src/types/enums";
+import {
+  gameCardBaseState,
+  gameCardMarkedState,
+  gameCardTwoMarkedNumbersState,
+  gameCardLockRowConditionSatisfiedState,
+  gameCardPlayerLockedRowState,
+  gameCardOpponentLockedRowState
+}
+  from "./__fixtures__/gameCardStates";
 
-//const emptyGameCardData: QwixxLogic['players'][string] = {
-  //rows: {
-    //red: [],
-    //yellow: [],
-    //green: [],
-    //blue: [],
- // },
- // isLocked: {
-   // red: false,
-   // yellow: false,
-   // green: false,
-   // blue: false,
-  //},
- // penalties: 0,
-//};
-
-const gameCardDataWithNumbers: QwixxLogic['players'][string] = {
-  rows: {
-    red: [],
-    yellow: [],
-    green: [],
-    blue: [],
-  },
-  isLocked: {
-    red: false,
-    yellow: false,
-    green: false,
-    blue: false,
-  },
-  penalties: 0,
-};
-
-const gameCardMarked: QwixxLogic['players'][string] = {
-  rows: {
-    red: [6],
-    yellow: [],
-    green: [],
-    blue: [],
-  },
-  isLocked: {
-    red: false,
-    yellow: false,
-    green: false,
-    blue: false,
-  },
-  penalties: 0,
-};
-
-const gameCardWithLockedRow: QwixxLogic['players'][string] = {
-  rows: {
-    red: [],
-    yellow: [],
-    green: [],
-    blue: [],
-  },
-  isLocked: {
-    red: false,
-    yellow: false,
-    green: false,
-    blue: false,
-  },
-  penalties: 0,
-};
 
 const mockCellClick = vi.fn();
 
 const numbers = 11;
-//const classAttributeRowRed = "row-red";
-const classAttributeClicked = "clicked";
+const classAttrNumBtn = "number-btn"
+const classAttrLockBtn = "lock-btn"
+const classAttrRowRed = "red"
+const classAttrClicked = "clicked"
+const classAttrDisabled = "disabled"
 
-const classAttributeNonInteractiveButton = "non-interactive-button";
-const classAttributeInteractiveLockButton = "interactive-lock-button";
+const ariaLabelNonInteractiveButton = "non-interactive-button";
+const ariaLabelInteractiveButton = "interactive-button"
 
 const user = userEvent.setup();
 
 describe("Row component test:", () => {
-  //the Current test wont work as the opponents buttons won't have a clicked class unless the row data contains specific number selections
-  describe.skip("Opponents Card", () => {
-    test("it renders 'buttons' with a 'clicked' css class", () => {
-      render(
-        <Row
-          rowColour={RowColour.Red}
-          numbers={numbers}
-          isOpponent={true}
-          rowIndex={0}
-          gameCardData={gameCardDataWithNumbers}
-          cellClick={mockCellClick}
-        />
-      );
+  describe("Player's Card:", () => {
+    describe("Numbered buttons:", () => {
+      it("should be clickable when game starts", () => {
+        render(
+          <Row
+            rowColour={RowColour.Red}
+            rowIndex={1}
+            numbers={numbers}
+            isOpponent={false}
+            cellClick={mockCellClick}
+            gameCardData={gameCardBaseState}
+            handleLockRow={mockCellClick}
+          />
+        )
 
-      const redButtons = screen.getAllByLabelText(
-        classAttributeNonInteractiveButton
-      );
+        const redButtons = screen.getAllByLabelText(ariaLabelInteractiveButton)
 
-      redButtons
-        .filter((button, index) => index < 4)
-        .forEach((button) => expect(button).toHaveClass(classAttributeClicked));
-    });
-  });
+        redButtons
+          .filter((button, index) => index < numbers)
+          .forEach((button) => {
+            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed}`)
+            expect(button).not.toHaveClass(`${classAttrDisabled} ${classAttrClicked}`)
+            expect(button).not.toBeDisabled()
+          }
+          )
+      })
 
+      it("should be disabled when marked", () => {
+        render(
+          <Row
+            rowColour={RowColour.Red}
+            rowIndex={1}
+            numbers={numbers}
+            isOpponent={false}
+            cellClick={mockCellClick}
+            gameCardData={gameCardMarkedState}
+            handleLockRow={mockCellClick}
+          />
+        )
 
+        const red6Btn = screen.getByText("6")
+        expect(red6Btn).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed} ${classAttrClicked}`)
+        expect(red6Btn).toBeDisabled()
+      })
 
+      it("should be disabled if their values are below a marked number and aren't clicked", () => {
+        render(
+          <Row
+            rowColour={RowColour.Red}
+            rowIndex={1}
+            numbers={numbers}
+            isOpponent={false}
+            cellClick={mockCellClick}
+            gameCardData={gameCardMarkedState}
+            handleLockRow={mockCellClick}
+          />
+        )
 
-  //IGNORE THESE TESTS FOR NOW AS THEY'RE RELATED TO LOCKING UI
-  describe("Player's Card", () => {
-    test.skip("it renders buttons with disabled attribute", () => {
-      render(
-        <Row
-          rowColour={RowColour.Red}
-          numbers={numbers}
-          isOpponent={false}
-          rowIndex={0}
-          gameCardData={gameCardDataWithNumbers}
-          cellClick={mockCellClick}
-        />
-      );
+        const redButtons = screen.getAllByLabelText(ariaLabelInteractiveButton)
 
-      const redButtons = screen.getAllByRole("button");
-      const disabledButtons = redButtons.filter((button) =>
-        button.hasAttribute("disabled")
-      );
-      expect(disabledButtons.length).toBe(4);
-    });
+        redButtons
+          .filter((button, index) => index < 4)
+          .forEach((button) => {
+            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed} ${classAttrDisabled}`)
+            expect(button).toBeDisabled()
+          })
+      })
 
-    test.skip("when a button is clicked it becomes disabled", async () => {
-      render(
-        <Row
-          rowColour={RowColour.Red}
-          numbers={numbers}
-          isOpponent={false}
-          rowIndex={0}
-          gameCardData={gameCardDataWithNumbers}
-          cellClick={mockCellClick}
-        />
-      );
+      it("should be enabled if their values are above a marked number", () => {
+        render(
+          <Row
+            rowColour={RowColour.Red}
+            rowIndex={1}
+            numbers={numbers}
+            isOpponent={false}
+            cellClick={mockCellClick}
+            gameCardData={gameCardMarkedState}
+            handleLockRow={mockCellClick}
+          />
+        )
 
-      const redButtons = screen.getAllByRole("button");
-      await user.click(redButtons[4]);
+        const redButtons = screen.getAllByLabelText(ariaLabelInteractiveButton)
 
-      expect(redButtons[4]).toBeDisabled();
-    });
+        redButtons
+          .filter((button, index) => { index > 4 && index < numbers })
+          .forEach((button) => {
+            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed}`)
+            expect(button).not.toHaveClass(`${classAttrDisabled} ${classAttrClicked}`)
+            expect(button).not.toBeDisabled()
+          })
+      })
 
-    test("when a button is clicked the numbers below are disabled", async () => {
-      render(
-        <Row
-          rowColour={RowColour.Red}
-          numbers={numbers}
-          isOpponent={false}
-          rowIndex={0}
-          gameCardData={gameCardMarked}
-          cellClick={mockCellClick}
-        />
-      );
+      it("should be disabled if their values are between 2 marked numbers and aren't clicked", () => {
+        render(
+          <Row
+            rowColour={RowColour.Red}
+            rowIndex={1}
+            numbers={numbers}
+            isOpponent={false}
+            cellClick={mockCellClick}
+            gameCardData={gameCardTwoMarkedNumbersState}
+            handleLockRow={mockCellClick}
+          />
+        )
+        screen.debug
+        const redButtons = screen.getAllByLabelText(ariaLabelInteractiveButton)
 
-      const redButtons = screen.getAllByRole("button");
-      await user.click(redButtons[6]);
+        redButtons
+          .filter((button, index) => index < 4)
+          .forEach((button) => {
+            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed} ${classAttrDisabled}`)
+            expect(button).not.toHaveClass(`${classAttrClicked}`)
+            expect(button).toBeDisabled()
+          })
 
-      await waitFor(()=> {
-        expect(redButtons[3]).toHaveClass("disabled");
-        expect(redButtons[2]).toHaveClass("disabled");
+        redButtons
+          .filter((button, index) => index > 4 && index < 7)
+          .forEach((button) => {
+            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed} ${classAttrDisabled}`)
+            expect(button).not.toHaveClass(`${classAttrClicked}`)
+            expect(button).toBeDisabled()
+          })
+      })
+
+      test("that haven't been marked should be disabled when a row is locked", () => {
+        render(
+          <Row
+            rowColour={RowColour.Red}
+            rowIndex={1}
+            numbers={numbers}
+            isOpponent={false}
+            cellClick={mockCellClick}
+            gameCardData={gameCardPlayerLockedRowState}
+            handleLockRow={mockCellClick}
+          />
+        )
+
+        const buttons = screen.getAllByLabelText(ariaLabelInteractiveButton)
+
+        buttons
+          .filter((button, index) => { index > 4 && index < numbers })
+          .forEach((button) => {
+            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed} ${classAttrDisabled}`)
+            expect(button).not.toHaveClass(`${classAttrClicked}`)
+            expect(button).toBeDisabled()
+          })
       })
     });
 
+    describe("Lock Button:", () => {
+      it("should be disabled when game starts", () => {
+        render(
+          <Row
+            rowColour={RowColour.Red}
+            rowIndex={1}
+            numbers={numbers}
+            isOpponent={false}
+            cellClick={mockCellClick}
+            gameCardData={gameCardBaseState}
+            handleLockRow={mockCellClick}
+          />
+        )
 
-    test.skip("when the row is locked, all buttons are disabled", async () => {
-      render(
-        <Row
-          rowColour={RowColour.Red}
-          numbers={numbers}
-          isOpponent={false}
-          rowIndex={0}
-          gameCardData={gameCardWithLockedRow}
-          cellClick={mockCellClick}
-        />
-      );
+        const lockButton = screen.getByText("🔒")
+        expect(lockButton).toHaveClass(`${classAttrLockBtn} ${classAttrRowRed} ${classAttrDisabled}`)
+        expect(lockButton).not.toHaveClass(`${classAttrClicked}`)
+        expect(lockButton).toBeDisabled()
+      })
 
-      const redButtons = screen.getAllByRole("button");
-      redButtons.forEach((button) => expect(button).toBeDisabled());
+      it("should be enabled when conditions are met", () => {
+        render(
+          <Row
+            rowColour={RowColour.Red}
+            rowIndex={1}
+            numbers={numbers}
+            isOpponent={false}
+            cellClick={mockCellClick}
+            gameCardData={gameCardLockRowConditionSatisfiedState}
+            handleLockRow={mockCellClick}
+          />
+        )
+
+        const lockButton = screen.getByText(`🔒`)
+        expect(lockButton).toHaveClass(`${classAttrLockBtn} ${classAttrRowRed}`)
+        expect(lockButton).not.toHaveClass(`${classAttrDisabled} ${classAttrClicked}`)
+        expect(lockButton).not.toBeDisabled()
+      })
+
+      it("should be disabled when clicked", () => {
+        render(
+          <Row
+            rowColour={RowColour.Red}
+            rowIndex={1}
+            numbers={numbers}
+            isOpponent={false}
+            cellClick={mockCellClick}
+            gameCardData={gameCardPlayerLockedRowState}
+            handleLockRow={mockCellClick}
+          />
+        )
+
+        const lockButton = screen.getByText("🔒")
+        expect(lockButton).toHaveClass(`${classAttrLockBtn} ${classAttrRowRed} ${classAttrClicked}`)
+        expect(lockButton).not.toHaveClass(`${classAttrDisabled}`)
+        expect(lockButton).toBeDisabled()
+      })
+
+      it("should be disabled when row is locked by another player", () => {
+        render(
+          <Row
+            rowColour={RowColour.Red}
+            rowIndex={1}
+            numbers={numbers}
+            isOpponent={false}
+            cellClick={mockCellClick}
+            gameCardData={gameCardOpponentLockedRowState}
+            handleLockRow={mockCellClick}
+          />
+        )
+
+        const lockButton = screen.getByText("🔒")
+        expect(lockButton).toHaveClass(`${classAttrLockBtn} ${classAttrRowRed} ${classAttrDisabled}`)
+        expect(lockButton).not.toHaveClass(`${classAttrClicked}`)
+        expect(lockButton).toBeDisabled()
+      })
+
+    });
+  })
+
+  describe("Opponent's Card:", () => {
+    describe("Numbered spans:", () => {
+      it("shouldn't have a disabled or clicked CSS class on initial state", () => {
+        render(
+          <Row
+            rowColour={RowColour.Red}
+            rowIndex={1}
+            numbers={numbers}
+            isOpponent={true}
+            cellClick={mockCellClick}
+            gameCardData={gameCardBaseState}
+            handleLockRow={mockCellClick}
+          />
+        )
+
+        const redButtons = screen.getAllByLabelText(ariaLabelNonInteractiveButton)
+
+        redButtons
+          .filter((button, index) => index < numbers)
+          .forEach((button) => {
+            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed}`)
+            expect(button).not.toHaveClass(`${classAttrDisabled} ${classAttrClicked}`)
+          }
+          )
+
+        const lockButton = screen.getByText("🔒")
+        expect(lockButton).toHaveClass(`${classAttrLockBtn} ${classAttrRowRed} ${classAttrDisabled}`)
+      })
+
+
+      it("should have a 'clicked' CSS class when it has been marked", () => {
+        render(
+          <Row
+            rowColour={RowColour.Red}
+            rowIndex={1}
+            numbers={numbers}
+            isOpponent={true}
+            cellClick={mockCellClick}
+            gameCardData={gameCardMarkedState}
+            handleLockRow={mockCellClick}
+          />
+        )
+
+        const red6button = screen.getByText("6")
+        expect(red6button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed} ${classAttrClicked}`)
+      })
+
+      it("should have a 'disabled' CSS class if their values are below a marked number and aren't clicked", () => {
+        render(
+          <Row
+            rowColour={RowColour.Red}
+            rowIndex={1}
+            numbers={numbers}
+            isOpponent={true}
+            cellClick={mockCellClick}
+            gameCardData={gameCardMarkedState}
+            handleLockRow={mockCellClick}
+          />
+        )
+
+        const redButtons = screen.getAllByLabelText(ariaLabelNonInteractiveButton)
+
+        redButtons
+          .filter((button, index) => index < 4)
+          .forEach((button) => {
+            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed} ${classAttrDisabled}`)
+            expect(button).not.toHaveClass(`${classAttrClicked}`)
+          }
+          )
+      })
+
+      it("shouldn't have a 'disabled' CSS class if their values are above a marked number", () => {
+        render(
+          <Row
+            rowColour={RowColour.Red}
+            rowIndex={1}
+            numbers={numbers}
+            isOpponent={true}
+            cellClick={mockCellClick}
+            gameCardData={gameCardMarkedState}
+            handleLockRow={mockCellClick}
+          />
+        )
+
+        const redButtons = screen.getAllByLabelText(ariaLabelNonInteractiveButton)
+
+        redButtons
+          .filter((button, index) => { index > 4 && index < numbers })
+          .forEach((button) => {
+            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed}`)
+            expect(button).not.toHaveClass(`${classAttrClicked} ${classAttrDisabled}`)
+          }
+          )
+      })
+
+      it("should have a 'disabled' CSS class if their values are between two marked numbers and aren't clicked", () => {
+        render(
+          <Row
+            rowColour={RowColour.Red}
+            rowIndex={1}
+            numbers={numbers}
+            isOpponent={true}
+            cellClick={mockCellClick}
+            gameCardData={gameCardTwoMarkedNumbersState}
+            handleLockRow={mockCellClick}
+          />
+        )
+
+        const redButtons = screen.getAllByLabelText(ariaLabelNonInteractiveButton)
+
+        redButtons
+          .filter((button, index) => index < 4)
+          .forEach((button) => {
+            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed} ${classAttrDisabled}`)
+            expect(button).not.toHaveClass(`${classAttrClicked}`)
+          }
+          )
+
+        redButtons
+          .filter((button, index) => { index > 4 && index < 7 })
+          .forEach((button) => {
+            expect(button).toHaveClass(`${classAttrNumBtn} red ${classAttrDisabled}`)
+            expect(button).not.toHaveClass(`${classAttrClicked}`)
+          })
+
+        redButtons
+          .filter((button, index) => { index > 7 && index < numbers })
+          .forEach((button) => {
+            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed}`)
+            expect(button).not.toHaveClass(` ${classAttrClicked} ${classAttrDisabled}`)
+          })
+      })
+
+      test("that haven't been marked should be disabled when a row is locked", () => {
+        render(
+          <Row
+            rowColour={RowColour.Red}
+            rowIndex={1}
+            numbers={numbers}
+            isOpponent={true}
+            cellClick={mockCellClick}
+            gameCardData={gameCardPlayerLockedRowState}
+            handleLockRow={mockCellClick}
+          />
+        )
+        const redButtons = screen.getAllByLabelText(ariaLabelNonInteractiveButton)
+
+        redButtons
+          .filter((button, index) => index < 4)
+          .forEach((button) => {
+            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed} ${classAttrClicked}`)
+            expect(button).not.toHaveClass(`${classAttrDisabled}`)
+          }
+          )
+
+        redButtons
+          .filter((button, index) => { index > 4 && index < numbers })
+          .forEach((button) => {
+            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed} ${classAttrDisabled}`)
+            expect(button).not.toHaveClass(`${classAttrClicked}`)
+          }
+          )
+      })
     });
 
-    test.skip("when a user clicks the last number, it locks the row", async () => {
-      render(
-        <Row
-          rowColour={RowColour.Red}
-          numbers={numbers}
-          isOpponent={false}
-          rowIndex={0}
-          gameCardData={gameCardDataWithNumbers}
-          cellClick={mockCellClick}
-        />
-      );
+    describe("Lock span:", () => {
+      it("should have a 'disabled' CSS class on initial state", () => {
+        render(
+          <Row
+            rowColour={RowColour.Red}
+            rowIndex={1}
+            numbers={numbers}
+            isOpponent={true}
+            cellClick={mockCellClick}
+            gameCardData={gameCardBaseState}
+            handleLockRow={mockCellClick}
+          />
+        )
 
-      const redButtons = screen.getAllByRole("button");
-      const lockButton = screen.getByLabelText(
-        classAttributeInteractiveLockButton
-      );
+        const lockButton = screen.getByText("🔒")
+        expect(lockButton).toHaveClass(`${classAttrLockBtn} ${classAttrRowRed} ${classAttrDisabled}`)
+      })
 
-      expect(lockButton).toBeDisabled();
-      await user.click(redButtons[10]); //clicks number 12
-      screen.debug();
-      expect(redButtons[10]).toBeDisabled();
-      expect(lockButton).toBeEnabled();
-      await user.click(lockButton);
+      it("should be enabled when game conditions are met", () => {
+        render(
+          <Row
+            rowColour={RowColour.Red}
+            rowIndex={1}
+            numbers={numbers}
+            isOpponent={true}
+            cellClick={mockCellClick}
+            gameCardData={gameCardLockRowConditionSatisfiedState}
+            handleLockRow={mockCellClick}
+          />
+        )
 
-      redButtons.forEach((button) => expect(button).toBeDisabled());
+        const lockButton = screen.getByText("🔒")
+        expect(lockButton).toHaveClass(`${classAttrLockBtn} ${classAttrRowRed}`)
+        expect(lockButton).not.toHaveClass(`${classAttrDisabled} ${classAttrClicked}`)
+      })
+
+      it("should have a 'clicked' CSS class when it has been clicked", () => {
+        render(
+          <Row
+            rowColour={RowColour.Red}
+            rowIndex={1}
+            numbers={numbers}
+            isOpponent={true}
+            cellClick={mockCellClick}
+            gameCardData={gameCardPlayerLockedRowState}
+            handleLockRow={mockCellClick}
+          />
+        )
+
+        const lockButton = screen.getByText("🔒")
+        expect(lockButton).toHaveClass(`${classAttrLockBtn} ${classAttrRowRed} ${classAttrClicked}`)
+        expect(lockButton).not.toHaveClass(`${classAttrDisabled}`)
+      })
+
+      it("should have a 'disabled' CSS class when the row is locked by another player", () => {
+        render(
+          <Row
+            rowColour={RowColour.Red}
+            rowIndex={1}
+            numbers={numbers}
+            isOpponent={true}
+            cellClick={mockCellClick}
+            gameCardData={gameCardOpponentLockedRowState}
+            handleLockRow={mockCellClick}
+          />
+        )
+
+        const lockButton = screen.getByText("🔒")
+        expect(lockButton).toHaveClass(`${classAttrLockBtn} ${classAttrRowRed} ${classAttrDisabled}`)
+        expect(lockButton).not.toHaveClass(`${classAttrClicked}`)
+      })
+
     });
   });
 });
-
-//clicking confirm button

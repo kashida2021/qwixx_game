@@ -7,8 +7,7 @@
 //} from "react";
 import { GameCardData } from "../../types/GameCardData";
 import { RowColour } from "../../types/enums";
-import CellButton from "./CellButton";
-import { LockButton } from "./CellLockButton";
+import { GameCardButton } from "./GameCardButton";
 
 interface RowProps {
   rowColour: RowColour;
@@ -40,62 +39,78 @@ const Row: React.FC<RowProps> = ({
     const markedNumbers = gameCardData.rows[rowColour] || [];
     const maxMarkedNumber = markedNumbers.length > 0 ? Math.max(...markedNumbers) : undefined
     const minMarkedNumber = markedNumbers.length > 0 ? Math.min(...markedNumbers) : undefined
-    // TODO:
-    // When a round is finished (all players have submitted), the locked rows state is
-    // normalised across all players' game cards.
-    // Pass in this boolean to the cell button and lock button component
-    // Use that to disable the button
-    const isLocked = gameCardData.isLocked[rowColour]
+
+    // NOTE:
+    // When a round is finished (all players have submitted),
+    // the locked rows state is normalised across all players' game cards.
+    // The lock button is disabled when
+    //  - default
+    //  - when player locks a row (should have "clicked" CSS class)
+    //  - when another player locks a row and the round has ended (should have "disabled" CSS class)
+    // The lock button is enabled when
+    //  - player has marked 5 numbers and the number 12
+    //  - and the row isn't already locked
+    //  - (shouldn't have any special CSS class)
+
+    const isEnabled =
+      !gameCardData.isLocked[rowColour] &&
+      gameCardData.rows[rowColour].length >= 6 &&
+      (rowIndex < 2
+        ? gameCardData.rows[rowColour].includes(12)
+        : gameCardData.rows[rowColour].includes(2)
+      )
+
+    const isClicked =
+      gameCardData.isLocked[rowColour] &&
+      ((rowIndex < 2 && gameCardData.rows[rowColour].includes(13)) ||
+        (rowIndex >= 2 && gameCardData.rows[rowColour].includes(1))
+      )
+
+    const isDisabled = !isEnabled || isClicked
+
+    const lockBtnAttributes = isClicked ? "clicked" : !isEnabled ? "disabled" : ""
 
     return (
       <ol className={`row ${rowColour}`} aria-label={`row-${rowColour}`}>
         {buttonNumbers.map((num, numIndex) => {
-          // const isDisabled = gameCardData[rowColour].includes(num) || locked;
-          // TODO: 
-          // Maybe it is more appropriate to rename this as "isClicked" rather than "isDisabled"
-          // to distinguish between a button that is disabled because it has been clicked
-          // and disabled because it is no longer valid or the row is locked
+
+          // NOTE:
+          // A button has 3 'states' that affect the CSS styling:
+          // 1. Enabled - has yet to be disabled by marking a higher marked number or the row is yet to be locked
+          // 2. Disabled - when a higher number value has been marked or the row is locked
+          // 3. Clicked - when a player has clicked on that specific number
+
           const isClicked = gameCardData.rows[rowColour].includes(num);
 
-          let notValid = false;
+          const notValid =
+            rowIndex < 2
+              ? maxMarkedNumber !== undefined && num < maxMarkedNumber
+              : minMarkedNumber !== undefined && num > minMarkedNumber
 
-          if (rowIndex < 2) {
-            notValid = maxMarkedNumber !== undefined && num < maxMarkedNumber;
-          } else {
-            notValid = minMarkedNumber !== undefined && num > minMarkedNumber;
-          }
-
-          // TODO: 
-          // We are currently passing in the CSS class attribute from this row component 
-          // to the button components. Is this a good way to do it?
-          // If we are doing it here, then we would need to add the "isLocked" boolean to the list
-          // ": isLocked ? "disabled
-          // or we change "isClicked" to "isDisabled" and it's prop as { isDisabled || notValid || isLocked }
-          // but we still need to distinguish whether the button was clicked or is diabled because it is no longer valid
-          // 2 states / styles
-          // clicked - clicked style
-          // disabled - isLocked || notValid - disabled style
-          const classAttributes = isClicked ? "clicked" : notValid ? "disabled" : isClicked ? "disabled" : "";
+          const isDisabled = isClicked || notValid
+          const classAttributes = isClicked ? "clicked" : notValid ? "disabled" : "";
 
           return (
-            <CellButton
+            <GameCardButton
               key={numIndex}
+              type="num-btn"
+              label={num}
               rowColour={rowColour}
-              clickAttributes={classAttributes}
               isOpponent={isOpponent}
-              num={num}
-              isClicked={isClicked}
-              cellClick={cellClick}
+              isDisabled={isDisabled}
+              classAttributes={classAttributes}
+              eventHandler={cellClick}
             />
           );
         })}
-        <LockButton
-          // locked={locked}
-          colour={rowColour}
+        <GameCardButton
+          type="lock-btn"
+          label="🔒"
+          rowColour={rowColour}
           isOpponent={isOpponent}
-          handleLockRow={handleLockRow}
-          isLocked={isLocked}
-        // lockRow={setLocked}
+          isDisabled={isDisabled}
+          classAttributes={lockBtnAttributes}
+          eventHandler={handleLockRow}
         />
       </ol>
     );
