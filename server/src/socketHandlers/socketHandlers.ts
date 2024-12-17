@@ -175,12 +175,13 @@ export default function initializeSocketHandler(io: Server) {
       }
     });
 
-    socket.on("mark_numbers", ({ lobbyId, userId, playerChoice }) => {
+    socket.on("mark_numbers", ({ lobbyId, userId, playerChoice }, callback) => {
       if (!lobbyId || !userId || !playerChoice) {
         console.error("Missing data");
         socket.emit("error_occured", {
           message: "Missing data for marking numbers",
         });
+        callback(false);
       }
 
       const gameLogic = lobbiesMap[lobbyId].gameLogic;
@@ -190,6 +191,7 @@ export default function initializeSocketHandler(io: Server) {
         socket.emit("error_occured", {
           message: "The game session doesn't exist.",
         });
+        return callback(false);
       }
 
       try {
@@ -201,15 +203,18 @@ export default function initializeSocketHandler(io: Server) {
         if (!res?.success) {
           const responseData = { message: res?.error };
           socket.emit("error_occured", { message: responseData });
+          return callback(false);
         }
 
         if (res?.success) {
           const responseData = { gameState: res.data };
           io.to(lobbyId).emit("update_markedNumbers", responseData);
+          return callback(true);
         }
       } catch (err) {
         if (err instanceof Error) {
           socket.emit("error_occured", { message: err.message });
+          return callback(false);
         }
       }
 
@@ -288,6 +293,7 @@ export default function initializeSocketHandler(io: Server) {
 
         if (result.isValid) {
           io.to(lobbyId).emit("passMoveProcessed", { gameState: result.data });
+          console.log("data for passMove:", result.data);
         }
       } catch (err) {
         if (err instanceof Error) {

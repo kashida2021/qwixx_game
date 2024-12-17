@@ -37,6 +37,8 @@ export const Game: React.FC<IGameProps> = ({
     row: string;
     num: number;
   } | null>(null);
+  
+  const [submissionCount, setSubmissionCount] = useState<number>(0);
 
   const handleCellClick = (rowColour: string, num: number) => {
     setPlayerChoice({ row: rowColour, num });
@@ -66,7 +68,13 @@ export const Game: React.FC<IGameProps> = ({
   const filteredMembers = members.filter((member) => member !== userId);
 
   const handleNumberSelection = () => {
-    socket.emit("mark_numbers", { lobbyId, userId, playerChoice });
+    socket.emit("mark_numbers", { lobbyId, userId, playerChoice }, (isSuccessful: boolean) => {
+      if(isSuccessful){
+        setSubmissionCount((prev) => prev + 1);
+      } else {
+        console.log("move not successful");
+      }
+    });
     //console.log("player's choice:", playerChoice);
   }
 
@@ -76,10 +84,12 @@ export const Game: React.FC<IGameProps> = ({
 
   const handlePassMove = () => {
     socket.emit("pass_move", {lobbyId, userId});
+    setSubmissionCount((prev) => prev + 1);
   }
 
   const handleEndTurn = () => {
     socket.emit("end_turn", { lobbyId, userId })
+    setSubmissionCount(0);
   }
 
   const hasSubmitted = gameState.players[userId].hasSubmittedChoice;
@@ -138,7 +148,7 @@ export const Game: React.FC<IGameProps> = ({
           {/* For ending a turn even if there are available moves */}
           <button className="" onClick={handleEndTurn} disabled={hasSubmitted || !hasRolled}>End Turn</button>          
           {/* Possibly need to update structure of data sent back from backend to include submission count to disable button on 2nd choice rather than hasSubmitted */}
-          <button className="" onClick={handlePassMove} disabled={hasSubmitted || !hasRolled || activePlayer !== userId  }>Pass Move</button>
+          <button className="" onClick={handlePassMove} disabled={hasSubmitted || !hasRolled || activePlayer !== userId || submissionCount > 0  }>Pass Move</button>
 
         </div>
       </div>
