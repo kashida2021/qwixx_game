@@ -19,11 +19,20 @@ import {
 const mockCellClick = vi.fn();
 
 const numbers = 11;
-const classAttrNumBtn = "num-btn"
-const classAttrLockBtn = "lock-btn"
-const classAttrRowRed = "red"
-const classAttrClicked = "clicked"
-const classAttrDisabled = "disabled"
+
+const cssBtn = "qwixx-card__button"
+const cssRedBtn = "qwixx-card__button--red"
+const cssYellowBtn = "qwixx-card__button--yellow"
+const cssGreenBtn = "qwixx-card__button--green"
+const cssBlueBtn = "qwixx-card__button--blue"
+const cssDisabledBtn = "qwixx-card__button--disabled"
+const cssClickedBtn = "qwixx-card__button--clicked"
+
+const cssSpan = "qwixx-card__span"
+const cssRedSpan = "qwixx-card__span--red"
+const cssYellowSpan = "qwixx-card__span--yellow"
+const cssGreenSpan = "qwixx-card__span--green"
+const cssBlueSpan = "qwixx-card__span--blue"
 
 const ariaLabelNonInteractiveButton = "non-interactive-button";
 const ariaLabelInteractiveButton = "interactive-button"
@@ -51,8 +60,9 @@ describe("Row component test:", () => {
         redButtons
           .filter((button, index) => index < numbers)
           .forEach((button) => {
-            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed}`)
-            expect(button).not.toHaveClass(`${classAttrDisabled} ${classAttrClicked}`)
+            expect(button).toHaveClass(`${cssBtn} ${cssRedBtn}`)
+            expect(button).not.toHaveClass(`${cssDisabledBtn}`)
+            expect(button).not.toHaveClass(`${cssClickedBtn}`)
             expect(button).not.toBeDisabled()
           }
           )
@@ -72,7 +82,7 @@ describe("Row component test:", () => {
         )
 
         const red6Btn = screen.getByText("6")
-        expect(red6Btn).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed} ${classAttrClicked}`)
+        expect(red6Btn).toHaveClass(`${cssBtn} ${cssRedBtn} ${cssClickedBtn}`)
         expect(red6Btn).toBeDisabled()
       })
 
@@ -94,7 +104,7 @@ describe("Row component test:", () => {
         redButtons
           .filter((button, index) => index < 4)
           .forEach((button) => {
-            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed} ${classAttrDisabled}`)
+            expect(button).toHaveClass(`${cssBtn} ${cssRedBtn} ${cssDisabledBtn}`)
             expect(button).toBeDisabled()
           })
       })
@@ -117,8 +127,9 @@ describe("Row component test:", () => {
         redButtons
           .filter((button, index) => index > 4 && index < numbers)
           .forEach((button) => {
-            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed}`)
-            expect(button).not.toHaveClass(`${classAttrDisabled} ${classAttrClicked}`)
+            expect(button).toHaveClass(`${cssBtn} ${cssRedBtn}`)
+            expect(button).not.toHaveClass(`${cssClickedBtn}`)
+            expect(button).not.toHaveClass(`${cssDisabledBtn}`)
             expect(button).not.toBeDisabled()
           })
       })
@@ -141,16 +152,16 @@ describe("Row component test:", () => {
         redButtons
           .filter((button, index) => index < 4)
           .forEach((button) => {
-            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed} ${classAttrDisabled}`)
-            expect(button).not.toHaveClass(`${classAttrClicked}`)
+            expect(button).toHaveClass(`${cssBtn} ${cssRedBtn} ${cssDisabledBtn}`)
+            expect(button).not.toHaveClass(`${cssClickedBtn}`)
             expect(button).toBeDisabled()
           })
 
         redButtons
           .filter((button, index) => index > 4 && index < 7)
           .forEach((button) => {
-            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed} ${classAttrDisabled}`)
-            expect(button).not.toHaveClass(`${classAttrClicked}`)
+            expect(button).toHaveClass(`${cssBtn} ${cssRedBtn} ${cssDisabledBtn}`)
+            expect(button).not.toHaveClass(`${cssClickedBtn}`)
             expect(button).toBeDisabled()
           })
       })
@@ -173,8 +184,8 @@ describe("Row component test:", () => {
         buttons
           .filter((button, index) => index > 4 && index < numbers - 1)
           .forEach((button) => {
-            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed} ${classAttrDisabled}`)
-            expect(button).not.toHaveClass(`${classAttrClicked}`)
+            expect(button).toHaveClass(`${cssBtn} ${cssRedBtn} ${cssDisabledBtn}`)
+            expect(button).not.toHaveClass(`${cssClickedBtn}`)
             expect(button).toBeDisabled()
           })
       })
@@ -197,8 +208,7 @@ describe("Row component test:", () => {
         buttons
           .filter((button, index) => index > 4 && index < numbers)
           .forEach((button) => {
-            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed}`)
-            expect(button).not.toHaveClass(`${classAttrClicked} ${classAttrDisabled}`)
+            expect(button).toHaveClass(`${cssBtn} ${cssRedBtn} ${cssDisabledBtn}`)
             expect(button).toBeDisabled()
           })
 
@@ -220,8 +230,8 @@ describe("Row component test:", () => {
         )
 
         const lockButton = screen.getByText("🔒")
-        expect(lockButton).toHaveClass(`${classAttrLockBtn} ${classAttrRowRed} ${classAttrDisabled}`)
-        expect(lockButton).not.toHaveClass(`${classAttrClicked}`)
+        expect(lockButton).toHaveClass(`${cssBtn} ${cssRedBtn} ${cssDisabledBtn}`)
+        expect(lockButton).not.toHaveClass(`${cssClickedBtn}`)
         expect(lockButton).toBeDisabled()
       })
 
@@ -239,8 +249,9 @@ describe("Row component test:", () => {
         )
 
         const lockButton = screen.getByText(`🔒`)
-        expect(lockButton).toHaveClass(`${classAttrLockBtn} ${classAttrRowRed}`)
-        expect(lockButton).not.toHaveClass(`${classAttrDisabled} ${classAttrClicked}`)
+        expect(lockButton).toHaveClass(`${cssBtn} ${cssRedBtn}`)
+        expect(lockButton).not.toHaveClass(`${cssDisabledBtn}`)
+        expect(lockButton).not.toHaveClass(`${cssClickedBtn}`)
         expect(lockButton).not.toBeDisabled()
       })
 
@@ -258,8 +269,8 @@ describe("Row component test:", () => {
         )
 
         const lockButton = screen.getByText("🔒")
-        expect(lockButton).toHaveClass(`${classAttrLockBtn} ${classAttrRowRed} ${classAttrClicked}`)
-        expect(lockButton).not.toHaveClass(`${classAttrDisabled}`)
+        expect(lockButton).toHaveClass(`${cssBtn} ${cssRedBtn} ${cssClickedBtn}`)
+        expect(lockButton).not.toHaveClass(`${cssDisabledBtn}`)
         expect(lockButton).toBeDisabled()
       })
 
@@ -277,11 +288,10 @@ describe("Row component test:", () => {
         )
 
         const lockButton = screen.getByText("🔒")
-        expect(lockButton).toHaveClass(`${classAttrLockBtn} ${classAttrRowRed} ${classAttrDisabled}`)
-        expect(lockButton).not.toHaveClass(`${classAttrClicked}`)
+        expect(lockButton).toHaveClass(`${cssBtn} ${cssRedBtn} ${cssDisabledBtn}`)
+        expect(lockButton).not.toHaveClass(`${cssClickedBtn}`)
         expect(lockButton).toBeDisabled()
       })
-
     });
   })
 
@@ -305,13 +315,14 @@ describe("Row component test:", () => {
         redButtons
           .filter((button, index) => index < numbers)
           .forEach((button) => {
-            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed}`)
-            expect(button).not.toHaveClass(`${classAttrDisabled} ${classAttrClicked}`)
+            expect(button).toHaveClass(`${cssSpan} ${cssRedSpan}`)
+            expect(button).not.toHaveClass(`${cssDisabledBtn}`)
+            expect(button).not.toHaveClass(`${cssClickedBtn}`)
           }
           )
 
         const lockButton = screen.getByText("🔒")
-        expect(lockButton).toHaveClass(`${classAttrLockBtn} ${classAttrRowRed} ${classAttrDisabled}`)
+        expect(lockButton).toHaveClass(`${cssSpan} ${cssRedSpan} ${cssDisabledBtn}`)
       })
 
 
@@ -329,7 +340,7 @@ describe("Row component test:", () => {
         )
 
         const red6button = screen.getByText("6")
-        expect(red6button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed} ${classAttrClicked}`)
+        expect(red6button).toHaveClass(`${cssSpan} ${cssRedSpan} ${cssClickedBtn}`)
       })
 
       it("should have a 'disabled' CSS class if their values are below a marked number and aren't clicked", () => {
@@ -350,8 +361,8 @@ describe("Row component test:", () => {
         redButtons
           .filter((button, index) => index < 4)
           .forEach((button) => {
-            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed} ${classAttrDisabled}`)
-            expect(button).not.toHaveClass(`${classAttrClicked}`)
+            expect(button).toHaveClass(`${cssSpan} ${cssRedSpan} ${cssDisabledBtn}`)
+            expect(button).not.toHaveClass(`${cssClickedBtn}`)
           }
           )
       })
@@ -374,8 +385,8 @@ describe("Row component test:", () => {
         redButtons
           .filter((button, index) => index > 4 && index < numbers)
           .forEach((button) => {
-            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed}`)
-            expect(button).not.toHaveClass(`${classAttrClicked} ${classAttrDisabled}`)
+            expect(button).toHaveClass(`${cssSpan} ${cssRedSpan}`)
+            expect(button).not.toHaveClass(`${cssClickedBtn} ${cssDisabledBtn}`)
           }
           )
       })
@@ -398,23 +409,23 @@ describe("Row component test:", () => {
         redButtons
           .filter((button, index) => index < 4)
           .forEach((button) => {
-            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed} ${classAttrDisabled}`)
-            expect(button).not.toHaveClass(`${classAttrClicked}`)
+            expect(button).toHaveClass(`${cssSpan} ${cssRedSpan} ${cssDisabledBtn}`)
+            expect(button).not.toHaveClass(`${cssClickedBtn}`)
           }
           )
 
         redButtons
           .filter((button, index) => index > 4 && index < 7)
           .forEach((button) => {
-            expect(button).toHaveClass(`${classAttrNumBtn} red ${classAttrDisabled}`)
-            expect(button).not.toHaveClass(`${classAttrClicked}`)
+            expect(button).toHaveClass(`${cssSpan} ${cssRedSpan} ${cssDisabledBtn}`)
+            expect(button).not.toHaveClass(`${cssClickedBtn}`)
           })
 
         redButtons
           .filter((button, index) => index > 7 && index < numbers)
           .forEach((button) => {
-            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed}`)
-            expect(button).not.toHaveClass(` ${classAttrClicked} ${classAttrDisabled}`)
+            expect(button).toHaveClass(`${cssSpan} ${cssRedSpan}`)
+            expect(button).not.toHaveClass(` ${cssClickedBtn} ${cssDisabledBtn}`)
           })
       })
 
@@ -435,16 +446,16 @@ describe("Row component test:", () => {
         redButtons
           .filter((button, index) => index < 4)
           .forEach((button) => {
-            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed} ${classAttrClicked}`)
-            expect(button).not.toHaveClass(`${classAttrDisabled}`)
+            expect(button).toHaveClass(`${cssSpan} ${cssRedSpan} ${cssClickedBtn}`)
+            expect(button).not.toHaveClass(`${cssDisabledBtn}`)
           }
           )
 
         redButtons
           .filter((button, index) => index > 4 && index < numbers - 1)
           .forEach((button) => {
-            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed} ${classAttrDisabled}`)
-            expect(button).not.toHaveClass(`${classAttrClicked}`)
+            expect(button).toHaveClass(`${cssSpan} ${cssRedSpan} ${cssDisabledBtn}`)
+            expect(button).not.toHaveClass(`${cssClickedBtn}`)
           }
           )
       })
@@ -465,7 +476,7 @@ describe("Row component test:", () => {
         )
 
         const lockButton = screen.getByText("🔒")
-        expect(lockButton).toHaveClass(`${classAttrLockBtn} ${classAttrRowRed} ${classAttrDisabled}`)
+        expect(lockButton).toHaveClass(`${cssSpan} ${cssRedSpan} ${cssDisabledBtn}`)
       })
 
       it("should be enabled when game conditions are met", () => {
@@ -482,8 +493,8 @@ describe("Row component test:", () => {
         )
 
         const lockButton = screen.getByText("🔒")
-        expect(lockButton).toHaveClass(`${classAttrLockBtn} ${classAttrRowRed}`)
-        expect(lockButton).not.toHaveClass(`${classAttrDisabled} ${classAttrClicked}`)
+        expect(lockButton).toHaveClass(`${cssSpan} ${cssRedSpan}`)
+        expect(lockButton).not.toHaveClass(`${cssDisabledBtn} ${cssClickedBtn}`)
       })
 
       it("should have a 'clicked' CSS class when it has been clicked", () => {
@@ -500,8 +511,8 @@ describe("Row component test:", () => {
         )
 
         const lockButton = screen.getByText("🔒")
-        expect(lockButton).toHaveClass(`${classAttrLockBtn} ${classAttrRowRed} ${classAttrClicked}`)
-        expect(lockButton).not.toHaveClass(`${classAttrDisabled}`)
+        expect(lockButton).toHaveClass(`${cssSpan} ${cssRedSpan} ${cssClickedBtn}`)
+        expect(lockButton).not.toHaveClass(`${cssDisabledBtn}`)
       })
 
       it("should have a 'disabled' CSS class when the row is locked by another player", () => {
@@ -518,8 +529,8 @@ describe("Row component test:", () => {
         )
 
         const lockButton = screen.getByText("🔒")
-        expect(lockButton).toHaveClass(`${classAttrLockBtn} ${classAttrRowRed} ${classAttrDisabled}`)
-        expect(lockButton).not.toHaveClass(`${classAttrClicked}`)
+        expect(lockButton).toHaveClass(`${cssSpan} ${cssRedSpan} ${cssDisabledBtn}`)
+        expect(lockButton).not.toHaveClass(`${cssClickedBtn}`)
       })
 
     });
