@@ -137,8 +137,8 @@ export const Game: React.FC<IGameProps> = ({
           }
           {/* For ending a turn even if there are available moves */}
           <button className="" onClick={handleEndTurn} disabled={hasSubmitted || !hasRolled}>End Turn</button>          
-          {/* Need to disable if not active player or players second choice */}
-          <button className="" onClick={handlePassMove}>Pass Move</button>
+          {/* Possibly need to update structure of data sent back from backend to include submission count to disable button on 2nd choice rather than hasSubmitted */}
+          <button className="" onClick={handlePassMove} disabled={hasSubmitted || !hasRolled || activePlayer !== userId  }>Pass Move</button>
 
         </div>
       </div>
