@@ -49,6 +49,22 @@ export const gameCardTwoMarkedNumbersState: GameCardData = {
 	penalties: [],
 };
 
+export const gameCardManyMarkedNumbersState: GameCardData = {
+	rows: {
+		red: [2, 3, 4, 5],
+		yellow: [2],
+		green: [11],
+		blue: [11],
+	},
+	isLocked: {
+		red: false,
+		yellow: false,
+		green: false,
+		blue: false,
+	},
+	penalties: [],
+}
+
 export const gameCardLockRowConditionSatisfiedState: GameCardData = {
 	rows: {
 		red: [2, 3, 4, 5, 6, 12],

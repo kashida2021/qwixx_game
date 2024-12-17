@@ -5,169 +5,51 @@ import React from "react";
 import GameCard from "../../../src/components/GameCard/GameCard";
 import "@testing-library/jest-dom";
 import { socket } from "../../../src/services/socketServices";
-import {Socket} from "socket.io-client";
+import { Socket } from "socket.io-client";
 import { QwixxLogic } from "../../../src/types/qwixxLogic";
-import { MemoryRouter } from "react-router-dom";
-import GamePage from "../../../src/pages/GamePage/GamePage";
+import { gameCardBaseState, gameCardManyMarkedNumbersState, gameCardPlayerLockedRowState } from "./__fixtures__/gameCardStates";
 
 const user = userEvent.setup();
 
-type SocketServiceModule = {
-  socket: Socket;
-};
+//type SocketServiceModule = {
+//  socket: Socket;
+//};
+//
+//interface PlayerChoice {
+//  row: string;
+//  number: number;
+//}
 
-interface PlayerChoice {
-  row: string;
-  number: number;
-}
+//const mockAvailableMoves = { testUser1: true, testUser2: true, testUser3: true }
+//const membersArrayMock = ["testUser1", "testUser2", "testUser3"];
+//
+//let lobbyIdMock: string = "1234";
+//let userIdMock: string = "";
+//let playerChoiceMock: PlayerChoice | null = null;
+//
+//vi.mock(
+//  "../../../src/services/socketServices",
+//  async (importOriginal: () => Promise<SocketServiceModule>) => {
+//    const actual = await importOriginal();
+//    return {
+//      ...actual,
+//      socket: {
+//        ...actual.socket,
+//        emit: vi.fn(() => {
+//          lobbyIdMock = "1234",
+//            userIdMock = "test_user"
+//          playerChoiceMock = { row: "red", number: 2 }
+//        }),
+//      },
+//    };
+//  }
+//);
 
-const mockAvailableMoves = {testUser1: true, testUser2: true, testUser3: true}
-const membersArrayMock = ["testUser1", "testUser2", "testUser3"];
-const gameState = {
-  players: {
-    testUser1: {
-      gamecard: {
-        rows: {
-          red: [],
-          yellow: [],
-          green: [],
-          blue: [],
-        },
-        isLocked: {
-          red: false,
-          yellow: false,
-          green: false,
-          blue: false,
-        },
-        penalties: [],
-      },
-      hasSubmittedChoice: false,
-      },
-    testUser2: {
-      gamecard: {
-        rows: {
-          red: [],
-          yellow: [],
-          green: [],
-          blue: [],
-        },
-        isLocked: {
-          red: false,
-          yellow: false,
-          green: false,
-          blue: false,
-        },
-        penalties: [],
-      },
-      hasSubmittedChoice: false,
-    },
-    testUser3: {
-      gamecard: {
-        rows: {
-          red: [],
-          yellow: [],
-          green: [],
-          blue: [],
-        },
-        isLocked: {
-          red: false,
-          yellow: false,
-          green: false,
-          blue: false,
-        },
-        penalties: [],
-      },
-      hasSubmittedChoice: false,
-    },
-  },
-  dice:{
-    white1: 1,
-    white2: 2,
-    red: 3,
-    yellow: 4,
-    green: 5,
-    blue: 6,
-  },
-  activePlayer: "testUser1" ,
-  hasRolled: false
-};
-
-let lobbyIdMock: string = "1234";
-let userIdMock: string = "";
-let playerChoiceMock: PlayerChoice| null = null;
-
-vi.mock(
-  "../../../src/services/socketServices",
-  async (importOriginal: () => Promise<SocketServiceModule>) => {
-    const actual = await importOriginal();
-    return {
-      ...actual,
-      socket: {
-        ...actual.socket,
-        emit: vi.fn(() => {
-            lobbyIdMock = "1234",
-            userIdMock = "test_user"
-            playerChoiceMock = {row: "red", number: 2}
-           }),
-          },
-        };
-      }
-    );
-    
-
-const emptyGameCardData: QwixxLogic['players'][string]['gamecard'] = {
-    rows: {
-      red: [],
-      yellow: [],
-      green: [],
-      blue: [],
-    },
-    isLocked: {
-      red: false,
-      yellow: false,
-      green: false,
-      blue: false,
-    },
-    penalties: [],
-  };
-
-const gameCardDataWithNumbers: QwixxLogic['players'][string]['gamecard'] = {
-    rows: {
-      red: [2, 3, 4, 5],
-      yellow: [2],
-      green: [11],
-      blue: [11],
-    },
-    isLocked: {
-      red: false,
-      yellow: false,
-      green: false,
-      blue: false,
-    },
-    penalties: [],
-  };
-
-const gameCardWithLockedRow: QwixxLogic['players'][string]['gamecard'] = {
-    rows: {
-      red: [2, 3, 4, 5, 12],
-      yellow: [],
-      green: [],
-      blue: [],
-    },
-    isLocked: {
-      red: true,
-      yellow: false,
-      green: false,
-      blue: false,
-    },
-    penalties: [],
-  };
-
-const cssRowRed = "row-red";
-const cssRowYellow = "row-yellow";
-const cssRowBlue = "row-blue";
-const cssRowGreen = "row-green";
-const cssClicked = "clicked";
+const ariaLabelRed = "row-red";
+const ariaLabelYellow = "row-yellow";
+const ariaLabelBlue = "row-blue";
+const ariaLabelGreen = "row-green";
+const cssClicked = "qwixx-card__button--clicked";
 const cssPenalties = "penalties-list";
 
 const ariaNonInteractiveBtn = "non-interactive-button";
@@ -181,20 +63,21 @@ describe("Game Card Test:", () => {
         <GameCard
           member={"testUser1"}
           isOpponent={true}
-          gameCardData={emptyGameCardData}
+          gameCardData={gameCardBaseState}
           cellClick={mockCellClick}
+          handleLockRow={mockCellClick}
         />
       );
 
-      const redRow = screen.getByRole("list", { name: cssRowRed });
-      const yellowRow = screen.getByRole("list", { name: cssRowYellow });
-      const blueRow = screen.getByRole("list", { name: cssRowBlue });
-      const greenRow = screen.getByRole("list", { name: cssRowGreen });
+      const redRow = screen.getByRole("list", { name: ariaLabelRed });
+      const yellowRow = screen.getByRole("list", { name: ariaLabelYellow });
+      const blueRow = screen.getByRole("list", { name: ariaLabelBlue });
+      const greenRow = screen.getByRole("list", { name: ariaLabelGreen });
 
-      const redRowButtons = within(redRow).getAllByLabelText( ariaNonInteractiveBtn );
-      const yellowRowButtons = within(yellowRow).getAllByLabelText( ariaNonInteractiveBtn );
-      const blueRowButtons = within(blueRow).getAllByLabelText( ariaNonInteractiveBtn );
-      const greenRowButtons = within(greenRow).getAllByLabelText( ariaNonInteractiveBtn );
+      const redRowButtons = within(redRow).getAllByLabelText(ariaNonInteractiveBtn);
+      const yellowRowButtons = within(yellowRow).getAllByLabelText(ariaNonInteractiveBtn);
+      const blueRowButtons = within(blueRow).getAllByLabelText(ariaNonInteractiveBtn);
+      const greenRowButtons = within(greenRow).getAllByLabelText(ariaNonInteractiveBtn);
 
       const penalties = screen.getByRole("list", { name: cssPenalties });
       const penaltiesCheckBox = within(penalties).getAllByLabelText("fake-checkbox");
@@ -218,20 +101,21 @@ describe("Game Card Test:", () => {
         <GameCard
           member={"testUser1"}
           isOpponent={true}
-          gameCardData={gameCardDataWithNumbers}
+          gameCardData={gameCardManyMarkedNumbersState}
           cellClick={mockCellClick}
+          handleLockRow={mockCellClick}
         />
       );
 
-      const redRow = screen.getByRole("list", { name: cssRowRed });
-      const yellowRow = screen.getByRole("list", { name: cssRowYellow });
-      const blueRow = screen.getByRole("list", { name: cssRowBlue });
-      const greenRow = screen.getByRole("list", { name: cssRowGreen });
+      const redRow = screen.getByRole("list", { name: ariaLabelRed });
+      const yellowRow = screen.getByRole("list", { name: ariaLabelYellow });
+      const blueRow = screen.getByRole("list", { name: ariaLabelBlue });
+      const greenRow = screen.getByRole("list", { name: ariaLabelGreen });
 
-      const redButtons = within(redRow).getAllByLabelText( ariaNonInteractiveBtn );
-      const yellowButtons = within(yellowRow).getAllByLabelText( ariaNonInteractiveBtn );
-      const blueButtons = within(blueRow).getAllByLabelText( ariaNonInteractiveBtn );
-      const greenButtons = within(greenRow).getAllByLabelText( ariaNonInteractiveBtn );
+      const redButtons = within(redRow).getAllByLabelText(ariaNonInteractiveBtn);
+      const yellowButtons = within(yellowRow).getAllByLabelText(ariaNonInteractiveBtn);
+      const blueButtons = within(blueRow).getAllByLabelText(ariaNonInteractiveBtn);
+      const greenButtons = within(greenRow).getAllByLabelText(ariaNonInteractiveBtn);
 
       redButtons
         .filter((button, index) => index < 4)
@@ -258,15 +142,16 @@ describe("Game Card Test:", () => {
         <GameCard
           member={"testUser1"}
           isOpponent={false}
-          gameCardData={emptyGameCardData}
+          gameCardData={gameCardBaseState}
           cellClick={mockCellClick}
+          handleLockRow={mockCellClick}
         />
       );
 
-      const redRow = screen.getByRole("list", { name: cssRowRed });
-      const yellowRow = screen.getByRole("list", { name: cssRowYellow });
-      const blueRow = screen.getByRole("list", { name: cssRowBlue });
-      const greenRow = screen.getByRole("list", { name: cssRowGreen });
+      const redRow = screen.getByRole("list", { name: ariaLabelRed });
+      const yellowRow = screen.getByRole("list", { name: ariaLabelYellow });
+      const blueRow = screen.getByRole("list", { name: ariaLabelBlue });
+      const greenRow = screen.getByRole("list", { name: ariaLabelGreen });
 
       const redRowButtons = within(redRow).getAllByRole("button");
       const yellowRowButtons = within(yellowRow).getAllByRole("button");
@@ -289,23 +174,25 @@ describe("Game Card Test:", () => {
       expect(penalties).toBeVisible;
       expect(penaltiesCheckBox).toHaveLength(4);
     });
+
     it("the numbered buttons are disabled appropriately", () => {
       render(
         <GameCard
           member={"testUser1"}
           isOpponent={false}
-          gameCardData={gameCardDataWithNumbers}
+          gameCardData={gameCardManyMarkedNumbersState}
           cellClick={mockCellClick}
+          handleLockRow={mockCellClick}
         />
       );
 
-      const redRow = screen.getByRole("list", { name: cssRowRed });
+      const redRow = screen.getByRole("list", { name: ariaLabelRed });
       const yellowRow = screen.getByRole("list", {
-        name: cssRowYellow,
+        name: ariaLabelYellow,
       });
-      const blueRow = screen.getByRole("list", { name: cssRowBlue });
+      const blueRow = screen.getByRole("list", { name: ariaLabelBlue });
       const greenRow = screen.getByRole("list", {
-        name: cssRowGreen,
+        name: ariaLabelGreen,
       });
 
       const redButtons = within(redRow).getAllByRole("button");
@@ -329,121 +216,89 @@ describe("Game Card Test:", () => {
       expect(greenButtons[2]).toBeEnabled();
     });
   });
+});
+
+
+//BELOW TESTS ARE SKIPPED FOR NOW AS THEY'RE RELATED TO LOCKING ROWS
+describe.skip("When a user clicks on a number button", () => {
+  test("the button is disabled", async () => {
+    render(
+      <GameCard
+        member={"testUser1"}
+        isOpponent={false}
+        gameCardData={gameCardBaseState}
+        cellClick={mockCellClick}
+        handleLockRow={mockCellClick}
+      />
+    );
+
+    const redRow = screen.getByRole("list", { name: ariaLabelRed });
+    const redButtons = within(redRow).getAllByRole("button");
+    await user.click(redButtons[0]);
+
+    expect(redButtons[0]).toBeDisabled();
   });
 
+  test("locks the row when number 12 is clicked", async () => {
+    render(
+      <GameCard
+        member={"testUser1"}
+        isOpponent={false}
+        gameCardData={gameCardManyMarkedNumbersState}
+        cellClick={mockCellClick}
+        handleLockRow={mockCellClick}
+      />
+    );
 
-  //BELOW TESTS ARE SKIPPED FOR NOW AS THEY'RE RELATED TO LOCKING ROWS
-  describe.skip("When a user clicks on a number button", () => {
-    test("the button is disabled", async () => {
-      render(
-        <GameCard
-          member={"testUser1"}
-          isOpponent={false}
-          gameCardData={emptyGameCardData}
-          cellClick={mockCellClick}
-        />
-      );
+    const redRow = screen.getByRole("list", { name: ariaLabelRed });
+    const redButtons = within(redRow).getAllByRole("button");
+    await user.click(redButtons[10]);
 
-      const redRow = screen.getByRole("list", { name: cssRowRed });
-      const redButtons = within(redRow).getAllByRole("button");
-      await user.click(redButtons[0]);
-
-      expect(redButtons[0]).toBeDisabled();
-    });
-
-    test("locks the row when number 12 is clicked", async () => {
-      render(
-        <GameCard
-          member={"testUser1"}
-          isOpponent={false}
-          gameCardData={gameCardDataWithNumbers}
-          cellClick={mockCellClick}
-        />
-      );
-
-      const redRow = screen.getByRole("list", { name: cssRowRed });
-      const redButtons = within(redRow).getAllByRole("button");
-      await user.click(redButtons[10]);
-
-      redButtons.forEach((button) => {
-        expect(button).toBeDisabled();
-      });
-    });
-
-    test("the player choice state is updated", async () => {
-      const mockSetPlayerChoice = vi.fn();
-
-      render(
-        <GameCard
-          member={"testUser1"}
-          isOpponent={false}
-          gameCardData={emptyGameCardData}
-          cellClick={mockCellClick}
-        />
-      );
-
-      const redRow = screen.getByRole("list", { name: cssRowRed });
-      const redButtons = within(redRow).getAllByRole("button");
-      await user.click(redButtons[0]);
-
-      expect(mockSetPlayerChoice).toHaveBeenCalledWith("red", 2);   
-    });
-
-  });
-
-  describe.skip("When a row is locked", () => {
-    test("all buttons of that row should be disabled", async () => {
-      render(
-        <GameCard
-          member={"testUser1"}
-          isOpponent={false}
-          gameCardData={gameCardWithLockedRow}
-          cellClick={mockCellClick}
-        />
-      );
-
-      const redRow = screen.getByRole("list", { name: cssRowRed });
-      const redButtons = within(redRow).getAllByRole("button");
-      redButtons.forEach((button) => {
-        expect(button).toBeDisabled();
-      });
+    redButtons.forEach((button) => {
+      expect(button).toBeDisabled();
     });
   });
 
-  describe.skip("When confirm button is clicked", () => {
-    beforeEach(() => {
-      vi.clearAllMocks();
-    });
+  test("the player choice state is updated", async () => {
+    const mockSetPlayerChoice = vi.fn();
 
-    it("should emit a mark numbers event which is sent to backend", async ()=> {
-      render(
-          <MemoryRouter>
-              <GamePage
-                socket={socket}
-                userId={"testUser1"}
-                members={membersArrayMock}
-                lobbyId={lobbyIdMock}
-                gameState={gameState}
-                availableMoves={mockAvailableMoves}
-              />
-          </MemoryRouter>
-      )
+    render(
+      <GameCard
+        member={"testUser1"}
+        isOpponent={false}
+        gameCardData={gameCardBaseState}
+        cellClick={mockCellClick}
+        handleLockRow={mockCellClick}
+      />
+    );
 
-      const confirmBtn = screen.getByRole("button", {name: "Confirm"});
-      expect(confirmBtn).toBeVisible();
-      await user.click(confirmBtn);
+    const redRow = screen.getByRole("list", { name: ariaLabelRed });
+    const redButtons = within(redRow).getAllByRole("button");
+    await user.click(redButtons[0]);
 
-      expect(socket.emit).toHaveBeenCalledWith("mark_numbers", {
-        lobbyId: lobbyIdMock,
-        userId: userIdMock,
-        playerChoice: playerChoiceMock
-      })
-
-      expect(lobbyIdMock).toBe("1234");
-      expect(userIdMock).toBe("test_user");
-      expect(playerChoiceMock).toEqual({ row: "red", number: 2 });
-    })
-
+    expect(mockSetPlayerChoice).toHaveBeenCalledWith("red", 2);
   });
+
+});
+
+describe.skip("When a row is locked", () => {
+  test("all buttons of that row should be disabled", async () => {
+    render(
+      <GameCard
+        member={"testUser1"}
+        isOpponent={false}
+        gameCardData={gameCardPlayerLockedRowState}
+        cellClick={mockCellClick}
+        handleLockRow={mockCellClick}
+      />
+    );
+
+    const redRow = screen.getByRole("list", { name: ariaLabelRed });
+    const redButtons = within(redRow).getAllByRole("button");
+    redButtons.forEach((button) => {
+      expect(button).toBeDisabled();
+    });
+  });
+});
 
 
