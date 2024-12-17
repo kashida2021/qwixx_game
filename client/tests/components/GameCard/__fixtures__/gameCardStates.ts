@@ -83,7 +83,7 @@ export const gameCardPlayerLockedRowState: GameCardData = {
 
 export const gameCardOpponentLockedRowState: GameCardData = {
 	rows: {
-		red: [2, 3, 4, 5, 6, 12],
+		red: [2, 3, 4, 5, 6],
 		yellow: [],
 		green: [],
 		blue: [],
