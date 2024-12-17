@@ -37,8 +37,6 @@ export const GameCardButton: React.FC<ButtonProps> = ({
   classAttributes,
   eventHandler,
 }) => {
-  const buttonType = type === "num-btn" ? 'num-btn' : 'lock-btn'
-
   const handleClick = () => {
     if (type === "num-btn") {
       eventHandler(rowColour, label)
@@ -49,17 +47,17 @@ export const GameCardButton: React.FC<ButtonProps> = ({
   }
 
   return (
-    <li>
+    <li className="qwixx-card__item">
       {isOpponent ? (
         <span
-          className={`${buttonType} ${rowColour} ${classAttributes}`}
+          className={`qwixx-card__span qwixx-card__span--${rowColour} ${classAttributes}`}
           aria-label="non-interactive-button"
         >
           {label}
         </span>
       ) : (
         <button
-          className={`${buttonType} ${rowColour} ${classAttributes}`}
+          className={`qwixx-card__button qwixx-card__button--${rowColour} ${classAttributes}`}
           aria-label="interactive-button"
           disabled={isDisabled}
           onClick={handleClick}

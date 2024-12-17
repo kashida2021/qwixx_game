@@ -44,7 +44,7 @@ const GameCard: React.FC<IGameCard> = ({ member, isOpponent, gameCardData, cellC
   };
 
   return (
-    <div className="game-card" aria-label={`${member} card`}>
+    <div className="qwixx-card" aria-label={`${member} card`}>
       <p>{member}</p>
       {rowColours.map((rowColour, rowIndex) => (
         <Row

@@ -1,11 +1,15 @@
-.game-card{
+{/* rename to qwixx-card*/}
+/* Qwixx Game Card Block*/
+.qwixx-card{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
-.row{
+/* Qwixx Game Card Elements */
+{/* keep */}
+.qwixx-card__row{
     display: flex;
     justify-content: space-around;
     max-width: 800px;
@@ -13,29 +17,29 @@
     gap: 0.5rem;
 }
 
-.row > li{
+/* Row */
+.qwixx-card__item{
     width: 4rem;
     border: none;
     border-radius: 0.5rem;
 }
 
-.row.red{
+.qwixx-card__row--red{ 
     background-color: #c44123;
 }
-
-.row.yellow{
+.qwixx-card__row--yellow{ 
     background-color: #fecf4d;
 }
-
-.row.green{
+.qwixx-card__row--green{
     background-color: #458d59;
 }
-
-.row.blue{
+.qwixx-card__row--blue{
     background-color: #1e3184;
 }
 
-.num-btn, .lock-btn{
+/* Buttons */
+/* button styling */
+.qwixx-card__button, qwixx-card__span{
     display: inline-block;
     font-size: 1.5rem;
     width: 100%;
@@ -43,32 +47,45 @@
     border-radius: 0.5rem;
 }
 
-.num-btn.red, .lock-btn.red{
-    background-color: #ffdddd;
-    color:#c44123;
+.qwixx-card__button--red, qwixx-card__span--red{
+    background-color: #:ffdddd;
+    color: #c44123;
 }
 
-.num-btn.yellow, .lock-btn.yellow{
+.qwixx-card__button--yellow, qwixx-card__span--yellow{
     background-color: #fbfbf4;
     color:#fecf4d;
 }
 
-.num-btn.blue, .lock-btn.blue{
+.qwixx-card__button--blue, qwixx-card__span--blue{
     background-color: #ddddff;
     color:#1e3184;
 }
 
-.num-btn.green, .lock-btn.green{
+.qwixx-card__button--green, qwixx-card__span--green{
     background-color: #ddffdd;
     color:#458d59;
-
 }
 
-.num-btn:hover, .lock-btn:hover{
+.qwixx-card__button:hover {
     box-shadow: 0.25rem 0.25rem 0.25rem 0 rgba(0,0,0,0.24);
     cursor: pointer;
 }
 
+/* button states */
+.qwixx-card__button--clicked, qwixx-card__span--clicked{
+    background-color: black;
+    color: white;
+}
+
+.qwixx-card__button--disabled, qwixx-card__span--disabled{
+    background-color: grey;
+    color: white;
+    cursor: not-allowed;
+    opactiry: 0.8;
+}
+
+/* Penalties */
 .penalties-container > ul{
     display: flex;
     gap: 1rem;
@@ -78,33 +95,5 @@
     display: flex;
     flex-direction: column-reverse;
 }
-
-.num-btn.clicked {
-    background-color: black;
-    color: white;
-}
-
-.num-btn.disabled {
-    background-color: grey;
-    color: white;
-    cursor: not-allowed;
-    opacity: 0.8;
-}
-
-.lock-btn.disabled {
-    background-color: grey;
-    color: white;
-    cursor: not-allowed;
-    opacity: 0.8;
-}
-
-.lock-btn.clicked {
-    background-color: black;
-    color: white;
-}
-
-
-
-  
 
 
