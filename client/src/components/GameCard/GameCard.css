@@ -39,7 +39,7 @@
 
 /* Buttons */
 /* button styling */
-.qwixx-card__button, qwixx-card__span{
+.qwixx-card__button, .qwixx-card__span{
     display: inline-block;
     font-size: 1.5rem;
     width: 100%;
@@ -47,38 +47,39 @@
     border-radius: 0.5rem;
 }
 
-.qwixx-card__button--red, qwixx-card__span--red{
-    background-color: #:ffdddd;
+.qwixx-card__button--red, .qwixx-card__span--red{
+    background-color: #ffdddd;
     color: #c44123;
 }
 
-.qwixx-card__button--yellow, qwixx-card__span--yellow{
+.qwixx-card__button--yellow, .qwixx-card__span--yellow{
     background-color: #fbfbf4;
     color:#fecf4d;
 }
 
-.qwixx-card__button--blue, qwixx-card__span--blue{
+.qwixx-card__button--blue, .qwixx-card__span--blue{
     background-color: #ddddff;
     color:#1e3184;
 }
 
-.qwixx-card__button--green, qwixx-card__span--green{
+.qwixx-card__button--green, .qwixx-card__span--green{
     background-color: #ddffdd;
     color:#458d59;
 }
 
 .qwixx-card__button:hover {
-    box-shadow: 0.25rem 0.25rem 0.25rem 0 rgba(0,0,0,0.24);
+    box-shadow: 0.25rem 0.25rem 0.25rem 0 rgba(0,0,0,0.50);
     cursor: pointer;
+    background-color: grey;
 }
 
 /* button states */
-.qwixx-card__button--clicked, qwixx-card__span--clicked{
+.qwixx-card__button--clicked, .qwixx-card__span--clicked{
     background-color: black;
     color: white;
 }
 
-.qwixx-card__button--disabled, qwixx-card__span--disabled{
+.qwixx-card__button--disabled, .qwixx-card__span--disabled{
     background-color: grey;
     color: white;
     cursor: not-allowed;
