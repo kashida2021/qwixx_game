@@ -19,7 +19,7 @@ import {
 const mockCellClick = vi.fn();
 
 const numbers = 11;
-const classAttrNumBtn = "number-btn"
+const classAttrNumBtn = "num-btn"
 const classAttrLockBtn = "lock-btn"
 const classAttrRowRed = "red"
 const classAttrClicked = "clicked"
@@ -115,7 +115,7 @@ describe("Row component test:", () => {
         const redButtons = screen.getAllByLabelText(ariaLabelInteractiveButton)
 
         redButtons
-          .filter((button, index) => { index > 4 && index < numbers })
+          .filter((button, index) => index > 4 && index < numbers)
           .forEach((button) => {
             expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed}`)
             expect(button).not.toHaveClass(`${classAttrDisabled} ${classAttrClicked}`)
@@ -171,12 +171,37 @@ describe("Row component test:", () => {
         const buttons = screen.getAllByLabelText(ariaLabelInteractiveButton)
 
         buttons
-          .filter((button, index) => { index > 4 && index < numbers })
+          .filter((button, index) => index > 4 && index < numbers - 1)
           .forEach((button) => {
             expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed} ${classAttrDisabled}`)
             expect(button).not.toHaveClass(`${classAttrClicked}`)
             expect(button).toBeDisabled()
           })
+      })
+
+      test("that haven't been marked should be disabled when an opponent has locked the row", () => {
+        render(
+          <Row
+            rowColour={RowColour.Red}
+            rowIndex={1}
+            numbers={numbers}
+            isOpponent={false}
+            cellClick={mockCellClick}
+            gameCardData={gameCardOpponentLockedRowState}
+            handleLockRow={mockCellClick}
+          />
+        )
+
+        const buttons = screen.getAllByLabelText(ariaLabelInteractiveButton)
+
+        buttons
+          .filter((button, index) => index > 4 && index < numbers)
+          .forEach((button) => {
+            expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed}`)
+            expect(button).not.toHaveClass(`${classAttrClicked} ${classAttrDisabled}`)
+            expect(button).toBeDisabled()
+          })
+
       })
     });
 
@@ -347,7 +372,7 @@ describe("Row component test:", () => {
         const redButtons = screen.getAllByLabelText(ariaLabelNonInteractiveButton)
 
         redButtons
-          .filter((button, index) => { index > 4 && index < numbers })
+          .filter((button, index) => index > 4 && index < numbers)
           .forEach((button) => {
             expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed}`)
             expect(button).not.toHaveClass(`${classAttrClicked} ${classAttrDisabled}`)
@@ -379,14 +404,14 @@ describe("Row component test:", () => {
           )
 
         redButtons
-          .filter((button, index) => { index > 4 && index < 7 })
+          .filter((button, index) => index > 4 && index < 7)
           .forEach((button) => {
             expect(button).toHaveClass(`${classAttrNumBtn} red ${classAttrDisabled}`)
             expect(button).not.toHaveClass(`${classAttrClicked}`)
           })
 
         redButtons
-          .filter((button, index) => { index > 7 && index < numbers })
+          .filter((button, index) => index > 7 && index < numbers)
           .forEach((button) => {
             expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed}`)
             expect(button).not.toHaveClass(` ${classAttrClicked} ${classAttrDisabled}`)
@@ -416,7 +441,7 @@ describe("Row component test:", () => {
           )
 
         redButtons
-          .filter((button, index) => { index > 4 && index < numbers })
+          .filter((button, index) => index > 4 && index < numbers - 1)
           .forEach((button) => {
             expect(button).toHaveClass(`${classAttrNumBtn} ${classAttrRowRed} ${classAttrDisabled}`)
             expect(button).not.toHaveClass(`${classAttrClicked}`)

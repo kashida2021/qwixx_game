@@ -39,10 +39,12 @@ const Row: React.FC<RowProps> = ({
 
     const isClicked = gameCardData.rows[rowColour].includes(num);
 
+    // TODO: 
+    // Need to update below to check against if a row is locked as well
     const notValid =
       rowIndex < 2
-        ? maxMarkedNumber !== undefined && num < maxMarkedNumber
-        : minMarkedNumber !== undefined && num > minMarkedNumber
+        ? maxMarkedNumber !== undefined && num < maxMarkedNumber || gameCardData.isLocked[rowColour]
+        : minMarkedNumber !== undefined && num > minMarkedNumber || gameCardData.isLocked[rowColour]
 
     const isDisabled = isClicked || notValid
     const classAttributes = isClicked ? "clicked" : notValid ? "disabled" : "";
