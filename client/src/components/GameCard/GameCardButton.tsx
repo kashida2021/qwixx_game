@@ -37,7 +37,7 @@ export const GameCardButton: React.FC<ButtonProps> = ({
   classAttributes,
   eventHandler,
 }) => {
-  const buttonType = type === "num-btn" ? 'number-btn' : 'lock-btn'
+  const buttonType = type === "num-btn" ? 'num-btn' : 'lock-btn'
 
   const handleClick = () => {
     if (type === "num-btn") {
