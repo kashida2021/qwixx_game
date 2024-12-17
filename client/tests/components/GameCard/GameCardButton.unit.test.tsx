@@ -10,6 +10,20 @@ import { RowColour } from "../../../src/types/enums";
 const onClickHandler = vi.fn()
 const user = userEvent.setup()
 
+const cssBtn = "qwixx-card__button"
+const cssRedBtn = "qwixx-card__button--red"
+const cssYellowBtn = "qwixx-card__button--yellow"
+const cssGreenBtn = "qwixx-card__button--green"
+const cssBlueBtn = "qwixx-card__button--blue"
+const cssDisabledBtn = "qwixx-card__button--disabled"
+const cssClickedBtn = "qwixx-card__button--clicked"
+
+const cssSpan = "qwixx-card__span"
+const cssRedSpan = "qwixx-card__span--red"
+const cssYellowSpan = "qwixx-card__span--yellow"
+const cssGreenSpan = "qwixx-card__span--green"
+const cssBlueSpan = "qwixx-card__span--blue"
+
 describe("Lock Button", () => {
   describe("Player:", () => {
     describe("number button:", () => {
@@ -28,9 +42,10 @@ describe("Lock Button", () => {
 
         const btn = screen.getByRole("button");
         expect(btn).toHaveTextContent("2")
-        expect(btn).toHaveClass("number-btn red")
-        expect(btn).not.toHaveClass("lock-btn disabled clicked")
-        expect(btn).not.toHaveAttribute("disabled")
+        expect(btn).toHaveClass(`${cssBtn} ${cssRedBtn}`)
+        expect(btn).not.toHaveClass(`${cssClickedBtn}`)
+        expect(btn).not.toHaveClass(`${cssDisabledBtn}`)
+        expect(btn).not.toBeDisabled()
 
         const span = screen.queryByLabelText("non-interactive-button")
         expect(span).not.toBeInTheDocument()
@@ -44,16 +59,16 @@ describe("Lock Button", () => {
             rowColour={RowColour.Red}
             isOpponent={false}
             isDisabled={true}
-            classAttributes={"clicked"}
+            classAttributes={`${cssClickedBtn}`}
             eventHandler={onClickHandler}
           />
         );
 
         const btn = screen.getByRole("button");
         expect(btn).toHaveTextContent("2")
-        expect(btn).toHaveClass("number-btn red clicked")
-        expect(btn).not.toHaveClass("lock-btn disabled")
-        expect(btn).toHaveAttribute("disabled")
+        expect(btn).toHaveClass(`${cssBtn} ${cssRedBtn} ${cssClickedBtn}`)
+        expect(btn).not.toHaveClass(`${cssDisabledBtn}`)
+        expect(btn).toBeDisabled()
 
         const span = screen.queryByLabelText("non-interactive-button")
         expect(span).not.toBeInTheDocument()
@@ -67,16 +82,16 @@ describe("Lock Button", () => {
             rowColour={RowColour.Red}
             isOpponent={false}
             isDisabled={true}
-            classAttributes={"disabled"}
+            classAttributes={`${cssDisabledBtn}`}
             eventHandler={onClickHandler}
           />
         );
 
         const btn = screen.getByRole("button");
         expect(btn).toHaveTextContent("2")
-        expect(btn).toHaveClass("number-btn red disabled")
-        expect(btn).not.toHaveClass("lock-btn clicked")
-        expect(btn).toHaveAttribute("disabled")
+        expect(btn).toHaveClass(`${cssBtn} ${cssRedBtn} ${cssDisabledBtn}`)
+        expect(btn).not.toHaveClass(`${cssClickedBtn}`)
+        expect(btn).toBeDisabled()
 
         const span = screen.queryByLabelText("non-interactive-button")
         expect(span).not.toBeInTheDocument()
@@ -117,9 +132,10 @@ describe("Lock Button", () => {
 
         const btn = screen.getByRole("button");
         expect(btn).toHaveTextContent("🔒")
-        expect(btn).toHaveClass("lock-btn red")
-        expect(btn).not.toHaveClass("number-btn disabled clicked")
-        expect(btn).not.toHaveAttribute("disabled")
+        expect(btn).toHaveClass(`${cssBtn} ${cssRedBtn}`)
+        expect(btn).not.toHaveClass(`${cssClickedBtn}`)
+        expect(btn).not.toHaveClass(`${cssDisabledBtn}`)
+        expect(btn).not.toBeDisabled()
 
         const span = screen.queryByLabelText("non-interactive-button")
         expect(span).not.toBeInTheDocument()
@@ -133,16 +149,16 @@ describe("Lock Button", () => {
             rowColour={RowColour.Red}
             isOpponent={false}
             isDisabled={true}
-            classAttributes={"clicked"}
+            classAttributes={`${cssClickedBtn}`}
             eventHandler={onClickHandler}
           />
         );
 
         const btn = screen.getByRole("button");
         expect(btn).toHaveTextContent("🔒")
-        expect(btn).toHaveClass("lock-btn red clicked")
-        expect(btn).not.toHaveClass("number-btn disabled")
-        expect(btn).toHaveAttribute("disabled")
+        expect(btn).toHaveClass(`${cssBtn} ${cssRedBtn} ${cssClickedBtn}`)
+        expect(btn).not.toHaveClass(`${cssDisabledBtn}`)
+        expect(btn).toBeDisabled()
 
         const span = screen.queryByLabelText("non-interactive-button")
         expect(span).not.toBeInTheDocument()
@@ -156,16 +172,16 @@ describe("Lock Button", () => {
             rowColour={RowColour.Red}
             isOpponent={false}
             isDisabled={true}
-            classAttributes={"disabled"}
+            classAttributes={`${cssDisabledBtn}`}
             eventHandler={onClickHandler}
           />
         );
 
         const btn = screen.getByRole("button");
         expect(btn).toHaveTextContent("🔒")
-        expect(btn).toHaveClass("lock-btn red disabled")
-        expect(btn).not.toHaveClass("number-btn clicked")
-        expect(btn).toHaveAttribute("disabled")
+        expect(btn).toHaveClass(`${cssBtn} ${cssRedBtn} ${cssDisabledBtn}`)
+        expect(btn).not.toHaveClass(`${cssClickedBtn}`)
+        expect(btn).toBeDisabled()
 
         const span = screen.queryByLabelText("non-interactive-button")
         expect(span).not.toBeInTheDocument()
@@ -194,7 +210,7 @@ describe("Lock Button", () => {
 
   describe("Opponent:", () => {
     describe("Number button:", () => {
-      it("is a span that doesn't have a 'disabled' class when opponent hasn't 'clicked'", () => {
+      it("is a span that doesn't have a 'clicked' class when opponent hasn't 'clicked'", () => {
         render(
           <GameCardButton
             type="num-btn"
@@ -210,9 +226,10 @@ describe("Lock Button", () => {
         const span = screen.getByLabelText("non-interactive-button");
         expect(span).toHaveTextContent("2")
         expect(span).toBeVisible()
-        expect(span).toHaveClass("number-btn red")
-        expect(span).not.toHaveClass("lock-btn disabled clicked")
-        expect(span).not.toHaveAttribute("disabled")
+        expect(span).toHaveClass(`${cssSpan} ${cssRedSpan}`)
+        expect(span).not.toHaveClass(`${cssClickedBtn}`)
+        expect(span).not.toHaveClass(`${cssDisabledBtn}`)
+        expect(span).not.toBeDisabled()
 
         const button = screen.queryByRole("button")
         expect(button).not.toBeInTheDocument()
@@ -226,7 +243,7 @@ describe("Lock Button", () => {
             rowColour={RowColour.Red}
             isOpponent={true}
             isDisabled={true}
-            classAttributes={"clicked"}
+            classAttributes={`${cssClickedBtn}`}
             eventHandler={onClickHandler}
           />
         );
@@ -234,9 +251,9 @@ describe("Lock Button", () => {
         const span = screen.getByLabelText("non-interactive-button");
         expect(span).toHaveTextContent("2")
         expect(span).toBeVisible()
-        expect(span).toHaveClass("number-btn red clicked")
-        expect(span).not.toHaveClass("lock-btn disabled")
-        expect(span).not.toHaveAttribute("disabled")
+        expect(span).toHaveClass(`${cssSpan} ${cssRedSpan} ${cssClickedBtn}`)
+        expect(span).not.toHaveClass(`${cssDisabledBtn}`)
+        expect(span).not.toBeDisabled()
 
         const button = screen.queryByRole("button")
         expect(button).not.toBeInTheDocument()
@@ -250,7 +267,7 @@ describe("Lock Button", () => {
             rowColour={RowColour.Red}
             isOpponent={true}
             isDisabled={true}
-            classAttributes={"disabled"}
+            classAttributes={`${cssDisabledBtn}`}
             eventHandler={onClickHandler}
           />
         );
@@ -258,9 +275,9 @@ describe("Lock Button", () => {
         const span = screen.getByLabelText("non-interactive-button");
         expect(span).toHaveTextContent("2")
         expect(span).toBeVisible()
-        expect(span).toHaveClass("number-btn red disabled")
-        expect(span).not.toHaveClass("lock-btn clicked")
-        expect(span).not.toHaveAttribute("disabled")
+        expect(span).toHaveClass(`${cssSpan} ${cssRedSpan} ${cssDisabledBtn}`)
+        expect(span).not.toHaveClass(`${cssClickedBtn}`)
+        expect(span).not.toBeDisabled()
 
         const button = screen.queryByRole("button")
         expect(button).not.toBeInTheDocument()
@@ -284,9 +301,10 @@ describe("Lock Button", () => {
         const span = screen.getByLabelText("non-interactive-button");
         expect(span).toHaveTextContent("🔒")
         expect(span).toBeVisible()
-        expect(span).toHaveClass("lock-btn red")
-        expect(span).not.toHaveClass("number-btn disabled clicked")
-        expect(span).not.toHaveAttribute("disabled")
+        expect(span).toHaveClass(`${cssSpan} ${cssRedSpan}`)
+        expect(span).not.toHaveClass(`${cssDisabledBtn}`)
+        expect(span).not.toHaveClass(`${cssClickedBtn}`)
+        expect(span).not.toBeDisabled()
 
         const button = screen.queryByRole("button")
         expect(button).not.toBeInTheDocument()
@@ -300,7 +318,7 @@ describe("Lock Button", () => {
             rowColour={RowColour.Red}
             isOpponent={true}
             isDisabled={false}
-            classAttributes={"clicked"}
+            classAttributes={`${cssClickedBtn}`}
             eventHandler={onClickHandler}
           />
         );
@@ -308,9 +326,9 @@ describe("Lock Button", () => {
         const span = screen.getByLabelText("non-interactive-button");
         expect(span).toHaveTextContent("🔒")
         expect(span).toBeVisible()
-        expect(span).toHaveClass("lock-btn red clicked")
-        expect(span).not.toHaveClass("number-btn disabled")
-        expect(span).not.toHaveAttribute("disabled")
+        expect(span).toHaveClass(`${cssSpan} ${cssRedSpan} ${cssClickedBtn}`)
+        expect(span).not.toHaveClass(`${cssDisabledBtn}`)
+        expect(span).not.toBeDisabled()
 
         const button = screen.queryByRole("button")
         expect(button).not.toBeInTheDocument()
@@ -324,7 +342,7 @@ describe("Lock Button", () => {
             rowColour={RowColour.Red}
             isOpponent={true}
             isDisabled={true}
-            classAttributes={"disabled"}
+            classAttributes={`${cssDisabledBtn}`}
             eventHandler={onClickHandler}
           />
         );
@@ -332,9 +350,9 @@ describe("Lock Button", () => {
         const span = screen.getByLabelText("non-interactive-button");
         expect(span).toHaveTextContent("🔒")
         expect(span).toBeVisible()
-        expect(span).toHaveClass("lock-btn red disabled")
-        expect(span).not.toHaveClass("number-btn clicked")
-        expect(span).not.toHaveAttribute("disabled")
+        expect(span).toHaveClass(`${cssSpan} ${cssRedSpan} ${cssDisabledBtn}`)
+        expect(span).not.toHaveClass(`${cssClickedBtn}`)
+        expect(span).not.toBeDisabled()
 
         const button = screen.queryByRole("button")
         expect(button).not.toBeInTheDocument()

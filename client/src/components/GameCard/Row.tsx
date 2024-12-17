@@ -47,7 +47,7 @@ const Row: React.FC<RowProps> = ({
         : minMarkedNumber !== undefined && num > minMarkedNumber || gameCardData.isLocked[rowColour]
 
     const isDisabled = isClicked || notValid
-    const classAttributes = isClicked ? "clicked" : notValid ? "disabled" : "";
+    const classAttributes = isClicked ? "qwixx-card__button--clicked" : notValid ? "qwixx-card__button--disabled" : "";
 
     return { isDisabled, classAttributes }
   }
@@ -79,7 +79,7 @@ const Row: React.FC<RowProps> = ({
       )
 
     const isDisabled = !isEnabled || isClicked
-    const cssAttributes = isClicked ? "clicked" : !isEnabled ? "disabled" : ""
+    const cssAttributes = isClicked ? "qwixx-card__button--clicked" : !isEnabled ? "qwixx-card__button--disabled" : ""
 
     return { isDisabled, cssAttributes }
   }
@@ -119,7 +119,7 @@ const Row: React.FC<RowProps> = ({
   }
 
   return (
-    <ol className={`row ${rowColour}`} aria-label={`row-${rowColour}`}>
+    <ol className={`qwixx-card__row qwixx-card__row--${rowColour}`} aria-label={`row-${rowColour}`}>
       {renderNumberButtons()}
       {renderLockButon()}
     </ol>
