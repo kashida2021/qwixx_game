@@ -39,7 +39,7 @@ function App() {
       setIsConnected(false);
     };
 
-    const handlePlayerJoined = (lobbyMembers: string[], user: string) => {
+    const onPlayerJoined = (lobbyMembers: string[], user: string) => {
       setMembers(lobbyMembers);
       setNotifications((prevNotifications) => [
         ...prevNotifications,
@@ -47,7 +47,7 @@ function App() {
       ]);
     };
 
-    const handleUserLeft = (lobbyMembers: string[], user: string) => {
+    const onUserLeft = (lobbyMembers: string[], user: string) => {
       setMembers(lobbyMembers);
       setNotifications((prevNotifications) => [
         ...prevNotifications,
@@ -55,7 +55,7 @@ function App() {
       ]);
     };
 
-    const handleUserDisconnected = (lobbyMembers: string[], user: string) => {
+    const onUserDisconnected = (lobbyMembers: string[], user: string) => {
       setMembers(lobbyMembers);
       setNotifications((prevNotifications) => [
         ...prevNotifications,
@@ -63,9 +63,9 @@ function App() {
       ]);
     };
 
-    const currentMembers = (lobbyMembers: string[]) => {
-      setMembers(lobbyMembers);
-    };
+    //    const currentMembers = (lobbyMembers: string[]) => {
+    //      setMembers(lobbyMembers);
+    //    };
 
     // const createGameBoard = (data: GameBoard) => {
     //   const gameBoard = GameBoard.from(data);
@@ -85,7 +85,7 @@ function App() {
       console.log(data.gameState);
     };
 
-    const updateMarkedNumbers = (data: { gameState: QwixxLogic }) => {
+    const onUpdateMarkedNumbers = (data: { gameState: QwixxLogic }) => {
       setGameState(data.gameState);
       console.log("data received from backend", data);
     };
@@ -95,7 +95,7 @@ function App() {
       setGameState(data.gameState);
     }
 
-    const handleDiceRolled = (data: { diceValues: any, hasAvailableMoves: boolean, hasRolled: boolean }) => {
+    const onDiceRolled = (data: { diceValues: any, hasAvailableMoves: boolean, hasRolled: boolean }) => {
       setGameState((prevState) => {
         if (!prevState) {
           return {
@@ -118,22 +118,28 @@ function App() {
       console.log("data after dice roll", data);
     };
 
-    const updatePenalty = (data: { responseData: QwixxLogic }) => {
+    const onPenaltyProcessed = (data: { responseData: QwixxLogic }) => {
       setGameState(data.responseData)
       console.log("penalty data", data.responseData);
     }
 
+    const onRowLocked = (data: { gameState: QwixxLogic }) => {
+      setGameState(data.gameState)
+      console.log("Data after locking a row", data)
+    }
+
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
-    socket.on("player_joined", handlePlayerJoined);
-    socket.on("user_left", handleUserLeft);
-    socket.on("user_disconnected", handleUserDisconnected);
-    socket.on("current_members", currentMembers);
+    socket.on("player_joined", onPlayerJoined);
+    socket.on("user_left", onUserLeft);
+    socket.on("user_disconnected", onUserDisconnected);
+    //socket.on("current_members", currentMembers);
     // socket.on("gameBoard_created", createGameBoard);
     socket.on("game_initialised", onGameInitialised);
-    socket.on("update_markedNumbers", updateMarkedNumbers);
-    socket.on("dice_rolled", handleDiceRolled);
-    socket.on("penalty_processed", updatePenalty);
+    socket.on("update_marked_numbers", onUpdateMarkedNumbers);
+    socket.on("dice_rolled", onDiceRolled);
+    socket.on("penalty_processed", onPenaltyProcessed);
+    socket.on("row_locked", onRowLocked)
     socket.on("turn_ended", onTurnEnded);
 
     return () => {
@@ -149,6 +155,7 @@ function App() {
       socket.off("dice_rolled");
       socket.off("penalty_processed");
       socket.off("turn_ended");
+      socket.off("row_locked")
     };
   }, []);
 

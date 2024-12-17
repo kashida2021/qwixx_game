@@ -306,7 +306,7 @@ describe("socket event handler test", () => {
 
         const updatedGameState: any = await waitFor(
           clientSocket2,
-          "update_markedNumbers"
+          "update_marked_numbers"
         );
 
         const player2 = updatedGameState.gameState.players.clientSocket2;

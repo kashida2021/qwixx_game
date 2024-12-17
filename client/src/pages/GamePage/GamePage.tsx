@@ -38,10 +38,6 @@ export const Game: React.FC<IGameProps> = ({
     num: number;
   } | null>(null);
 
-  const handleCellClick = (rowColour: string, num: number) => {
-    setPlayerChoice({ row: rowColour, num });
-  };
-
   //  useEffect(() => {
   //    console.log(playerChoice);
   //  }, [playerChoice]);
@@ -64,6 +60,16 @@ export const Game: React.FC<IGameProps> = ({
   //     setGameBoardState(gameBoardState);
   // }
   const filteredMembers = members.filter((member) => member !== userId);
+  const hasSubmitted = gameState.players[userId].hasSubmittedChoice;
+  const hasAvailableMoves = availableMoves;
+  const hasRolled = gameState.hasRolled;
+  const activePlayer = gameState.activePlayer;
+
+  console.log("player has moves:", hasAvailableMoves);
+
+  const handleCellClick = (rowColour: string, num: number) => {
+    setPlayerChoice({ row: rowColour, num });
+  };
 
   const handleNumberSelection = () => {
     socket.emit("mark_numbers", { lobbyId, userId, playerChoice });
@@ -78,14 +84,10 @@ export const Game: React.FC<IGameProps> = ({
     socket.emit("end_turn", { lobbyId, userId })
   }
 
-  const hasSubmitted = gameState.players[userId].hasSubmittedChoice;
-  const hasAvailableMoves = availableMoves;
-  const hasRolled = gameState.hasRolled;
-  const activePlayer = gameState.activePlayer;
+  const handleLockRow = (rowColour: string) => {
+    socket.emit("lock_row", { userId, lobbyId, rowColour })
+  }
 
-  console.log("active player:", activePlayer)
-  console.log("has rolled:", hasRolled)
-  console.log("player has moves:", hasAvailableMoves);
 
 
   return (
@@ -115,6 +117,7 @@ export const Game: React.FC<IGameProps> = ({
               isOpponent={true}
               gameCardData={gameState.players[member].gameCard}
               cellClick={handleCellClick}
+              handleLockRow={handleLockRow}
             />
           ))}
         </div>
@@ -125,6 +128,7 @@ export const Game: React.FC<IGameProps> = ({
             isOpponent={false}
             gameCardData={gameState.players[userId].gameCard}
             cellClick={handleCellClick}
+            handleLockRow={handleLockRow}
           />
           {!hasAvailableMoves && !hasSubmitted && hasRolled && activePlayer === userId ? (
             <button className="penalty-btn" onClick={handlePenalty}>Accept Penalty</button>

@@ -36,15 +36,15 @@ describe("Game Page Unit Test:", () => {
     expect(user3).toBeVisible();
 
     const opponentZone = screen.getByLabelText("opponent-zone");
-    const opponentGameCards = opponentZone.querySelectorAll(".game-card");
+    const opponentGameCards = opponentZone.querySelectorAll(".qwixx-card");
     expect(opponentGameCards.length).toBe(2);
 
     const playerZone = screen.getByLabelText("player-zone")
-    const playerGameCard = playerZone.querySelectorAll(".game-card");
+    const playerGameCard = playerZone.querySelectorAll(".qwixx-card");
     expect(playerGameCard.length).toBe(1);
   });
 
-  test("end turn button should enabled when dice has been rolled", () => {
+  test("end turn button should be enabled when dice has been rolled", () => {
     render(
       <GamePage
         socket={socket}

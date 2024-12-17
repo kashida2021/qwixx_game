@@ -3,6 +3,7 @@ import Dice from "../models/DiceClass";
 import { rowColour } from "../enums/rowColours";
 import { SerializePlayer } from "../models/PlayerClass";
 import { TDiceValues } from "../models/DiceClass";
+import { DiceColour } from "../enums/DiceColours";
 
 interface rollDiceResults {
   hasRolled: boolean;
@@ -32,17 +33,23 @@ type MakeMoveResult =
   | { success: true; data: SerializedGameState }
   | { success: false; error: string }
 
+type LockRowResult =
+  | { success: true; data: SerializedGameState }
+  | { success: false; errorMessage: string }
+
 export default class QwixxLogic {
   private _playersArray: Player[];
   private _dice: Dice;
   private _currentTurnIndex: number;
   private _hasRolled: boolean;
+  private _lockedRows: rowColour[]
 
   constructor(players: Player[], dice: Dice) {
     this._playersArray = players;
     this._dice = dice;
     this._currentTurnIndex = 0;
     this._hasRolled = false;
+    this._lockedRows = []
   }
 
   public rollDice(): rollDiceResults {
@@ -67,8 +74,7 @@ export default class QwixxLogic {
     return this._playersArray.find((player) => player.name === playerName);
   }
 
-  //TOOD make it private
-  public get hasRolled() {
+  private get hasRolled() {
     return this._hasRolled;
   }
 
@@ -86,10 +92,36 @@ export default class QwixxLogic {
     return this._playersArray.every((player) => player.hasSubmittedChoice);
   }
 
+  private normaliseLockedRows() {
+    this._playersArray.forEach((player) => player.gameCard.normaliseRows(this._lockedRows))
+  }
+
   private processPlayersSubmission() {
     if (this.haveAllPlayersSubmitted()) {
       this.resetAllPlayersSubmission();
+
+      if (this._lockedRows) {
+        this.normaliseLockedRows();
+        this._lockedRows.forEach(row => {
+          const diceColour = this.getDiceColourFromLockedRow(row)
+          this._dice.disableDie(diceColour)
+        })
+      }
+
       this.nextTurn();
+    }
+  }
+
+  private getDiceColourFromLockedRow(row: rowColour): DiceColour {
+    switch (row) {
+      case rowColour.Red:
+        return DiceColour.Red;
+      case rowColour.Yellow:
+        return DiceColour.Yellow;
+      case rowColour.Green:
+        return DiceColour.Green;
+      case rowColour.Blue:
+        return DiceColour.Blue;
     }
   }
 
@@ -265,6 +297,27 @@ export default class QwixxLogic {
     return this.serialize();
   }
 
+  public lockRow(playerName: string, row: string): LockRowResult {
+    const colourToLock = this.getColourFromRow(row)
+
+    const player = this.playerExistsInLobby(playerName)
+    if (!player) {
+      throw new Error("Player not found")
+    }
+
+    const res = player.gameCard.lockRow(colourToLock)
+
+    if (!res.success) {
+      return res
+    }
+    // NOTE: 
+    //Does having this result in any bugs?
+    if (res.lockedRow && !this._lockedRows.includes(res.lockedRow)) {
+      this._lockedRows.push(res.lockedRow)
+    }
+
+    return { success: true, data: this.serialize() }
+  }
   // private get players() {
   //   return this._playersArray;
   // }
@@ -275,6 +328,9 @@ export default class QwixxLogic {
       return acc;
     }, {} as Record<string, SerializePlayer>);
 
+    // NOTE:
+    // We aren't returning the lockedRow state from this class, but we are getting locked rows from Player class
+    // The frontend code is built with that in mind but would including _lockedRows from this class make it more efficient?
     return {
       players: serializedPlayers,
       dice: this._dice.serialize(),

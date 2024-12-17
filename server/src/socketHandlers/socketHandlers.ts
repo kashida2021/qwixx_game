@@ -205,7 +205,7 @@ export default function initializeSocketHandler(io: Server) {
 
         if (res?.success) {
           const responseData = { gameState: res.data }
-          io.to(lobbyId).emit("update_markedNumbers", responseData);
+          io.to(lobbyId).emit("update_marked_numbers", responseData);
         }
 
       } catch (err) {
@@ -213,18 +213,6 @@ export default function initializeSocketHandler(io: Server) {
           socket.emit("error_occured", { message: err.message });
         }
       }
-
-      // TODO: Delete commented out code
-
-      //if (gameLogic?.haveAllPlayersSubmitted()) {
-      //gameLogic.resetAllPlayersSubmission();
-      //gameLogic.nextTurn();
-
-      //const serializedGameState = lobbiesMap[lobbyId].serializedGameLogic;
-
-      //io.to(lobbyId).emit("turn_ended", { gameState: serializedGameState });
-      //console.log("turn ended", serializedGameState);
-      //}
     });
 
     socket.on("roll_dice", ({ lobbyId }) => {
@@ -296,6 +284,39 @@ export default function initializeSocketHandler(io: Server) {
         }
       }
 
+    })
+
+    socket.on("lock_row", ({ userId, lobbyId, rowColour }) => {
+      if (!lobbyId || !userId) {
+        socket.emit("error_occured", {
+          message: "Missing userId or lobbyId for locking a row",
+        });
+        return;
+      }
+
+      const game = lobbiesMap[lobbyId].gameLogic;
+
+      if (!game) {
+        socket.emit("error_occured", { message: "Lobby or game not found" });
+        return;
+      }
+
+      try {
+        const res = game.lockRow(userId, rowColour)
+
+        if (!res.success) {
+          socket.emit("error_occured", { message: res.errorMessage })
+        }
+
+        if (res?.success) {
+          io.to(lobbyId).emit("row_locked", { gameState: res.data });
+        }
+
+      } catch (err) {
+        if (err instanceof Error) {
+          socket.emit("error_occured", { message: err.message });
+        }
+      }
     })
   });
 }
