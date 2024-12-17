@@ -123,8 +123,9 @@ function App() {
       console.log("penalty data", data.responseData);
     }
 
-    const handlePassMove = ( data: {result: QwixxLogic} ) => {
-      setGameState(data.result);
+    const handlePassMove = ( data: {gameState: QwixxLogic} ) => {
+      setGameState(data.gameState);
+      console.log(data.gameState);
     }
 
     socket.on("connect", onConnect);
