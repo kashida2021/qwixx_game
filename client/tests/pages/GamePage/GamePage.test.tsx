@@ -95,6 +95,56 @@ describe("Game Page Unit Test:", () => {
     expect(endTurnBtn).toBeDisabled()
   })
 
+  test("passMove button should be disabled if dice has not been rolled", ()=> {
+    render(
+      <GamePage
+        socket={socket}
+        userId={"testUser1"}
+        members={membersArrayMock}
+        lobbyId={lobbyIdMock}
+        gameState={initialGameState}
+        availableMoves={true}
+      />
+    )
+    const passMoveBtn = screen.getByText("Pass Move");
+    expect(passMoveBtn).toBeVisible();
+    expect(passMoveBtn).toBeDisabled();
+  })
+
+  test("passMove btn should be disabled if player has ended turn", ()=> {
+    render(
+      <GamePage
+        socket={socket}
+        userId={"testUser1"}
+        members={membersArrayMock}
+        lobbyId={lobbyIdMock}
+        gameState={user1HasSubmittedState}
+        availableMoves={false}
+      />
+      )
+      const passMoveBtn = screen.getByText("Pass Move");
+      expect(passMoveBtn).toBeVisible();
+      expect(passMoveBtn).toBeDisabled();
+    
+  })
+
+  test("passMoveBtn should be disabled if not active player", ()=> {
+      render(
+        <GamePage
+          socket={socket}
+          userId={"testUser2"}
+          members={membersArrayMock}
+          lobbyId={lobbyIdMock}
+          gameState={user1HasSubmittedState}
+          availableMoves={true}
+        />
+      )
+
+      const passMoveBtn = screen.getByText("Pass Move");
+      expect(passMoveBtn).toBeVisible();
+      expect(passMoveBtn).toBeDisabled();
+  })
+
   test("confirm button should render if there is an available move", () => {
     render(
       <GamePage
