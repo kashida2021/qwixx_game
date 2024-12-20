@@ -262,4 +262,42 @@ describe("Qwixx Logic tests", () => {
       expect(res.isValid).toBeTruthy();
     });
   });
+
+  // TODO: This should be combined with the game end phase test.
+  describe.only("Calculate all players' score", () => {
+    it("Can get back all players' score", () => {
+      gameCardMock1.calculateScore = jest.fn().mockReturnValueOnce(73)
+      gameCardMock2.calculateScore = jest.fn().mockReturnValueOnce(68)
+
+      const expected = {
+        player1: 73,
+        player2: 68,
+      }
+
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice)
+      const res = testGame.calculateScores()
+
+      expect(res).toEqual(expected)
+    })
+
+    it("Can determine the winner", () => {
+      gameCardMock1.calculateScore = jest.fn().mockReturnValueOnce(73)
+      gameCardMock2.calculateScore = jest.fn().mockReturnValueOnce(68)
+
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice)
+      const res = testGame.determineWinner()
+
+      expect(res).toEqual(["player1"])
+    })
+
+    it("Can determine multiple winners", () => {
+      gameCardMock1.calculateScore = jest.fn().mockReturnValueOnce(73)
+      gameCardMock2.calculateScore = jest.fn().mockReturnValueOnce(73)
+
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice)
+      const res = testGame.determineWinner()
+
+      expect(res).toEqual(["player1", "player2"])
+    })
+  })
 });
