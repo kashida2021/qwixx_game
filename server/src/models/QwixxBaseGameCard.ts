@@ -213,4 +213,10 @@ export default class qwixxBaseGameCard {
     }
     return false;
   }
+
+  public calculateScore(): number {
+    const multiplier = [0, 1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 66, 78]
+
+    return Object.values(this.MarkedNumbers).reduce((score, row) => score + multiplier[row.length], 0)
+  }
 }

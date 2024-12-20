@@ -249,4 +249,43 @@ describe("Base Game Card test", () => {
       });
     });
   });
+
+  it.only("can calculate the score with a single marked number", () => {
+    testGameCard.markNumbers(rowColour.Red, 2)
+    const res = testGameCard.calculateScore()
+    expect(res).toEqual(1)
+  })
+
+  it.only("can calculate the score with a two marked number", () => {
+    testGameCard.markNumbers(rowColour.Red, 2)
+    testGameCard.markNumbers(rowColour.Red, 3)
+    const res = testGameCard.calculateScore()
+    expect(res).toEqual(3)
+  })
+
+  it.only("can calculate the score including the 13th marked number", () => {
+    for (let i = 2; i < 14; i++) {
+      testGameCard.markNumbers(rowColour.Red, i)
+    }
+    const res = testGameCard.calculateScore()
+    expect(res).toEqual(78)
+  })
+
+  it.only("can calculate the score of multiple rows", () => {
+    for (let i = 2; i < 13; i++) {
+      testGameCard.markNumbers(rowColour.Red, i)
+    }
+    for (let i = 2; i < 13; i++) {
+      testGameCard.markNumbers(rowColour.Yellow, i)
+    }
+    for (let i = 12; i > 1; i--) {
+      testGameCard.markNumbers(rowColour.Green, i)
+    }
+    for (let i = 12; i > 1; i--) {
+      testGameCard.markNumbers(rowColour.Blue, i)
+    }
+
+    const res = testGameCard.calculateScore()
+    expect(res).toEqual(264)
+  })
 });
