@@ -1,4 +1,4 @@
-import "./scoring-guide-table.css"
+import "./score-guide-table.css"
 import React from 'react'
 
 // score-multiplier-table
