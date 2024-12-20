@@ -363,6 +363,23 @@ export default class QwixxLogic {
   //   return this._playersArray;
   // }
 
+  public calculateScores(): Record<string, number> {
+    const scores = this._playersArray.reduce((acc, player) => {
+      acc[player.name] = player.gameCard.calculateScore();
+      return acc;
+    }, {} as Record<string, number>)
+
+    return scores
+  }
+
+  public determineWinner() {
+    const scores = this.calculateScores()
+
+    return Object.keys(scores).filter(
+      player => scores[player] == Math.max(...Object.values(scores))
+    )
+  }
+
   public serialize(): SerializedGameState {
     const serializedPlayers = this._playersArray.reduce((acc, player) => {
       acc[player.name] = player.serialize();
