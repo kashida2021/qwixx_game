@@ -1,0 +1,13 @@
+/*BEM - Block, Element, Modifier */
+
+.score-guide-table{
+	border: 1px solid;
+	border-collapse: collapse;
+	width: 50%;
+	align-self: center;
+}
+
+.score-guide-table__cell{
+	border: 1px solid;
+	padding: 0.5rem;
+}
