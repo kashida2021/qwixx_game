@@ -264,7 +264,7 @@ describe("Qwixx Logic tests", () => {
   });
 
   // TODO: This should be combined with the game end phase test.
-  describe.only("Calculate all players' score", () => {
+  describe("Calculate all players' score", () => {
     it("Can get back all players' score", () => {
       gameCardMock1.calculateScore = jest.fn().mockReturnValueOnce(73)
       gameCardMock2.calculateScore = jest.fn().mockReturnValueOnce(68)
