@@ -288,4 +288,25 @@ describe("Base Game Card test", () => {
     const res = testGameCard.calculateScore()
     expect(res).toEqual(264)
   })
+
+  it.only("calculates the total score while factoring 1 penalty", () => {
+    for (let i = 2; i < 14; i++) {
+      testGameCard.markNumbers(rowColour.Red, i)
+    }
+
+    testGameCard.addPenalty()
+    const res = testGameCard.calculateScore()
+    expect(res).toEqual(73)
+  })
+
+  it.only("calculates the total score while factoring 2 penalties", () => {
+    for (let i = 2; i < 14; i++) {
+      testGameCard.markNumbers(rowColour.Red, i)
+    }
+
+    testGameCard.addPenalty()
+    testGameCard.addPenalty()
+    const res = testGameCard.calculateScore()
+    expect(res).toEqual(68)
+  })
 });

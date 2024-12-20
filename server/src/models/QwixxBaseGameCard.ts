@@ -215,8 +215,19 @@ export default class qwixxBaseGameCard {
   }
 
   public calculateScore(): number {
+    // NOTE: Would it be more scalable if this multiplier was a part of the constructor? 
     const multiplier = [0, 1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 66, 78]
 
-    return Object.values(this.MarkedNumbers).reduce((score, row) => score + multiplier[row.length], 0)
+    const score = Object.values(this.MarkedNumbers).reduce((score, row) => score + multiplier[row.length], 0)
+
+    const penalties = this.calculatePenalties()
+
+    return score - penalties
+  }
+
+  private calculatePenalties(): number {
+    const multiplier = 5
+    const penalties = this.penalties.at(-1) || 0
+    return multiplier * penalties
   }
 }
