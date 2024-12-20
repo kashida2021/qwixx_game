@@ -8,6 +8,7 @@ import { QwixxLogic } from "../../types/qwixxLogic";
 // import { SetStateAction, Dispatch } from "react";
 // import { rowColour} from "../../../../shared/types";
 import DiceContainer from "../../components/Dice/DiceContainer";
+import ScoreGuideTable from "../../components/ScoreGuideTable/ScoreGuideTable";
 import { MoveAvailability } from "../../types/GameCardData";
 //interface GameState {
 //players: {
@@ -147,6 +148,7 @@ export const Game: React.FC<IGameProps> = ({
             cellClick={handleCellClick}
             handleLockRow={handleLockRow}
           />
+          <ScoreGuideTable />
           {!hasAvailableMoves && !hasSubmitted && hasRolled && activePlayer === userId ? (
             <button className="penalty-btn" onClick={handlePenalty}>Accept Penalty</button>
           ) :
