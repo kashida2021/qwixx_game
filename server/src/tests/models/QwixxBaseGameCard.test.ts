@@ -72,241 +72,233 @@ describe("Base Game Card test", () => {
       const rows = testGameCard.MarkedNumbers;
       expect(rows).toEqual({ red: [], yellow: [], green: [], blue: [5] });
     });
+  });
 
-    describe("Check rolled dice values against game card state", () => {
-      test("return true if there are available moves based on current gamecard", () => {
-        const obj = {
-          [rowColour.Red]: [4, 8],
-          [rowColour.Yellow]: [5, 10],
-          [rowColour.Blue]: [10, 6],
-          [rowColour.Green]: [11, 7],
-        };
+  describe("Check rolled dice values against game card state", () => {
+    test("return true if there are available moves based on current gamecard", () => {
+      const obj = {
+        [rowColour.Red]: [4, 8],
+        [rowColour.Yellow]: [5, 10],
+        [rowColour.Blue]: [10, 6],
+        [rowColour.Green]: [11, 7],
+      };
 
-        const res = testGameCard.hasAvailableMoves(obj);
-        expect(res).toBeTruthy();
-      });
+      const res = testGameCard.hasAvailableMoves(obj);
+      expect(res).toBeTruthy();
     });
+  });
 
-    it("can add penalty to game card", () => {
-      testGameCard.addPenalty();
-      const penalties = testGameCard.penalties;
-      expect(penalties).toEqual([1]);
-    });
+  it("can add penalty to game card", () => {
+    testGameCard.addPenalty();
+    const penalties = testGameCard.penalties;
+    expect(penalties).toEqual([1]);
+  });
 
-    describe("Marking last number in a row", () => {
-      test.each([
-        [
-          rowColour.Red,
-          [2, 3, 4, 5, 6, 12],
-          { red: [2, 3, 4, 5, 6, 12], yellow: [], green: [], blue: [] },
-        ],
-        [
-          rowColour.Yellow,
-          [2, 3, 4, 5, 6, 12],
-          { red: [], yellow: [2, 3, 4, 5, 6, 12], green: [], blue: [] },
-        ],
-        [
-          rowColour.Green,
-          [12, 11, 10, 9, 8, 2],
-          { red: [], yellow: [], green: [12, 11, 10, 9, 8, 2], blue: [] },
-        ],
-        [
-          rowColour.Blue,
-          [12, 11, 10, 9, 8, 2],
-          { red: [], yellow: [], green: [], blue: [12, 11, 10, 9, 8, 2] },
-        ],
-      ])(
-        "can mark final number on %s row if atleast 5 numbers in row",
-        (row, numbers, expected) => {
-          numbers.forEach((num) => testGameCard.markNumbers(row, num));
-
-          const rows = testGameCard.MarkedNumbers;
-          expect(rows).toEqual(expected);
-        }
-      );
-
-      const redYellowRowErrMsg =
-        "Number 12 can't be marked. 5 lower values numbers haven't been marked yet";
-      test.each([
-        [
-          rowColour.Red,
-          12,
-          { success: false, errorMessage: redYellowRowErrMsg },
-        ],
-        [
-          rowColour.Yellow,
-          12,
-          { success: false, errorMessage: redYellowRowErrMsg },
-        ],
-      ])(
-        "can't mark %s 12 if row doesn't have atleast 5 numbers in it",
-        (row, number, expected) => {
-          const res = testGameCard.markNumbers(row, number);
-          expect(res).toEqual(expected);
-        }
-      );
-
-      const greenBlueRowErrMsg =
-        "Number 2 can't be marked. 5 higher values numbers haven't been marked yet";
-      test.each([
-        [
-          rowColour.Green,
-          2,
-          { success: false, errorMessage: greenBlueRowErrMsg },
-        ],
-        [
-          rowColour.Blue,
-          2,
-          { success: false, errorMessage: greenBlueRowErrMsg },
-        ],
-      ])(
-        "can't mark %s 12 if row doesn't have atleast 5 numbers in it",
-        (row, number, expected) => {
-          const res = testGameCard.markNumbers(row, number);
-          expect(res).toEqual(expected);
-        }
-      );
-    });
-
-    describe("Locking rows", () => {
-      test.each([
-        [
-          rowColour.Red,
-          [2, 3, 4, 5, 6, 12],
-          { red: true, yellow: false, green: false, blue: false },
-        ],
-        [
-          rowColour.Yellow,
-          [2, 3, 4, 5, 6, 12],
-          { red: false, yellow: true, green: false, blue: false },
-        ],
-        [
-          rowColour.Green,
-          [12, 11, 10, 9, 8, 2],
-          { red: false, yellow: false, green: true, blue: false },
-        ],
-        [
-          rowColour.Blue,
-          [12, 11, 10, 9, 8, 2],
-          { red: false, yellow: false, green: false, blue: true },
-        ],
-      ])("Can lock %s row", (row, numbers, expected) => {
+  describe("Marking last number in a row", () => {
+    test.each([
+      [
+        rowColour.Red,
+        [2, 3, 4, 5, 6, 12],
+        { red: [2, 3, 4, 5, 6, 12], yellow: [], green: [], blue: [] },
+      ],
+      [
+        rowColour.Yellow,
+        [2, 3, 4, 5, 6, 12],
+        { red: [], yellow: [2, 3, 4, 5, 6, 12], green: [], blue: [] },
+      ],
+      [
+        rowColour.Green,
+        [12, 11, 10, 9, 8, 2],
+        { red: [], yellow: [], green: [12, 11, 10, 9, 8, 2], blue: [] },
+      ],
+      [
+        rowColour.Blue,
+        [12, 11, 10, 9, 8, 2],
+        { red: [], yellow: [], green: [], blue: [12, 11, 10, 9, 8, 2] },
+      ],
+    ])(
+      "can mark final number on %s row if atleast 5 numbers in row",
+      (row, numbers, expected) => {
         numbers.forEach((num) => testGameCard.markNumbers(row, num));
-        const res = testGameCard.lockRow(row);
 
-        expect(res).toEqual({ success: true, lockedRow: row });
+        const rows = testGameCard.MarkedNumbers;
+        expect(rows).toEqual(expected);
+      }
+    );
+
+    const redYellowRowErrMsg =
+      "Number 12 can't be marked. 5 lower values numbers haven't been marked yet";
+    test.each([
+      [rowColour.Red, 12, { success: false, errorMessage: redYellowRowErrMsg }],
+      [
+        rowColour.Yellow,
+        12,
+        { success: false, errorMessage: redYellowRowErrMsg },
+      ],
+    ])(
+      "can't mark %s 12 if row doesn't have atleast 5 numbers in it",
+      (row, number, expected) => {
+        const res = testGameCard.markNumbers(row, number);
+        expect(res).toEqual(expected);
+      }
+    );
+
+    const greenBlueRowErrMsg =
+      "Number 2 can't be marked. 5 higher values numbers haven't been marked yet";
+    test.each([
+      [
+        rowColour.Green,
+        2,
+        { success: false, errorMessage: greenBlueRowErrMsg },
+      ],
+      [rowColour.Blue, 2, { success: false, errorMessage: greenBlueRowErrMsg }],
+    ])(
+      "can't mark %s 12 if row doesn't have atleast 5 numbers in it",
+      (row, number, expected) => {
+        const res = testGameCard.markNumbers(row, number);
+        expect(res).toEqual(expected);
+      }
+    );
+  });
+
+  describe("Locking rows", () => {
+    test.each([
+      [
+        rowColour.Red,
+        [2, 3, 4, 5, 6, 12],
+        { red: true, yellow: false, green: false, blue: false },
+      ],
+      [
+        rowColour.Yellow,
+        [2, 3, 4, 5, 6, 12],
+        { red: false, yellow: true, green: false, blue: false },
+      ],
+      [
+        rowColour.Green,
+        [12, 11, 10, 9, 8, 2],
+        { red: false, yellow: false, green: true, blue: false },
+      ],
+      [
+        rowColour.Blue,
+        [12, 11, 10, 9, 8, 2],
+        { red: false, yellow: false, green: false, blue: true },
+      ],
+    ])("Can lock %s row", (row, numbers, expected) => {
+      numbers.forEach((num) => testGameCard.markNumbers(row, num));
+      const res = testGameCard.lockRow(row);
+
+      expect(res).toEqual({ success: true, lockedRow: row });
+      const lockedRows = testGameCard.isLocked;
+      expect(lockedRows).toEqual(expected);
+    });
+
+    test.each([
+      [
+        rowColour.Red,
+        [2, 3, 4, 5, 6],
+        { red: false, yellow: false, green: false, blue: false },
+      ],
+      [
+        rowColour.Yellow,
+        [2, 3, 4, 5, 6],
+        { red: false, yellow: false, green: false, blue: false },
+      ],
+      [
+        rowColour.Green,
+        [12, 11, 10, 9, 8],
+        { red: false, yellow: false, green: false, blue: false },
+      ],
+      [
+        rowColour.Blue,
+        [12, 11, 10, 9, 8],
+        { red: false, yellow: false, green: false, blue: false },
+      ],
+    ])(
+      "Can't lock %s row if row's final number hasn't been marked",
+      (row, numbers, expected) => {
+        numbers.forEach((num) => testGameCard.markNumbers(row, num));
+
+        const res = testGameCard.lockRow(row);
+        expect(res).toEqual({
+          success: false,
+          errorMessage: "Didn't satisfy conditions to lock a row.",
+        });
+
         const lockedRows = testGameCard.isLocked;
         expect(lockedRows).toEqual(expected);
-      });
+      }
+    );
 
-      test.each([
-        [
-          rowColour.Red,
-          [2, 3, 4, 5, 6],
-          { red: false, yellow: false, green: false, blue: false },
-        ],
-        [
-          rowColour.Yellow,
-          [2, 3, 4, 5, 6],
-          { red: false, yellow: false, green: false, blue: false },
-        ],
-        [
-          rowColour.Green,
-          [12, 11, 10, 9, 8],
-          { red: false, yellow: false, green: false, blue: false },
-        ],
-        [
-          rowColour.Blue,
-          [12, 11, 10, 9, 8],
-          { red: false, yellow: false, green: false, blue: false },
-        ],
-      ])(
-        "Can't lock %s row if row's final number hasn't been marked",
-        (row, numbers, expected) => {
-          numbers.forEach((num) => testGameCard.markNumbers(row, num));
+    test("Can normalise rows", () => {
+      testGameCard.normaliseRows([rowColour.Red, rowColour.Blue]);
 
-          const res = testGameCard.lockRow(row);
-          expect(res).toEqual({
-            success: false,
-            errorMessage: "Didn't satisfy conditions to lock a row.",
-          });
-
-          const lockedRows = testGameCard.isLocked;
-          expect(lockedRows).toEqual(expected);
-        }
-      );
-
-      test("Can normalise rows", () => {
-        testGameCard.normaliseRows([rowColour.Red, rowColour.Blue]);
-
-        const lockedRows = testGameCard.isLocked;
-        expect(lockedRows).toEqual({
-          red: true,
-          yellow: false,
-          green: false,
-          blue: true,
-        });
+      const lockedRows = testGameCard.isLocked;
+      expect(lockedRows).toEqual({
+        red: true,
+        yellow: false,
+        green: false,
+        blue: true,
       });
     });
   });
 
-  it.only("can calculate the score with a single marked number", () => {
-    testGameCard.markNumbers(rowColour.Red, 2)
-    const res = testGameCard.calculateScore()
-    expect(res).toEqual(1)
-  })
+  it("can calculate the score with a single marked number", () => {
+    testGameCard.markNumbers(rowColour.Red, 2);
+    const res = testGameCard.calculateScore();
+    expect(res).toEqual(1);
+  });
 
-  it.only("can calculate the score with a two marked number", () => {
-    testGameCard.markNumbers(rowColour.Red, 2)
-    testGameCard.markNumbers(rowColour.Red, 3)
-    const res = testGameCard.calculateScore()
-    expect(res).toEqual(3)
-  })
+  it("can calculate the score with a two marked number", () => {
+    testGameCard.markNumbers(rowColour.Red, 2);
+    testGameCard.markNumbers(rowColour.Red, 3);
+    const res = testGameCard.calculateScore();
+    expect(res).toEqual(3);
+  });
 
-  it.only("can calculate the score including the 13th marked number", () => {
+  it("can calculate the score including the 13th marked number", () => {
     for (let i = 2; i < 14; i++) {
-      testGameCard.markNumbers(rowColour.Red, i)
+      testGameCard.markNumbers(rowColour.Red, i);
     }
-    const res = testGameCard.calculateScore()
-    expect(res).toEqual(78)
-  })
+    const res = testGameCard.calculateScore();
+    expect(res).toEqual(78);
+  });
 
-  it.only("can calculate the score of multiple rows", () => {
+  it("can calculate the score of multiple rows", () => {
     for (let i = 2; i < 13; i++) {
-      testGameCard.markNumbers(rowColour.Red, i)
+      testGameCard.markNumbers(rowColour.Red, i);
     }
     for (let i = 2; i < 13; i++) {
-      testGameCard.markNumbers(rowColour.Yellow, i)
+      testGameCard.markNumbers(rowColour.Yellow, i);
     }
     for (let i = 12; i > 1; i--) {
-      testGameCard.markNumbers(rowColour.Green, i)
+      testGameCard.markNumbers(rowColour.Green, i);
     }
     for (let i = 12; i > 1; i--) {
-      testGameCard.markNumbers(rowColour.Blue, i)
+      testGameCard.markNumbers(rowColour.Blue, i);
     }
 
-    const res = testGameCard.calculateScore()
-    expect(res).toEqual(264)
-  })
+    const res = testGameCard.calculateScore();
+    expect(res).toEqual(264);
+  });
 
-  it.only("calculates the total score while factoring 1 penalty", () => {
+  it("calculates the total score while factoring 1 penalty", () => {
     for (let i = 2; i < 14; i++) {
-      testGameCard.markNumbers(rowColour.Red, i)
+      testGameCard.markNumbers(rowColour.Red, i);
     }
 
-    testGameCard.addPenalty()
-    const res = testGameCard.calculateScore()
-    expect(res).toEqual(73)
-  })
+    testGameCard.addPenalty();
+    const res = testGameCard.calculateScore();
+    expect(res).toEqual(73);
+  });
 
-  it.only("calculates the total score while factoring 2 penalties", () => {
+  it("calculates the total score while factoring 2 penalties", () => {
     for (let i = 2; i < 14; i++) {
-      testGameCard.markNumbers(rowColour.Red, i)
+      testGameCard.markNumbers(rowColour.Red, i);
     }
 
-    testGameCard.addPenalty()
-    testGameCard.addPenalty()
-    const res = testGameCard.calculateScore()
-    expect(res).toEqual(68)
-  })
+    testGameCard.addPenalty();
+    testGameCard.addPenalty();
+    const res = testGameCard.calculateScore();
+    expect(res).toEqual(68);
+  });
 });
