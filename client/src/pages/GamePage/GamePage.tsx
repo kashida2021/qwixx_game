@@ -44,6 +44,9 @@ export const Game: React.FC<IGameProps> = ({
     setPlayerChoice({ row: rowColour, num });
   };
 
+  useEffect(() => {
+    setSubmissionCount(0);
+  }, [gameState.activePlayer]);
   //  useEffect(() => {
   //    console.log(playerChoice);
   //  }, [playerChoice]);
@@ -100,6 +103,7 @@ export const Game: React.FC<IGameProps> = ({
   console.log("active player:", activePlayer)
   console.log("has rolled:", hasRolled)
   console.log("player has moves:", hasAvailableMoves);
+  console.log("player submission count", submissionCount);
 
 
   return (
