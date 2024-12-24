@@ -88,10 +88,12 @@ describe("Base Game Card test", () => {
     });
   });
 
-  it("can add penalty to game card", () => {
-    testGameCard.addPenalty();
-    const penalties = testGameCard.penalties;
-    expect(penalties).toEqual([1]);
+  describe("Penalties", () => {
+    it("can add penalty to game card", () => {
+      testGameCard.addPenalty();
+      const penalties = testGameCard.penalties;
+      expect(penalties).toEqual([1]);
+    });
   });
 
   describe("Marking last number in a row", () => {
@@ -242,63 +244,65 @@ describe("Base Game Card test", () => {
     });
   });
 
-  it("can calculate the score with a single marked number", () => {
-    testGameCard.markNumbers(rowColour.Red, 2);
-    const res = testGameCard.calculateScore();
-    expect(res).toEqual(1);
-  });
+  describe("Calculate Score", () => {
+    it("can calculate the score with a single marked number", () => {
+      testGameCard.markNumbers(rowColour.Red, 2);
+      const res = testGameCard.calculateScore();
+      expect(res).toEqual(1);
+    });
 
-  it("can calculate the score with a two marked number", () => {
-    testGameCard.markNumbers(rowColour.Red, 2);
-    testGameCard.markNumbers(rowColour.Red, 3);
-    const res = testGameCard.calculateScore();
-    expect(res).toEqual(3);
-  });
+    it("can calculate the score with a two marked number", () => {
+      testGameCard.markNumbers(rowColour.Red, 2);
+      testGameCard.markNumbers(rowColour.Red, 3);
+      const res = testGameCard.calculateScore();
+      expect(res).toEqual(3);
+    });
 
-  it("can calculate the score including the 13th marked number", () => {
-    for (let i = 2; i < 14; i++) {
-      testGameCard.markNumbers(rowColour.Red, i);
-    }
-    const res = testGameCard.calculateScore();
-    expect(res).toEqual(78);
-  });
+    it("can calculate the score including the 13th marked number", () => {
+      for (let i = 2; i < 14; i++) {
+        testGameCard.markNumbers(rowColour.Red, i);
+      }
+      const res = testGameCard.calculateScore();
+      expect(res).toEqual(78);
+    });
 
-  it("can calculate the score of multiple rows", () => {
-    for (let i = 2; i < 13; i++) {
-      testGameCard.markNumbers(rowColour.Red, i);
-    }
-    for (let i = 2; i < 13; i++) {
-      testGameCard.markNumbers(rowColour.Yellow, i);
-    }
-    for (let i = 12; i > 1; i--) {
-      testGameCard.markNumbers(rowColour.Green, i);
-    }
-    for (let i = 12; i > 1; i--) {
-      testGameCard.markNumbers(rowColour.Blue, i);
-    }
+    it("can calculate the score of multiple rows", () => {
+      for (let i = 2; i < 13; i++) {
+        testGameCard.markNumbers(rowColour.Red, i);
+      }
+      for (let i = 2; i < 13; i++) {
+        testGameCard.markNumbers(rowColour.Yellow, i);
+      }
+      for (let i = 12; i > 1; i--) {
+        testGameCard.markNumbers(rowColour.Green, i);
+      }
+      for (let i = 12; i > 1; i--) {
+        testGameCard.markNumbers(rowColour.Blue, i);
+      }
 
-    const res = testGameCard.calculateScore();
-    expect(res).toEqual(264);
-  });
+      const res = testGameCard.calculateScore();
+      expect(res).toEqual(264);
+    });
 
-  it("calculates the total score while factoring 1 penalty", () => {
-    for (let i = 2; i < 14; i++) {
-      testGameCard.markNumbers(rowColour.Red, i);
-    }
+    it("calculates the total score while factoring 1 penalty", () => {
+      for (let i = 2; i < 14; i++) {
+        testGameCard.markNumbers(rowColour.Red, i);
+      }
 
-    testGameCard.addPenalty();
-    const res = testGameCard.calculateScore();
-    expect(res).toEqual(73);
-  });
+      testGameCard.addPenalty();
+      const res = testGameCard.calculateScore();
+      expect(res).toEqual(73);
+    });
 
-  it("calculates the total score while factoring 2 penalties", () => {
-    for (let i = 2; i < 14; i++) {
-      testGameCard.markNumbers(rowColour.Red, i);
-    }
+    it("calculates the total score while factoring 2 penalties", () => {
+      for (let i = 2; i < 14; i++) {
+        testGameCard.markNumbers(rowColour.Red, i);
+      }
 
-    testGameCard.addPenalty();
-    testGameCard.addPenalty();
-    const res = testGameCard.calculateScore();
-    expect(res).toEqual(68);
+      testGameCard.addPenalty();
+      testGameCard.addPenalty();
+      const res = testGameCard.calculateScore();
+      expect(res).toEqual(68);
+    });
   });
 });
