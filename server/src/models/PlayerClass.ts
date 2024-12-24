@@ -8,10 +8,10 @@ interface MarkNumberSuccess {
 
 interface MarkNumberFailure {
   success: false;
-  errorMessage: string
+  errorMessage: string;
 }
 
-type MarkNumberResult = MarkNumberSuccess | MarkNumberFailure
+type MarkNumberResult = MarkNumberSuccess | MarkNumberFailure;
 
 export interface SerializePlayer {
   gameCard: SerializeGameCard;
@@ -60,11 +60,15 @@ export default class Player {
     const res = this.gameCard.markNumbers(colour, num);
 
     if (!res.success) {
-      return { success: res.success, errorMessage: res.errorMessage }
+      return { success: res.success, errorMessage: res.errorMessage };
     }
 
     this._submissionCount++;
     return { success: true };
+  }
+
+  public passMove() {
+    this._submissionCount++;
   }
 
   serialize(): SerializePlayer {

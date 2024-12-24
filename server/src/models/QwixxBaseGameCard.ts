@@ -4,12 +4,16 @@ interface MarkNumbersSuccess {
   success: true;
 }
 
-interface MarkNumbersFailre {
+interface MarkNumbersFailure {
   success: false;
   errorMessage: string;
 }
 
-type MarkNumbersResult = MarkNumbersSuccess | MarkNumbersFailre
+type MarkNumbersResult = MarkNumbersSuccess | MarkNumbersFailure
+type IsValidMoveResult = MarkNumbersSuccess | MarkNumbersFailure
+type LockRowResult =
+  | { success: true; lockedRow: rowColour }
+  | { success: false; errorMessage: string }
 
 type RowValues = Record<rowColour, number[]>
 type RowLocks = Record<rowColour, boolean>
@@ -66,19 +70,55 @@ export default class qwixxBaseGameCard {
     this._rows[row].push(number)
   }
 
+  public normaliseRows(rows: rowColour[]) {
+    //    this._isLocked[row] = true
+    rows.forEach(row => this._isLocked[row] = true)
+  }
+
+  public lockRow(row: rowColour): LockRowResult {
+    if (row === rowColour.Red || row === rowColour.Yellow) {
+      if (this._rows[row].length < 6 && this.getHighestMarkedNumber(row) !== 12) {
+        return { success: false, errorMessage: "Didn't satisfy conditions to lock a row." }
+      }
+      this.addNumberToRow(row, 13)
+    }
+
+    if (row === rowColour.Green || row === rowColour.Blue) {
+      if (this._rows[row].length < 6 && this.getLowestMarkedNumber(row) !== 2) {
+        return { success: false, errorMessage: "Didn't satisfy conditions to lock a row." }
+      }
+      this.addNumberToRow(row, 1)
+    }
+
+    this._isLocked[row] = true
+    return { success: true, lockedRow: row }
+  }
+
   public markNumbers(row: rowColour, number: number): MarkNumbersResult {
     if (this._rows[row].includes(number)) {
       return { success: false, errorMessage: `Number ${number} is already marked in ${row} row.` }
     }
 
-    if (!this.isValidMove(row, number)) {
-      return {
-        success: false, errorMessage:
-          "Invalid move. Number is not higher/lower than previous marked number"
-      }
+    //if (!this.isValidMove(row, number)) {
+    //  return {
+    //    success: false, errorMessage:
+    //      "Invalid move. Number is not higher/lower than previous marked number"
+    //  }
+    //}
+
+    // TODO: Is it better to move this check into 'isValidMove'?
+    if (this.isLocked[row]) {
+      return { success: false, errorMessage: `${row} row is already locked.` }
+    }
+
+    const res = this.isValidMove(row, number)
+
+    if (!res.success) {
+      return { success: res.success, errorMessage: res.errorMessage }
     }
 
     this.addNumberToRow(row, number)
+
     return { success: true }
 
     //    this._rows[row].push(number)
@@ -117,15 +157,44 @@ export default class qwixxBaseGameCard {
 
   // TODO: Better error handling for when colour is invalid.
   // It should already be validated in QwixxLogic but it is also being handled here.
-  private isValidMove(colour: rowColour, num: number): boolean {
+  private isValidMove(colour: rowColour, num: number): IsValidMoveResult {
     if (colour === rowColour.Red || colour === rowColour.Yellow) {
-      return this.getHighestMarkedNumber(colour) < num;
+      if (num < 12 && this.getHighestMarkedNumber(colour) > num) {
+        //return this.getHighestMarkedNumber(colour) < num;
+        return {
+          success: false,
+          errorMessage:
+            "Invalid move. Number is not greater than previous marked number"
+        }
+      }
+      if (num === 12 && this.MarkedNumbers[colour].length < 5) {
+        //return this.MarkedNumbers[colour].length >= 5
+        return {
+          success: false,
+          errorMessage:
+            "Number 12 can't be marked. 5 lower values numbers haven't been marked yet"
+        }
+      }
     }
 
     if (colour === rowColour.Blue || colour === rowColour.Green) {
-      return this.getLowestMarkedNumber(colour) > num;
+      //      return this.getLowestMarkedNumber(colour) > num;
+      if (num > 2 && this.getLowestMarkedNumber(colour) < num) {
+        return {
+          success: false,
+          errorMessage:
+            "Invalid move. Number is not less than previous marked number"
+        }
+      }
+      if (num === 2 && this.MarkedNumbers[colour].length! < 5) {
+        return {
+          success: false,
+          errorMessage:
+            "Number 2 can't be marked. 5 higher values numbers haven't been marked yet"
+        }
+      }
     }
-    return false;
+    return { success: true };
   }
 
   // TODO: Doesn't check valid moves for white1 + white2
@@ -143,5 +212,22 @@ export default class qwixxBaseGameCard {
       }
     }
     return false;
+  }
+
+  public calculateScore(): number {
+    // NOTE: Would it be more scalable if this multiplier was a part of the constructor? 
+    const multiplier = [0, 1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 66, 78]
+
+    const score = Object.values(this.MarkedNumbers).reduce((score, row) => score + multiplier[row.length], 0)
+
+    const penalties = this.calculatePenalties()
+
+    return score - penalties
+  }
+
+  private calculatePenalties(): number {
+    const multiplier = 5
+    const penalties = this.penalties.at(-1) || 0
+    return multiplier * penalties
   }
 }

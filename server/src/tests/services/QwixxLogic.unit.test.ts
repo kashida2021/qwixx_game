@@ -36,7 +36,7 @@ jest.spyOn(fakeDice, "validColouredNumbers", "get").mockReturnValue({
   [DiceColour.Blue]: [10, 10],
 });
 
-jest.spyOn(fakeDice, "whiteDiceSum", "get").mockReturnValue(10)
+jest.spyOn(fakeDice, "whiteDiceSum", "get").mockReturnValue(10);
 
 // TODO: This might no longer be necessary
 jest
@@ -68,7 +68,7 @@ describe("Qwixx Logic tests", () => {
     it("should call the markNumber method with correct args", () => {
       const testGame = new QwixxLogic(playersArrayMock, fakeDice);
       testGame.rollDice();
-      console.log(testGame.makeMove("player1", "red", 10));
+      testGame.makeMove("player1", "red", 10);
 
       expect(player1Mock.markNumber).toHaveBeenCalledWith("red", 10);
       expect(player1Mock.markNumber).toHaveBeenCalledTimes(1);
@@ -88,10 +88,12 @@ describe("Qwixx Logic tests", () => {
 
       testGame.rollDice();
 
-      const res = testGame.makeMove("player2", "red", 9)
+      const res = testGame.makeMove("player2", "red", 9);
       if (!res.success) {
-        expect(res.success).toBeFalsy()
-        expect(res.error).toEqual("Number selected doesn't equal to sum of white dice.")
+        expect(res.success).toBeFalsy();
+        expect(res.error).toEqual(
+          "Number selected doesn't equal to sum of white dice."
+        );
       }
     });
 
@@ -109,10 +111,12 @@ describe("Qwixx Logic tests", () => {
       const testGame = new QwixxLogic(playersArrayMock, fakeDice);
       testGame.rollDice();
 
-      const res = testGame.makeMove("player1", "red", 9)
+      const res = testGame.makeMove("player1", "red", 9);
       if (!res.success) {
-        expect(res.success).toBeFalsy()
-        expect(res.error).toEqual("Number selected doesn't equal to sum of white dice.")
+        expect(res.success).toBeFalsy();
+        expect(res.error).toEqual(
+          "Number selected doesn't equal to sum of white dice."
+        );
       }
     });
 
@@ -129,12 +133,12 @@ describe("Qwixx Logic tests", () => {
 
         testGame.rollDice();
 
-        const res = testGame.makeMove("player1", row, num)
+        const res = testGame.makeMove("player1", row, num);
         if (!res.success) {
-          expect(res.success).toBeFalsy()
+          expect(res.success).toBeFalsy();
           expect(res.error).toEqual(
             "Number selected doesn't equal to sum of white die and coloured die."
-          )
+          );
         }
       }
     );
@@ -159,67 +163,7 @@ describe("Qwixx Logic tests", () => {
         );
       }
     );
-
-    test.skip("active-player marking a number that equals the sum of a white dice but lower than highest marked red row will throw an error", () => {
-
-      // TODO: Explain why this is no longer applicable and how to test it.
-      // We just mock the return value of markNumber without having to write complicated mock implementations.
-      // We just test the behaviour of what happens inside of Qwixx Logic by reducing coupling.
-
-      //      const originalImplementation = gameCardMock1.getHighestMarkedNumber;
-      //
-      //      jest
-      //        .spyOn(gameCardMock1, "getHighestMarkedNumber")
-      //        .mockImplementation((row) => {
-      //          if (row === "red") return 11;
-      //          if (row === "yellow") return 8;
-      //          if (row === "green") return 8;
-      //          if (row === "blue") return 8;
-      //          return 2;
-      //        });
-
-      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
-      testGame.rollDice();
-
-      expect(() => {
-        testGame.makeMove("player1", "red", 10);
-      }).toThrow("Number must be above the last marked number");
-
-      // TODO: Explain why this isn't necessary
-
-      //      jest
-      //        .spyOn(gameCardMock1, "getHighestMarkedNumber")
-      //        .mockImplementation(originalImplementation);
-    });
-
-    // TODO: I think this test is no longer necessary as it can be tested inside of game card
-    test.skip("should throw error when trying to mark blue 10, if gamecard has no valid moves", () => {
-      jest
-        .spyOn(gameCardMock1, "getHighestMarkedNumber")
-        .mockImplementation((row) => {
-          if (row === "red" || row === "yellow") return 11;
-          return 10;
-        });
-
-      jest
-        .spyOn(gameCardMock1, "getLowestMarkedNumber")
-        .mockImplementation((row) => {
-          if (row === "green" || row === "blue") return 6;
-          return 4;
-        });
-
-      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
-      testGame.rollDice();
-      //const isMoveAvailable = testGame.validMoveAvailable();
-
-      expect(() => {
-        testGame.makeMove("player1", "blue", 10);
-      }).toThrow("Number must be below the last marked number");
-
-      //expect(isMoveAvailable["player1"]).toBe(false);
-      //expect(isMoveAvailable["player2"]).toBe(true);
-    });
-  })
+  });
 
   describe("rollDice method tests", () => {
     test("moveAvailability should return true if gameCard is empty", () => {
@@ -229,7 +173,7 @@ describe("Qwixx Logic tests", () => {
       jest.spyOn(gameCardMock1, "hasAvailableMoves").mockReturnValueOnce(true);
       expect(res.hasAvailableMoves).toBeTruthy();
     });
-  })
+  });
 
   describe("processPenalthy method tests", () => {
     it("should add a penalty to the player and mark them as submitted", () => {
@@ -253,34 +197,107 @@ describe("Qwixx Logic tests", () => {
     it("should add a penalty to the players gamecard", () => {
       const testGame = new QwixxLogic(playersArrayMock, fakeDice);
 
-      // TODO: explain why this test isn't applicable in this unit test
-
-      //      const serializedData = {
-      //        gamecard: {
-      //          rows: {
-      //            red: [],
-      //            yellow: [],
-      //            green: [],
-      //            blue: [],
-      //          },
-      //          isLocked: {
-      //            red: false,
-      //            yellow: false,
-      //            green: false,
-      //            blue: false,
-      //          },
-      //          penalties: [1],
-      //        },
-      //        hasSubmittedChoice: false,
-      //      };
-
-      // jest.spyOn(player1Mock, "serialize").mockReturnValue(serializedData);
-
       const addPenaltySpy = jest.spyOn(player1Mock.gameCard, "addPenalty");
       testGame.processPenalty("player1");
 
       expect(addPenaltySpy).toHaveBeenCalled();
-      //expect(player1Mock.serialize()).toEqual(serializedData);
     });
   });
+
+  describe("endTurn method tests", () => {
+    test("Can't end a turn if a dice hasn't been rolled", () => {
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
+      const res = testGame.endTurn("player1");
+
+      expect(res.success).toBeFalsy();
+      expect(res.errorMessage).toBe("Dice hasn't been rolled yet.");
+    });
+
+    test("should throw an error if player not found", () => {
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
+      testGame.rollDice();
+      expect(() => testGame.endTurn("player3")).toThrow("Player not found.");
+    });
+  });
+
+  describe("passMove method tests", () => {
+    test("Can't pass turn if a dice hasn't been rolled", () => {
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
+      const res = testGame.passMove("player1");
+
+      expect(res.isValid).toBeFalsy();
+
+      if (!res.isValid) {
+        expect(res.errorMessage).toBe("Dice hasn't been rolled yet.");
+      }
+    });
+
+    test("should throw an error if player not found", () => {
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
+      testGame.rollDice();
+      expect(() => testGame.passMove("player3")).toThrow("Player not found.");
+    });
+
+    test("passMove method should be called if valid", () => {
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
+      console.log("submission count before:", player1Mock.submissionCount);
+
+      jest.spyOn(player1Mock, "submissionCount", "get").mockReturnValue(0);
+
+      if (player1Mock) {
+        jest.spyOn(player1Mock, "passMove");
+      }
+
+      testGame.rollDice();
+      console.log(
+        "expect submission count to be 0",
+        player1Mock.submissionCount
+      );
+      const res = testGame.passMove("player1");
+      console.log(
+        "submission count should be increased after passMove",
+        player1Mock.submissionCount
+      );
+      expect(player1Mock.passMove).toHaveBeenCalled();
+      expect(res.isValid).toBeTruthy();
+    });
+  });
+
+  // TODO: This should be combined with the game end phase test.
+  describe("Calculate all players' score", () => {
+    it("Can get back all players' score", () => {
+      gameCardMock1.calculateScore = jest.fn().mockReturnValueOnce(73)
+      gameCardMock2.calculateScore = jest.fn().mockReturnValueOnce(68)
+
+      const expected = {
+        player1: 73,
+        player2: 68,
+      }
+
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice)
+      const res = testGame.calculateScores()
+
+      expect(res).toEqual(expected)
+    })
+
+    it("Can determine the winner", () => {
+      gameCardMock1.calculateScore = jest.fn().mockReturnValueOnce(73)
+      gameCardMock2.calculateScore = jest.fn().mockReturnValueOnce(68)
+
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice)
+      const res = testGame.determineWinner()
+
+      expect(res).toEqual(["player1"])
+    })
+
+    it("Can determine multiple winners", () => {
+      gameCardMock1.calculateScore = jest.fn().mockReturnValueOnce(73)
+      gameCardMock2.calculateScore = jest.fn().mockReturnValueOnce(73)
+
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice)
+      const res = testGame.determineWinner()
+
+      expect(res).toEqual(["player1", "player2"])
+    })
+  })
 });

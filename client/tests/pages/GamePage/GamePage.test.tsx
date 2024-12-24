@@ -7,77 +7,10 @@ import "@testing-library/jest-dom";
 // import { MemoryRouter } from "react-router-dom";
 import { socket } from "../../../src/services/socketServices";
 //const user = userEvent.setup();
+import { initialGameState, hasRolledGameState, user1HasSubmittedState } from "./__fixtures__/gameStates";
 
 const lobbyIdMock = "1234";
 const membersArrayMock = ["testUser1", "testUser2", "testUser3"];
-const gameState = {
-  players: {
-    testUser1: {
-      gameCard: {
-        rows: {
-          red: [],
-          yellow: [],
-          green: [],
-          blue: [],
-        },
-        isLocked: {
-          red: false,
-          yellow: false,
-          green: false,
-          blue: false,
-        },
-        penalties: [],
-      },
-      hasSubmittedChoice: false,
-    },
-    testUser2: {
-      gameCard: {
-        rows: {
-          red: [],
-          yellow: [],
-          green: [],
-          blue: [],
-        },
-        isLocked: {
-          red: false,
-          yellow: false,
-          green: false,
-          blue: false,
-        },
-        penalties: [],
-      },
-      hasSubmittedChoice: false,
-    },
-    testUser3: {
-      gameCard: {
-        rows: {
-          red: [],
-          yellow: [],
-          green: [],
-          blue: [],
-        },
-        isLocked: {
-          red: false,
-          yellow: false,
-          green: false,
-          blue: false,
-        },
-        penalties: [],
-      },
-      hasSubmittedChoice: false,
-    },
-  },
-  dice: {
-    white1: 1,
-    white2: 2,
-    red: 3,
-    yellow: 4,
-    green: 5,
-    blue: 6,
-  },
-  activePlayer: "testUser1",
-  hasRolled: true,
-};
 
 describe("Game Page Unit Test:", () => {
   it("renders the page", () => {
@@ -87,7 +20,7 @@ describe("Game Page Unit Test:", () => {
         userId={"testUser1"}
         members={membersArrayMock}
         lobbyId={lobbyIdMock}
-        gameState={gameState}
+        gameState={hasRolledGameState}
         availableMoves={true}
       />
     );
@@ -103,13 +36,114 @@ describe("Game Page Unit Test:", () => {
     expect(user3).toBeVisible();
 
     const opponentZone = screen.getByLabelText("opponent-zone");
-    const opponentGameCards = opponentZone.querySelectorAll(".game-card");
+    const opponentGameCards = opponentZone.querySelectorAll(".qwixx-card");
     expect(opponentGameCards.length).toBe(2);
 
     const playerZone = screen.getByLabelText("player-zone")
-    const playerGameCard = playerZone.querySelectorAll(".game-card");
+    const playerGameCard = playerZone.querySelectorAll(".qwixx-card");
     expect(playerGameCard.length).toBe(1);
   });
+
+  test("end turn button should be enabled when dice has been rolled", () => {
+    render(
+      <GamePage
+        socket={socket}
+        userId={"testUser1"}
+        members={membersArrayMock}
+        lobbyId={lobbyIdMock}
+        gameState={hasRolledGameState}
+        availableMoves={true}
+      />
+    );
+
+    const endTurnBtn = screen.getByText("End Turn")
+    expect(endTurnBtn).toBeVisible()
+    expect(endTurnBtn).not.toBeDisabled()
+  })
+
+  test("end turn button should be disabled when dice hasn't been rolled", () => {
+    render(
+      <GamePage
+        socket={socket}
+        userId={"testUser1"}
+        members={membersArrayMock}
+        lobbyId={lobbyIdMock}
+        gameState={initialGameState}
+        availableMoves={true}
+      />
+    );
+
+    const endTurnBtn = screen.getByText("End Turn")
+    expect(endTurnBtn).toBeVisible()
+    expect(endTurnBtn).toBeDisabled()
+  })
+
+  test("end turn button should be disabled if player has finished their turn", () => {
+    render(
+      <GamePage
+        socket={socket}
+        userId={"testUser1"}
+        members={membersArrayMock}
+        lobbyId={lobbyIdMock}
+        gameState={user1HasSubmittedState}
+        availableMoves={true}
+      />
+    );
+
+    const endTurnBtn = screen.getByText("End Turn")
+    expect(endTurnBtn).toBeVisible()
+    expect(endTurnBtn).toBeDisabled()
+  })
+
+  test("passMove button should be disabled if dice has not been rolled", ()=> {
+    render(
+      <GamePage
+        socket={socket}
+        userId={"testUser1"}
+        members={membersArrayMock}
+        lobbyId={lobbyIdMock}
+        gameState={initialGameState}
+        availableMoves={true}
+      />
+    )
+    const passMoveBtn = screen.getByText("Pass Move");
+    expect(passMoveBtn).toBeVisible();
+    expect(passMoveBtn).toBeDisabled();
+  })
+
+  test("passMove btn should be disabled if player has ended turn", ()=> {
+    render(
+      <GamePage
+        socket={socket}
+        userId={"testUser1"}
+        members={membersArrayMock}
+        lobbyId={lobbyIdMock}
+        gameState={user1HasSubmittedState}
+        availableMoves={false}
+      />
+      )
+      const passMoveBtn = screen.getByText("Pass Move");
+      expect(passMoveBtn).toBeVisible();
+      expect(passMoveBtn).toBeDisabled();
+    
+  })
+
+  test("passMoveBtn should be disabled if not active player", ()=> {
+      render(
+        <GamePage
+          socket={socket}
+          userId={"testUser2"}
+          members={membersArrayMock}
+          lobbyId={lobbyIdMock}
+          gameState={user1HasSubmittedState}
+          availableMoves={true}
+        />
+      )
+
+      const passMoveBtn = screen.getByText("Pass Move");
+      expect(passMoveBtn).toBeVisible();
+      expect(passMoveBtn).toBeDisabled();
+  })
 
   test("confirm button should render if there is an available move", () => {
     render(
@@ -118,7 +152,7 @@ describe("Game Page Unit Test:", () => {
         userId={"testUser1"}
         members={membersArrayMock}
         lobbyId={lobbyIdMock}
-        gameState={gameState}
+        gameState={hasRolledGameState}
         availableMoves={true}
       />
     );
@@ -134,7 +168,7 @@ describe("Game Page Unit Test:", () => {
         userId={"testUser1"}
         members={membersArrayMock}
         lobbyId={lobbyIdMock}
-        gameState={gameState}
+        gameState={hasRolledGameState}
         availableMoves={false}
       />
     );

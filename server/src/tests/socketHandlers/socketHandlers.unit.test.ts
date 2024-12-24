@@ -295,18 +295,24 @@ describe("socket event handler test", () => {
 
         await new Promise<void>((resolve) => {
           clientSocket2.on("dice_rolled", () => {
-            clientSocket2.emit("mark_numbers", {
-              lobbyId: "1234",
-              userId: "clientSocket2",
-              playerChoice: { row: "red", num: 10 },
-            });
+            clientSocket2.emit(
+              "mark_numbers",
+              {
+                lobbyId: "1234",
+                userId: "clientSocket2",
+                playerChoice: { row: "red", num: 10 },
+              },
+              (success: boolean) => {
+                expect(success).toBe(true);
+              }
+            );
             resolve();
           });
         });
 
         const updatedGameState: any = await waitFor(
           clientSocket2,
-          "update_markedNumbers"
+          "update_marked_numbers"
         );
 
         const player2 = updatedGameState.gameState.players.clientSocket2;

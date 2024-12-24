@@ -8,6 +8,7 @@ import { QwixxLogic } from "../../types/qwixxLogic";
 // import { SetStateAction, Dispatch } from "react";
 // import { rowColour} from "../../../../shared/types";
 import DiceContainer from "../../components/Dice/DiceContainer";
+import ScoreGuideTable from "../../components/ScoreGuideTable/ScoreGuideTable";
 import { MoveAvailability } from "../../types/GameCardData";
 //interface GameState {
 //players: {
@@ -37,14 +38,15 @@ export const Game: React.FC<IGameProps> = ({
     row: string;
     num: number;
   } | null>(null);
-
-  const handleCellClick = (rowColour: string, num: number) => {
-    setPlayerChoice({ row: rowColour, num });
-  };
+  
+  const [submissionCount, setSubmissionCount] = useState<number>(0);
 
   useEffect(() => {
-    console.log(playerChoice);
-  }, [playerChoice]);
+    setSubmissionCount(0);
+  }, [gameState.activePlayer]);
+  //  useEffect(() => {
+  //    console.log(playerChoice);
+  //  }, [playerChoice]);
   // if(!gameState){
   //     return <div>Loading...</div>;
   // }
@@ -64,22 +66,46 @@ export const Game: React.FC<IGameProps> = ({
   //     setGameBoardState(gameBoardState);
   // }
   const filteredMembers = members.filter((member) => member !== userId);
-
-  const handleNumberSelection = () => {
-    socket.emit("mark_numbers", { lobbyId, userId, playerChoice });
-    console.log("player's choice:", playerChoice);
-  }
-
-  const handlePenalty = () => {
-    socket.emit("submit_penalty", { userId, lobbyId });
-  }
-
   const hasSubmitted = gameState.players[userId].hasSubmittedChoice;
   const hasAvailableMoves = availableMoves;
   const hasRolled = gameState.hasRolled;
   const activePlayer = gameState.activePlayer;
 
   console.log("player has moves:", hasAvailableMoves);
+
+  const handleCellClick = (rowColour: string, num: number) => {
+    setPlayerChoice({ row: rowColour, num });
+  };
+
+  const handleNumberSelection = () => {
+    socket.emit("mark_numbers", { lobbyId, userId, playerChoice }, (isSuccessful: boolean) => {
+      if(isSuccessful){
+        setSubmissionCount((prev) => prev + 1);
+      } else {
+        console.log("move not successful");
+      }
+    });
+    //console.log("player's choice:", playerChoice);
+  }
+
+  const handlePenalty = () => {
+    socket.emit("submit_penalty", { userId, lobbyId });
+  }
+
+  const handlePassMove = () => {
+    socket.emit("pass_move", {lobbyId, userId});
+    setSubmissionCount((prev) => prev + 1);
+  }
+
+  const handleEndTurn = () => {
+    socket.emit("end_turn", { lobbyId, userId })
+    setSubmissionCount(0);
+  }
+
+  const handleLockRow = (rowColour: string) => {
+    socket.emit("lock_row", { userId, lobbyId, rowColour })
+  }
+
 
 
   return (
@@ -109,6 +135,7 @@ export const Game: React.FC<IGameProps> = ({
               isOpponent={true}
               gameCardData={gameState.players[member].gameCard}
               cellClick={handleCellClick}
+              handleLockRow={handleLockRow}
             />
           ))}
         </div>
@@ -119,12 +146,18 @@ export const Game: React.FC<IGameProps> = ({
             isOpponent={false}
             gameCardData={gameState.players[userId].gameCard}
             cellClick={handleCellClick}
+            handleLockRow={handleLockRow}
           />
-          {!hasAvailableMoves && !hasSubmitted && hasRolled && activePlayer ? (
+          <ScoreGuideTable />
+          {!hasAvailableMoves && !hasSubmitted && hasRolled && activePlayer === userId ? (
             <button className="penalty-btn" onClick={handlePenalty}>Accept Penalty</button>
           ) :
             (<button onClick={handleNumberSelection} disabled={hasSubmitted}>Confirm</button>)
           }
+          {/* For ending a turn even if there are available moves */}
+          <button className="" onClick={handleEndTurn} disabled={hasSubmitted || !hasRolled}>End Turn</button>          
+          {/* Possibly need to update structure of data sent back from backend to include submission count to disable button on 2nd choice rather than hasSubmitted */}
+          <button className="" onClick={handlePassMove} disabled={hasSubmitted || !hasRolled || activePlayer !== userId || submissionCount > 0  }>Pass Move</button>
 
         </div>
       </div>

@@ -3,6 +3,7 @@ import Dice from "../models/DiceClass";
 import { rowColour } from "../enums/rowColours";
 import { SerializePlayer } from "../models/PlayerClass";
 import { TDiceValues } from "../models/DiceClass";
+import { DiceColour } from "../enums/DiceColours";
 
 interface rollDiceResults {
   hasRolled: boolean;
@@ -16,10 +17,10 @@ interface MoveValidationSuccess {
 
 interface MoveValidationFailure {
   isValid: false;
-  errorMessage: string
+  errorMessage: string;
 }
 
-type ValidationResult = MoveValidationSuccess | MoveValidationFailure
+type ValidationResult = MoveValidationSuccess | MoveValidationFailure;
 
 interface SerializedGameState {
   players: Record<string, SerializePlayer>;
@@ -28,21 +29,31 @@ interface SerializedGameState {
   hasRolled: boolean;
 }
 
+type PassMoveResult =
+  | { isValid: true; data: SerializedGameState }
+  | { isValid: false; errorMessage: string };
+
 type MakeMoveResult =
   | { success: true; data: SerializedGameState }
-  | { success: false; error: string }
+  | { success: false; error: string };
+
+type LockRowResult =
+  | { success: true; data: SerializedGameState }
+  | { success: false; errorMessage: string }
 
 export default class QwixxLogic {
   private _playersArray: Player[];
   private _dice: Dice;
   private _currentTurnIndex: number;
   private _hasRolled: boolean;
+  private _lockedRows: rowColour[]
 
   constructor(players: Player[], dice: Dice) {
     this._playersArray = players;
     this._dice = dice;
     this._currentTurnIndex = 0;
     this._hasRolled = false;
+    this._lockedRows = []
   }
 
   public rollDice(): rollDiceResults {
@@ -67,8 +78,7 @@ export default class QwixxLogic {
     return this._playersArray.find((player) => player.name === playerName);
   }
 
-  //TOOD make it private
-  public get hasRolled() {
+  private get hasRolled() {
     return this._hasRolled;
   }
 
@@ -86,10 +96,36 @@ export default class QwixxLogic {
     return this._playersArray.every((player) => player.hasSubmittedChoice);
   }
 
+  private normaliseLockedRows() {
+    this._playersArray.forEach((player) => player.gameCard.normaliseRows(this._lockedRows))
+  }
+
   private processPlayersSubmission() {
     if (this.haveAllPlayersSubmitted()) {
       this.resetAllPlayersSubmission();
+
+      if (this._lockedRows) {
+        this.normaliseLockedRows();
+        this._lockedRows.forEach(row => {
+          const diceColour = this.getDiceColourFromLockedRow(row)
+          this._dice.disableDie(diceColour)
+        })
+      }
+
       this.nextTurn();
+    }
+  }
+
+  private getDiceColourFromLockedRow(row: rowColour): DiceColour {
+    switch (row) {
+      case rowColour.Red:
+        return DiceColour.Red;
+      case rowColour.Yellow:
+        return DiceColour.Yellow;
+      case rowColour.Green:
+        return DiceColour.Green;
+      case rowColour.Blue:
+        return DiceColour.Blue;
     }
   }
 
@@ -108,14 +144,47 @@ export default class QwixxLogic {
     }
   }
 
-  public makeMove(playerName: string, row: string, num: number): MakeMoveResult {
+  public passMove(playerName: string): PassMoveResult {
+    // Call Player Method add submission to player
+    const player = this.playerExistsInLobby(playerName);
+
+    if (!player) {
+      throw new Error("Player not found.");
+    }
+
+    if (!this.hasRolled) {
+      return { isValid: false, errorMessage: "Dice hasn't been rolled yet." };
+    }
+    // Check if active player
+    if (player !== this.activePlayer) {
+      return {
+        isValid: false,
+        errorMessage: "Unable to pass if not active player.",
+      };
+    }
+
+    // Check submission count is 0
+    if (player?.submissionCount === 1) {
+      return { isValid: false, errorMessage: "Cannot pass on second choice." };
+    }
+
+    //add player method to update submission count for passmove
+    player.passMove();
+    return { isValid: true, data: this.serialize() };
+  }
+
+  public makeMove(
+    playerName: string,
+    row: string,
+    num: number
+  ): MakeMoveResult {
     const colourToMark = this.getColourFromRow(row);
     const player = this.playerExistsInLobby(playerName);
     // Moved this check up to here and early return
     // Only throw error here because critical error and not game-rule violation
     if (!player) {
       //return { isValid: false, errorMessage: new Error("Player not found.") };
-      throw new Error("Player not found.")
+      throw new Error("Player not found.");
     }
 
     //Passed the player object to validateMove instead of playerName
@@ -124,7 +193,7 @@ export default class QwixxLogic {
     // returning an object literal because it is a game-rule violation
     if (!validationResult.isValid) {
       //throw validationResult.errorMessage;
-      return { success: false, error: validationResult.errorMessage }
+      return { success: false, error: validationResult.errorMessage };
     }
 
     const markNumberResult = player.markNumber(colourToMark, num);
@@ -132,7 +201,10 @@ export default class QwixxLogic {
     // returning an object literal because it is a game-rule violation
     if (!markNumberResult.success) {
       //throw new Error("Invalid move: cannot mark this number.");
-      return { success: markNumberResult.success, error: markNumberResult.errorMessage }
+      return {
+        success: markNumberResult.success,
+        error: markNumberResult.errorMessage,
+      };
     }
 
     if (
@@ -176,13 +248,10 @@ export default class QwixxLogic {
     /*
      * Checks the non-active player's number selection.
      */
-    if (
-      player !== this.activePlayer &&
-      num !== this._dice.whiteDiceSum
-    ) {
+    if (player !== this.activePlayer && num !== this._dice.whiteDiceSum) {
       return {
         isValid: false,
-        errorMessage: "Number selected doesn't equal to sum of white dice."
+        errorMessage: "Number selected doesn't equal to sum of white dice.",
       };
     }
 
@@ -197,7 +266,7 @@ export default class QwixxLogic {
     ) {
       return {
         isValid: false,
-        errorMessage: "Number selected doesn't equal to sum of white dice."
+        errorMessage: "Number selected doesn't equal to sum of white dice.",
       };
     }
 
@@ -212,7 +281,8 @@ export default class QwixxLogic {
     ) {
       return {
         isValid: false,
-        errorMessage: "Number selected doesn't equal to sum of white die and coloured die."
+        errorMessage:
+          "Number selected doesn't equal to sum of white die and coloured die.",
       };
     }
 
@@ -222,6 +292,10 @@ export default class QwixxLogic {
   }
 
   public endTurn(playerName: string) {
+    if (!this.hasRolled) {
+      return { success: false, errorMessage: "Dice hasn't been rolled yet." };
+    }
+
     const player = this.playerExistsInLobby(playerName);
 
     if (!player) {
@@ -229,7 +303,10 @@ export default class QwixxLogic {
     }
 
     if (player.hasSubmittedChoice) {
-      throw new Error("Player already finished their turn.");
+      return {
+        success: false,
+        errorMessage: "Player has already ended their turn.",
+      };
     }
 
     if (player !== this.activePlayer) {
@@ -237,12 +314,15 @@ export default class QwixxLogic {
     }
 
     if (player === this.activePlayer) {
+      if (player.submissionCount === 0) {
+        player.gameCard.addPenalty();
+      }
       player.markSubmitted();
     }
 
     this.processPlayersSubmission();
 
-    return this.serialize();
+    return { success: true, data: this.serialize() };
   }
 
   public processPenalty(playerName: string) {
@@ -251,17 +331,54 @@ export default class QwixxLogic {
       throw new Error("Player not found");
     }
 
-    player.gameCard.addPenalty()
+    player.gameCard.addPenalty();
     player.markSubmitted();
-
     this.processPlayersSubmission();
 
     return this.serialize();
   }
 
+  public lockRow(playerName: string, row: string): LockRowResult {
+    const colourToLock = this.getColourFromRow(row)
+
+    const player = this.playerExistsInLobby(playerName)
+    if (!player) {
+      throw new Error("Player not found")
+    }
+
+    const res = player.gameCard.lockRow(colourToLock)
+
+    if (!res.success) {
+      return res
+    }
+    // NOTE: 
+    //Does having this result in any bugs?
+    if (res.lockedRow && !this._lockedRows.includes(res.lockedRow)) {
+      this._lockedRows.push(res.lockedRow)
+    }
+
+    return { success: true, data: this.serialize() }
+  }
   // private get players() {
   //   return this._playersArray;
   // }
+
+  public calculateScores(): Record<string, number> {
+    const scores = this._playersArray.reduce((acc, player) => {
+      acc[player.name] = player.gameCard.calculateScore();
+      return acc;
+    }, {} as Record<string, number>)
+
+    return scores
+  }
+
+  public determineWinner() {
+    const scores = this.calculateScores()
+
+    return Object.keys(scores).filter(
+      player => scores[player] == Math.max(...Object.values(scores))
+    )
+  }
 
   public serialize(): SerializedGameState {
     const serializedPlayers = this._playersArray.reduce((acc, player) => {
@@ -269,6 +386,9 @@ export default class QwixxLogic {
       return acc;
     }, {} as Record<string, SerializePlayer>);
 
+    // NOTE:
+    // We aren't returning the lockedRow state from this class, but we are getting locked rows from Player class
+    // The frontend code is built with that in mind but would including _lockedRows from this class make it more efficient?
     return {
       players: serializedPlayers,
       dice: this._dice.serialize(),
