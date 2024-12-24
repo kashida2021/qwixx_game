@@ -2,6 +2,7 @@ import Die from "../../../src/components/Dice/Die";
 import { vi, it, describe, test, expect } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import React from "react";
+import "@testing-library/jest-dom";
 
 describe("Die component test", () => {
   it("renders coloured die correctly", () => {
@@ -17,7 +18,6 @@ describe("Die component test", () => {
 
   it("renders white die correctly ", () => {
     render(<Die colour={"white"} colourKey={"white"} value={1} />);
-    screen.debug();
 
     const redDie = screen.getByLabelText("white die");
     expect(redDie).toHaveClass("face dice white");
