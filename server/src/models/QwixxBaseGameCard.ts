@@ -75,6 +75,10 @@ export default class qwixxBaseGameCard {
     rows.forEach(row => this._isLocked[row] = true)
   }
 
+  /**
+   * @description Locks a row and adds the final number to the row fields if conditions are met.
+   * @returns An object with success as either true or false. 
+   */
   public lockRow(row: rowColour): LockRowResult {
     if (row === rowColour.Red || row === rowColour.Yellow) {
       if (this._rows[row].length < 6 && this.getHighestMarkedNumber(row) !== 12) {
@@ -94,6 +98,10 @@ export default class qwixxBaseGameCard {
     return { success: true, lockedRow: row }
   }
 
+  /**
+   * @description Adds a number to the corresponding coloured row if the number is valid.
+   * @returns An object with a success key. If marking a number isn't a valid move, it'll also return an errorMessage.
+   */
   public markNumbers(row: rowColour, number: number): MarkNumbersResult {
     if (this._rows[row].includes(number)) {
       return { success: false, errorMessage: `Number ${number} is already marked in ${row} row.` }
@@ -214,15 +222,34 @@ export default class qwixxBaseGameCard {
     return false;
   }
 
-  public calculateScore(): number {
+  /**
+   * Calculates the subtotals for each row.
+   * @returns An object containing the row colour as key and subtotal as value.
+   */
+  public calculateSubtotalScore(): Record<string, number> {
     // NOTE: Would it be more scalable if this multiplier was a part of the constructor? 
-    const multiplier = [0, 1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 66, 78]
+    const multiplier = [0, 1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 66, 78];
 
-    const score = Object.values(this.MarkedNumbers).reduce((score, row) => score + multiplier[row.length], 0)
+    return Object.fromEntries(
+      Object.entries(this.MarkedNumbers)
+        .map(([row, numbers]) => [row, multiplier[numbers.length]])
+    )
+  }
 
+  /**
+  * Calculates the total score for the game and includes subtotals for each row and penalties.
+  * @returns An object containing the total score, subtotals, and penalties.
+  */
+  public calculateScores(): { subtotal: Record<string, number>; penalties: number, total: number } {
+    //const multiplier = [0, 1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 66, 78]
+    //const score = Object.values(this.MarkedNumbers).reduce((score, row) => score + multiplier[row.length], 0)
+
+    const subtotal = this.calculateSubtotalScore()
+    const score = Object.values(subtotal).reduce((sum, rowScore) => sum + rowScore, 0)
     const penalties = this.calculatePenalties()
+    const total = score - penalties
 
-    return score - penalties
+    return { subtotal, penalties, total };
   }
 
   private calculatePenalties(): number {
