@@ -1,11 +1,12 @@
 import SixSidedDie from "./SixSidedDieClass";
 import { DiceColour } from "../enums/DiceColours";
 import { rowColour } from "../enums/rowColours";
+import IDice from "./IDice";
 
 type TDice = Record<DiceColour, SixSidedDie>
 export type TDiceValues = Record<DiceColour, number>
 
-export default class Dice {
+export default class Dice implements IDice {
   private _dice: TDice;
   private _diceValues: TDiceValues;
 
@@ -29,20 +30,6 @@ export default class Dice {
     };
   }
 
-  public rollAllDice(): TDiceValues {
-    let diceColours = Object.keys(this._dice) as DiceColour[];
-    diceColours.forEach((colour) => {
-      const dieColour = colour as DiceColour;
-      if (this._dice[dieColour].active === false) {
-        this.diceValues[dieColour] = 0;
-      } else {
-        // this._dice[dieColour].rollDie();
-        // this._diceValues[dieColour] = this._dice[dieColour].value;
-        this.diceValues[dieColour] = this._dice[dieColour].rollDie();
-      }
-    });
-    return this.diceValues;
-  }
 
   get diceValues(): TDiceValues {
     return this._diceValues;
@@ -71,6 +58,21 @@ export default class Dice {
     }
 
     return result;
+  }
+
+  public rollAllDice(): TDiceValues {
+    let diceColours = Object.keys(this._dice) as DiceColour[];
+    diceColours.forEach((colour) => {
+      const dieColour = colour as DiceColour;
+      if (this._dice[dieColour].active === false) {
+        this.diceValues[dieColour] = 0;
+      } else {
+        // this._dice[dieColour].rollDie();
+        // this._diceValues[dieColour] = this._dice[dieColour].value;
+        this.diceValues[dieColour] = this._dice[dieColour].rollDie();
+      }
+    });
+    return this.diceValues;
   }
 
   public disableDie(colour: DiceColour): void {
