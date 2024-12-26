@@ -2,6 +2,7 @@ import qwixxBaseGameCard from "./QwixxBaseGameCard";
 import { rowColour } from "../enums/rowColours";
 import { SerializeGameCard } from "./QwixxBaseGameCard";
 import IPlayer from "./IPlayer";
+import IQwixxGameCard from "./IQwixxGameCard";
 
 interface MarkNumberSuccess {
   success: true;
@@ -21,11 +22,11 @@ export interface SerializePlayer {
 
 export default class Player implements IPlayer {
   private _name;
-  private _gameCard: qwixxBaseGameCard;
+  private _gameCard: IQwixxGameCard;
   private _hasSubmittedChoice;
   private _submissionCount;
 
-  constructor(name: string, gameCard: qwixxBaseGameCard) {
+  constructor(name: string, gameCard: IQwixxGameCard) {
     this._name = name;
     this._gameCard = gameCard;
     this._hasSubmittedChoice = false;
@@ -36,7 +37,7 @@ export default class Player implements IPlayer {
     return this._name;
   }
 
-  get gameCard(): qwixxBaseGameCard {
+  get gameCard(): IQwixxGameCard {
     return this._gameCard;
   }
 
