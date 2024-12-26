@@ -1,30 +1,48 @@
 import { rowColour } from "../enums/rowColours";
+import IQwixxGameCard from "../tests/models/IQwixxGameCard";
 
-interface MarkNumbersSuccess {
-  success: true;
-}
+// TODO: Delete these interfaces and types
+//interface MarkNumbersSuccess {
+//  success: true;
+//}
+//
+//interface MarkNumbersFailure {
+//  success: false;
+//  errorMessage: string;
+//}
+//
+//type MarkNumbersResult = MarkNumbersSuccess | MarkNumbersFailure
+//type IsValidMoveResult = MarkNumbersSuccess | MarkNumbersFailure
 
-interface MarkNumbersFailure {
-  success: false;
-  errorMessage: string;
-}
 
-type MarkNumbersResult = MarkNumbersSuccess | MarkNumbersFailure
-type IsValidMoveResult = MarkNumbersSuccess | MarkNumbersFailure
-type LockRowResult =
-  | { success: true; lockedRow: rowColour }
+/**
+ * Represents the reuslt of an action that can succeed or fail.
+ * - `success: true`: action was successful.
+ * - `success: false`: action failed with an optional `errorMessage`.
+ */
+export type GameCardActionResult =
+  | { success: true }
   | { success: false; errorMessage: string }
 
-type RowValues = Record<rowColour, number[]>
-type RowLocks = Record<rowColour, boolean>
+// Result for locking rows, which includes additional data in the success case
+export type LockRowResult =
+  | { success: true; lockedRow: rowColour }
+  | { success: false; errorMessage?: string }
 
+// Represents the structure of row values on the game card
+export type RowValues = Record<rowColour, number[]>
+
+// Represents the locking state of rows on the game card
+export type RowLocks = Record<rowColour, boolean>
+
+// Defines the serialized state of a game card
 export interface SerializeGameCard {
   rows: RowValues;
   isLocked: RowLocks;
   penalties: number[];
 }
 
-export default class qwixxBaseGameCard {
+export default class qwixxBaseGameCard implements IQwixxGameCard {
   private _rows: RowValues;
   private _numbers: number[];
   private _isLocked: RowLocks;
@@ -50,14 +68,6 @@ export default class qwixxBaseGameCard {
     this._penalties = [];
   }
 
-  public serialize(): SerializeGameCard {
-    return {
-      rows: this._rows,
-      isLocked: this._isLocked,
-      penalties: this._penalties,
-    };
-  }
-
   get MarkedNumbers() {
     return this._rows;
   }
@@ -66,19 +76,41 @@ export default class qwixxBaseGameCard {
     return this._numbers;
   }
 
+  get isLocked() {
+    return this._isLocked;
+  }
+
+  get penalties() {
+    return this._penalties;
+  }
+
   private addNumberToRow(row: rowColour, number: number) {
     this._rows[row].push(number)
   }
 
-  public normaliseRows(rows: rowColour[]) {
+  public serialize(): SerializeGameCard {
+    return {
+      rows: this._rows,
+      isLocked: this._isLocked,
+      penalties: this._penalties,
+    };
+  }
+
+  /**
+   * @description Synchronizes the locked state of rows across all players.
+   *  Ensures that when a row is locked by one player, it is locked for all players by the end of the turn,
+   *  in accordane with game rules.
+   * @param rows - The list of row colors to normalize.
+   */
+  public synchronizeLockedRows(rows: rowColour[]) {
     //    this._isLocked[row] = true
     rows.forEach(row => this._isLocked[row] = true)
   }
 
   /**
    * @description Locks a row and adds the final number to the row fields if conditions are met.
-   * @returns An object with success as either true or false. 
-   */
+   * @returns The result of the operation, including the locked row on success or an error message on failure.
+   * */
   public lockRow(row: rowColour): LockRowResult {
     if (row === rowColour.Red || row === rowColour.Yellow) {
       if (this._rows[row].length < 6 && this.getHighestMarkedNumber(row) !== 12) {
@@ -100,9 +132,9 @@ export default class qwixxBaseGameCard {
 
   /**
    * @description Adds a number to the corresponding coloured row if the number is valid.
-   * @returns An object with a success key. If marking a number isn't a valid move, it'll also return an errorMessage.
-   */
-  public markNumbers(row: rowColour, number: number): MarkNumbersResult {
+   * @returns The result of hte operation, indicating success of failture with an optional error message.
+   * */
+  public markNumbers(row: rowColour, number: number): GameCardActionResult {
     if (this._rows[row].includes(number)) {
       return { success: false, errorMessage: `Number ${number} is already marked in ${row} row.` }
     }
@@ -139,13 +171,6 @@ export default class qwixxBaseGameCard {
     //    }
   }
 
-  get isLocked() {
-    return this._isLocked;
-  }
-
-  get penalties() {
-    return this._penalties;
-  }
 
   public addPenalty() {
     this._penalties.push(this._penalties.length + 1);
@@ -165,7 +190,7 @@ export default class qwixxBaseGameCard {
 
   // TODO: Better error handling for when colour is invalid.
   // It should already be validated in QwixxLogic but it is also being handled here.
-  private isValidMove(colour: rowColour, num: number): IsValidMoveResult {
+  private isValidMove(colour: rowColour, num: number): GameCardActionResult {
     if (colour === rowColour.Red || colour === rowColour.Yellow) {
       if (num < 12 && this.getHighestMarkedNumber(colour) > num) {
         //return this.getHighestMarkedNumber(colour) < num;
@@ -206,6 +231,11 @@ export default class qwixxBaseGameCard {
   }
 
   // TODO: Doesn't check valid moves for white1 + white2
+  /**
+   * @description Determines whether there are any available moves based on the provided dice values.
+   * @param diceValues - A partial mapping of row colors to dice values.
+   * @returns `true` if there are available moves, `false` otherwise.
+   */
   public hasAvailableMoves(
     diceValues: Partial<Record<rowColour, number[]>>
   ): boolean {
@@ -223,8 +253,8 @@ export default class qwixxBaseGameCard {
   }
 
   /**
-   * Calculates the subtotals for each row.
-   * @returns An object containing the row colour as key and subtotal as value.
+   * @description Calculates the subtotal score for each row.
+   * @returns An object mapping row colors to their respective scores.
    */
   public calculateSubtotalScore(): Record<string, number> {
     // NOTE: Would it be more scalable if this multiplier was a part of the constructor? 
@@ -237,8 +267,11 @@ export default class qwixxBaseGameCard {
   }
 
   /**
-  * Calculates the total score for the game and includes subtotals for each row and penalties.
-  * @returns An object containing the total score, subtotals, and penalties.
+  * @description Calculates the total score, including subtotals for each row and penalties.
+  * @returns An object containing:
+  * - `subtotal`: A mapping of row colors to their respective scores.
+  * - `penalties`: The total penalty points.
+  * - `total`: The overall score after subtracting penalties.
   */
   public calculateScores(): { subtotal: Record<string, number>; penalties: number, total: number } {
     //const multiplier = [0, 1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 66, 78]
