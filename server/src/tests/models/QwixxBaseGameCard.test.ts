@@ -232,7 +232,7 @@ describe("Base Game Card test", () => {
     );
 
     test("Can normalise rows", () => {
-      testGameCard.normaliseRows([rowColour.Red, rowColour.Blue]);
+      testGameCard.synchronizeLockedRows([rowColour.Red, rowColour.Blue]);
 
       const lockedRows = testGameCard.isLocked;
       expect(lockedRows).toEqual({

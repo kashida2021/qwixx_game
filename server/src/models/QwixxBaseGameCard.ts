@@ -1,5 +1,5 @@
 import { rowColour } from "../enums/rowColours";
-import IQwixxGameCard from "../tests/models/IQwixxGameCard";
+import IQwixxGameCard from "./IQwixxGameCard";
 
 // TODO: Delete these interfaces and types
 //interface MarkNumbersSuccess {
@@ -103,7 +103,6 @@ export default class qwixxBaseGameCard implements IQwixxGameCard {
    * @param rows - The list of row colors to normalize.
    */
   public synchronizeLockedRows(rows: rowColour[]) {
-    //    this._isLocked[row] = true
     rows.forEach(row => this._isLocked[row] = true)
   }
 
@@ -132,7 +131,7 @@ export default class qwixxBaseGameCard implements IQwixxGameCard {
 
   /**
    * @description Adds a number to the corresponding coloured row if the number is valid.
-   * @returns The result of hte operation, indicating success of failture with an optional error message.
+   * @returns The result of the operation, indicating success or failure with an optional error message.
    * */
   public markNumbers(row: rowColour, number: number): GameCardActionResult {
     if (this._rows[row].includes(number)) {
