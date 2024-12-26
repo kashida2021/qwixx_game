@@ -4,9 +4,9 @@ import { TDiceValues } from "./DiceClass";
 
 export default interface IDice {
   // Getters for public fields
-  diceValues: TDiceValues;
-  whiteDiceSum: number;
-  validColouredNumbers: Partial<Record<rowColour, number[]>>;
+  readonly diceValues: TDiceValues;
+  readonly whiteDiceSum: number;
+  readonly validColouredNumbers: Partial<Record<rowColour, number[]>>;
 
   // Public methods
   rollAllDice(): TDiceValues;
