@@ -1,6 +1,7 @@
 import qwixxBaseGameCard from "./QwixxBaseGameCard";
 import { rowColour } from "../enums/rowColours";
 import { SerializeGameCard } from "./QwixxBaseGameCard";
+import IPlayer from "./IPlayer";
 
 interface MarkNumberSuccess {
   success: true;
@@ -11,14 +12,14 @@ interface MarkNumberFailure {
   errorMessage: string;
 }
 
-type MarkNumberResult = MarkNumberSuccess | MarkNumberFailure;
+export type MarkNumberResult = MarkNumberSuccess | MarkNumberFailure;
 
 export interface SerializePlayer {
   gameCard: SerializeGameCard;
   hasSubmittedChoice: boolean;
 }
 
-export default class Player {
+export default class Player implements IPlayer {
   private _name;
   private _gameCard: qwixxBaseGameCard;
   private _hasSubmittedChoice;
@@ -43,6 +44,10 @@ export default class Player {
     return this._hasSubmittedChoice;
   }
 
+  public get submissionCount(): number {
+    return this._submissionCount;
+  }
+
   public resetSubmission() {
     this._hasSubmittedChoice = false;
     this._submissionCount = 0;
@@ -50,10 +55,6 @@ export default class Player {
 
   public markSubmitted() {
     this._hasSubmittedChoice = true;
-  }
-
-  public get submissionCount(): number {
-    return this._submissionCount;
   }
 
   public markNumber(colour: rowColour, num: number): MarkNumberResult {
