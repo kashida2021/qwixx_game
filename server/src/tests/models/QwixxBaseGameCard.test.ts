@@ -244,26 +244,63 @@ describe("Base Game Card test", () => {
     });
   });
 
-  describe("Calculate Score", () => {
+  describe("Calculate Score:", () => {
+    it("can calculate the subtotal score", () => {
+      for (let i = 2; i < 13; i++) {
+        testGameCard.markNumbers(rowColour.Red, i);
+      }
+      for (let i = 2; i < 13; i++) {
+        testGameCard.markNumbers(rowColour.Yellow, i);
+      }
+      for (let i = 12; i > 1; i--) {
+        testGameCard.markNumbers(rowColour.Green, i);
+      }
+      for (let i = 12; i > 1; i--) {
+        testGameCard.markNumbers(rowColour.Blue, i);
+      }
+
+      const expected = { red: 66, yellow: 66, green: 66, blue: 66 }
+      const res = testGameCard.calculateSubtotalScore()
+      expect(res).toEqual(expected)
+    })
+
     it("can calculate the score with a single marked number", () => {
       testGameCard.markNumbers(rowColour.Red, 2);
-      const res = testGameCard.calculateScore();
-      expect(res).toEqual(1);
+      const res = testGameCard.calculateScores();
+      expect(res).toEqual(
+        {
+          total: 1,
+          subtotal: { red: 1, yellow: 0, green: 0, blue: 0 },
+          penalties: 0,
+        }
+      );
     });
 
     it("can calculate the score with a two marked number", () => {
       testGameCard.markNumbers(rowColour.Red, 2);
       testGameCard.markNumbers(rowColour.Red, 3);
-      const res = testGameCard.calculateScore();
-      expect(res).toEqual(3);
+      const res = testGameCard.calculateScores();
+      expect(res).toEqual(
+        {
+          total: 3,
+          subtotal: { red: 3, yellow: 0, green: 0, blue: 0 },
+          penalties: 0,
+        }
+      );
     });
 
     it("can calculate the score including the 13th marked number", () => {
       for (let i = 2; i < 14; i++) {
         testGameCard.markNumbers(rowColour.Red, i);
       }
-      const res = testGameCard.calculateScore();
-      expect(res).toEqual(78);
+      const res = testGameCard.calculateScores();
+      expect(res).toEqual(
+        {
+          total: 78,
+          subtotal: { red: 78, yellow: 0, green: 0, blue: 0 },
+          penalties: 0,
+        }
+      );
     });
 
     it("can calculate the score of multiple rows", () => {
@@ -280,8 +317,14 @@ describe("Base Game Card test", () => {
         testGameCard.markNumbers(rowColour.Blue, i);
       }
 
-      const res = testGameCard.calculateScore();
-      expect(res).toEqual(264);
+      const res = testGameCard.calculateScores();
+      expect(res).toEqual(
+        {
+          total: 264,
+          subtotal: { red: 66, yellow: 66, green: 66, blue: 66 },
+          penalties: 0,
+        }
+      );
     });
 
     it("calculates the total score while factoring 1 penalty", () => {
@@ -290,8 +333,14 @@ describe("Base Game Card test", () => {
       }
 
       testGameCard.addPenalty();
-      const res = testGameCard.calculateScore();
-      expect(res).toEqual(73);
+      const res = testGameCard.calculateScores();
+      expect(res).toEqual(
+        {
+          total: 73,
+          subtotal: { red: 78, yellow: 0, green: 0, blue: 0 },
+          penalties: 5,
+        }
+      );
     });
 
     it("calculates the total score while factoring 2 penalties", () => {
@@ -301,8 +350,14 @@ describe("Base Game Card test", () => {
 
       testGameCard.addPenalty();
       testGameCard.addPenalty();
-      const res = testGameCard.calculateScore();
-      expect(res).toEqual(68);
+      const res = testGameCard.calculateScores();
+      expect(res).toEqual(
+        {
+          total: 68,
+          subtotal: { red: 78, yellow: 0, green: 0, blue: 0 },
+          penalties: 10,
+        }
+      );
     });
   });
 });
