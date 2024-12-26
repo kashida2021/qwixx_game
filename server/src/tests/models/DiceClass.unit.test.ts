@@ -1,9 +1,10 @@
 import Dice from "../../models/DiceClass";
 import SixSidedDie from "../../models/SixSidedDieClass";
+import IDice from "../../models/IDice";
 import { DiceColour } from "../../enums/DiceColours";
 
 describe("DiceClass unit test", () => {
-  let testDice: Dice;
+  let testDice: IDice;
   beforeEach(() => {
     testDice = new Dice(SixSidedDie);
   });

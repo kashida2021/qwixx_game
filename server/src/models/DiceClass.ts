@@ -45,6 +45,10 @@ export default class Dice implements IDice {
   //   return whiteValues.flatMap(white => colouredValues.filter(value => value > 0).map(value => value + white));
   // }
 
+  /**
+   * @description Returns all possible number combinations for white and coloured dice in accordance to game rules
+   * @returns An object mapping dice colours to an array of white die + the respective coloured die's value 
+  */
   public get validColouredNumbers() {
     const { white1, white2, ...colouredValues } = this.diceValues;
     //const result: { [key in rowColour]?: number[] } = {};
