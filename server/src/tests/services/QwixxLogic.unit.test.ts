@@ -38,25 +38,6 @@ jest.spyOn(fakeDice, "validColouredNumbers", "get").mockReturnValue({
 
 jest.spyOn(fakeDice, "whiteDiceSum", "get").mockReturnValue(10);
 
-// TODO: This might no longer be necessary
-jest
-  .spyOn(gameCardMock1, "getHighestMarkedNumber")
-  .mockImplementation((row) => {
-    if (row === "red") return 9;
-    if (row === "yellow") return 8;
-    if (row === "green") return 8;
-    if (row === "blue") return 8;
-    return 2;
-  });
-
-jest.spyOn(gameCardMock1, "getLowestMarkedNumber").mockImplementation((row) => {
-  if (row === "red") return 2;
-  if (row === "yellow") return 2;
-  if (row === "green") return 5;
-  if (row === "blue") return 4;
-  return 12;
-});
-
 const playersArrayMock = [player1Mock, player2Mock];
 
 describe("Qwixx Logic tests", () => {
@@ -266,8 +247,8 @@ describe("Qwixx Logic tests", () => {
   // TODO: This should be combined with the game end phase test.
   describe("Calculate all players' score", () => {
     it("Can get back all players' score", () => {
-      gameCardMock1.calculateScore = jest.fn().mockReturnValueOnce(73)
-      gameCardMock2.calculateScore = jest.fn().mockReturnValueOnce(68)
+      gameCardMock1.calculateScores = jest.fn().mockReturnValueOnce(73)
+      gameCardMock2.calculateScores = jest.fn().mockReturnValueOnce(68)
 
       const expected = {
         player1: 73,
@@ -281,8 +262,8 @@ describe("Qwixx Logic tests", () => {
     })
 
     it("Can determine the winner", () => {
-      gameCardMock1.calculateScore = jest.fn().mockReturnValueOnce(73)
-      gameCardMock2.calculateScore = jest.fn().mockReturnValueOnce(68)
+      gameCardMock1.calculateScores = jest.fn().mockReturnValueOnce(73)
+      gameCardMock2.calculateScores = jest.fn().mockReturnValueOnce(68)
 
       const testGame = new QwixxLogic(playersArrayMock, fakeDice)
       const res = testGame.determineWinner()
@@ -291,13 +272,45 @@ describe("Qwixx Logic tests", () => {
     })
 
     it("Can determine multiple winners", () => {
-      gameCardMock1.calculateScore = jest.fn().mockReturnValueOnce(73)
-      gameCardMock2.calculateScore = jest.fn().mockReturnValueOnce(73)
+      gameCardMock1.calculateScores = jest.fn().mockReturnValueOnce(73)
+      gameCardMock2.calculateScores = jest.fn().mockReturnValueOnce(73)
 
       const testGame = new QwixxLogic(playersArrayMock, fakeDice)
       const res = testGame.determineWinner()
 
       expect(res).toEqual(["player1", "player2"])
     })
+  })
+
+  describe("Game end:", () => {
+    it("Can determine the game has ended when 2 rows are locked", () => {
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice)
+      testGame.rollDice()
+
+      gameCardMock1.lockRow = jest.fn()
+        .mockReturnValueOnce({ success: true, lockedRow: rowColour.Red })
+        .mockReturnValueOnce({ success: true, lockedRow: rowColour.Yellow })
+
+      gameCardMock1.calculateScores = jest.fn()
+        .mockReturnValueOnce({ penalties: 0, total: 48, subtotal: { red: 12, yellow: 12, green: 12, blue: 12 } })
+      gameCardMock2.calculateScores = jest.fn()
+        .mockReturnValueOnce({ penalties: 0, total: 36, subtotal: { red: 12, yellow: 12, green: 12, blue: 0 } })
+      testGame.lockRow("player1", "red")
+      testGame.lockRow("player1", "yellow")
+
+      jest.spyOn(player1Mock, "hasSubmittedChoice", "get").mockReturnValueOnce(false).mockReturnValueOnce(true)
+      jest.spyOn(player2Mock, "hasSubmittedChoice", "get").mockReturnValueOnce(true)
+      const res = testGame.endTurn("player1")
+
+      console.log(res)
+      if (res.success) {
+        expect(res.data).toEqual(["player1"])
+      }
+    })
+
+    it.todo("Can determine the game has ended when more than 2 rows are locked")
+    it.todo("Can determine the game has ended when a player has 4 penalties")
+    it.todo("Can determine the game hasn't ended if at least 2 rows aren't locked")
+    it.todo("Can determine the game hasn't ended if 4 penalties haven't been accrued by a player")
   })
 });
