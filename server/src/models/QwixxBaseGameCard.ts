@@ -14,7 +14,6 @@ import IQwixxGameCard from "./IQwixxGameCard";
 //type MarkNumbersResult = MarkNumbersSuccess | MarkNumbersFailure
 //type IsValidMoveResult = MarkNumbersSuccess | MarkNumbersFailure
 
-
 /**
  * Represents the reuslt of an action that can succeed or fail.
  * - `success: true`: action was successful.
@@ -22,18 +21,20 @@ import IQwixxGameCard from "./IQwixxGameCard";
  */
 export type GameCardActionResult =
   | { success: true }
-  | { success: false; errorMessage: string }
+  | { success: false; errorMessage: string };
 
 // Result for locking rows, which includes additional data in the success case
 export type LockRowResult =
   | { success: true; lockedRow: rowColour }
-  | { success: false; errorMessage?: string }
+  | { success: false; errorMessage?: string };
 
 // Represents the structure of row values on the game card
-export type RowValues = Record<rowColour, number[]>
+export type RowValues = Record<rowColour, number[]>;
+
+export type RowScores = Record<rowColour, number>;
 
 // Represents the locking state of rows on the game card
-export type RowLocks = Record<rowColour, boolean>
+export type RowLocks = Record<rowColour, boolean>;
 
 // Defines the serialized state of a game card
 export interface SerializeGameCard {
@@ -85,7 +86,7 @@ export default class qwixxBaseGameCard implements IQwixxGameCard {
   }
 
   private addNumberToRow(row: rowColour, number: number) {
-    this._rows[row].push(number)
+    this._rows[row].push(number);
   }
 
   public serialize(): SerializeGameCard {
@@ -103,7 +104,7 @@ export default class qwixxBaseGameCard implements IQwixxGameCard {
    * @param rows - The list of row colors to normalize.
    */
   public synchronizeLockedRows(rows: rowColour[]) {
-    rows.forEach(row => this._isLocked[row] = true)
+    rows.forEach((row) => (this._isLocked[row] = true));
   }
 
   /**
@@ -112,21 +113,30 @@ export default class qwixxBaseGameCard implements IQwixxGameCard {
    * */
   public lockRow(row: rowColour): LockRowResult {
     if (row === rowColour.Red || row === rowColour.Yellow) {
-      if (this._rows[row].length < 6 && this.getHighestMarkedNumber(row) !== 12) {
-        return { success: false, errorMessage: "Didn't satisfy conditions to lock a row." }
+      if (
+        this._rows[row].length < 6 &&
+        this.getHighestMarkedNumber(row) !== 12
+      ) {
+        return {
+          success: false,
+          errorMessage: "Didn't satisfy conditions to lock a row.",
+        };
       }
-      this.addNumberToRow(row, 13)
+      this.addNumberToRow(row, 13);
     }
 
     if (row === rowColour.Green || row === rowColour.Blue) {
       if (this._rows[row].length < 6 && this.getLowestMarkedNumber(row) !== 2) {
-        return { success: false, errorMessage: "Didn't satisfy conditions to lock a row." }
+        return {
+          success: false,
+          errorMessage: "Didn't satisfy conditions to lock a row.",
+        };
       }
-      this.addNumberToRow(row, 1)
+      this.addNumberToRow(row, 1);
     }
 
-    this._isLocked[row] = true
-    return { success: true, lockedRow: row }
+    this._isLocked[row] = true;
+    return { success: true, lockedRow: row };
   }
 
   /**
@@ -135,7 +145,10 @@ export default class qwixxBaseGameCard implements IQwixxGameCard {
    * */
   public markNumbers(row: rowColour, number: number): GameCardActionResult {
     if (this._rows[row].includes(number)) {
-      return { success: false, errorMessage: `Number ${number} is already marked in ${row} row.` }
+      return {
+        success: false,
+        errorMessage: `Number ${number} is already marked in ${row} row.`,
+      };
     }
 
     //if (!this.isValidMove(row, number)) {
@@ -145,20 +158,20 @@ export default class qwixxBaseGameCard implements IQwixxGameCard {
     //  }
     //}
 
-    // TODO: Is it better to move this check into 'isValidMove'?
+    // NOTE: Is it better to move this check into 'isValidMove'?
     if (this.isLocked[row]) {
-      return { success: false, errorMessage: `${row} row is already locked.` }
+      return { success: false, errorMessage: `${row} row is already locked.` };
     }
 
-    const res = this.isValidMove(row, number)
+    const res = this.isValidMove(row, number);
 
     if (!res.success) {
-      return { success: res.success, errorMessage: res.errorMessage }
+      return { success: res.success, errorMessage: res.errorMessage };
     }
 
-    this.addNumberToRow(row, number)
+    this.addNumberToRow(row, number);
 
-    return { success: true }
+    return { success: true };
 
     //    this._rows[row].push(number)
 
@@ -169,7 +182,6 @@ export default class qwixxBaseGameCard implements IQwixxGameCard {
     //      return false;
     //    }
   }
-
 
   public addPenalty() {
     this._penalties.push(this._penalties.length + 1);
@@ -196,16 +208,16 @@ export default class qwixxBaseGameCard implements IQwixxGameCard {
         return {
           success: false,
           errorMessage:
-            "Invalid move. Number is not greater than previous marked number"
-        }
+            "Invalid move. Number is not greater than previous marked number",
+        };
       }
       if (num === 12 && this.MarkedNumbers[colour].length < 5) {
         //return this.MarkedNumbers[colour].length >= 5
         return {
           success: false,
           errorMessage:
-            "Number 12 can't be marked. 5 lower values numbers haven't been marked yet"
-        }
+            "Number 12 can't be marked. 5 lower values numbers haven't been marked yet",
+        };
       }
     }
 
@@ -215,15 +227,15 @@ export default class qwixxBaseGameCard implements IQwixxGameCard {
         return {
           success: false,
           errorMessage:
-            "Invalid move. Number is not less than previous marked number"
-        }
+            "Invalid move. Number is not less than previous marked number",
+        };
       }
       if (num === 2 && this.MarkedNumbers[colour].length! < 5) {
         return {
           success: false,
           errorMessage:
-            "Number 2 can't be marked. 5 higher values numbers haven't been marked yet"
-        }
+            "Number 2 can't be marked. 5 higher values numbers haven't been marked yet",
+        };
       }
     }
     return { success: true };
@@ -255,38 +267,45 @@ export default class qwixxBaseGameCard implements IQwixxGameCard {
    * @description Calculates the subtotal score for each row.
    * @returns An object mapping row colors to their respective scores.
    */
-  public calculateSubtotalScore(): Record<string, number> {
-    // NOTE: Would it be more scalable if this multiplier was a part of the constructor? 
+  public calculateSubtotalScore(): Record<rowColour, number> {
+    // NOTE: Would it be more scalable if this multiplier was a part of the constructor?
     const multiplier = [0, 1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 66, 78];
 
     return Object.fromEntries(
       Object.entries(this.MarkedNumbers)
         .map(([row, numbers]) => [row, multiplier[numbers.length]])
-    )
+    ) as Record<rowColour, number>
   }
 
   /**
-  * @description Calculates the total score, including subtotals for each row and penalties.
-  * @returns An object containing:
-  * - `subtotal`: A mapping of row colors to their respective scores.
-  * - `penalties`: The total penalty points.
-  * - `total`: The overall score after subtracting penalties.
-  */
-  public calculateScores(): { subtotal: Record<string, number>; penalties: number, total: number } {
+   * @description Calculates the total score, including subtotals for each row and penalties.
+   * @returns An object containing:
+   * - `subtotal`: A mapping of row colors to their respective scores.
+   * - `penalties`: The total penalty points.
+   * - `total`: The overall score after subtracting penalties.
+   */
+  public calculateScores(): {
+    subtotal: Record<rowColour, number>;
+    penalties: number;
+    total: number;
+  } {
     //const multiplier = [0, 1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 66, 78]
     //const score = Object.values(this.MarkedNumbers).reduce((score, row) => score + multiplier[row.length], 0)
 
-    const subtotal = this.calculateSubtotalScore()
-    const score = Object.values(subtotal).reduce((sum, rowScore) => sum + rowScore, 0)
-    const penalties = this.calculatePenalties()
-    const total = score - penalties
+    const subtotal = this.calculateSubtotalScore();
+    const score = Object.values(subtotal).reduce(
+      (sum, rowScore) => sum + rowScore,
+      0
+    );
+    const penalties = this.calculatePenalties();
+    const total = score - penalties;
 
     return { subtotal, penalties, total };
   }
 
   private calculatePenalties(): number {
-    const multiplier = 5
-    const penalties = this.penalties.at(-1) || 0
-    return multiplier * penalties
+    const multiplier = 5;
+    const penalties = this.penalties.at(-1) || 0;
+    return multiplier * penalties;
   }
 }
