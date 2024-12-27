@@ -4,6 +4,8 @@ import { rowColour } from "../enums/rowColours";
 import { SerializePlayer } from "../models/PlayerClass";
 import { TDiceValues } from "../models/DiceClass";
 import { DiceColour } from "../enums/DiceColours";
+import IPlayer from "../models/IPlayer";
+import IDice from "../models/IDice";
 
 interface rollDiceResults {
   hasRolled: boolean;
@@ -42,13 +44,13 @@ type LockRowResult =
   | { success: false; errorMessage: string }
 
 export default class QwixxLogic {
-  private _playersArray: Player[];
-  private _dice: Dice;
+  private _playersArray: IPlayer[];
+  private _dice: IDice;
   private _currentTurnIndex: number;
   private _hasRolled: boolean;
   private _lockedRows: rowColour[]
 
-  constructor(players: Player[], dice: Dice) {
+  constructor(players: IPlayer[], dice: IDice) {
     this._playersArray = players;
     this._dice = dice;
     this._currentTurnIndex = 0;
@@ -74,7 +76,7 @@ export default class QwixxLogic {
     return this._playersArray[this._currentTurnIndex];
   }
 
-  private playerExistsInLobby(playerName: string): Player | undefined {
+  private playerExistsInLobby(playerName: string): IPlayer | undefined {
     return this._playersArray.find((player) => player.name === playerName);
   }
 
@@ -219,7 +221,7 @@ export default class QwixxLogic {
   }
 
   private validateMove(
-    player: Player,
+    player: IPlayer,
     row: string,
     num: number
   ): ValidationResult {
@@ -364,8 +366,11 @@ export default class QwixxLogic {
   // }
 
   public calculateScores(): Record<string, number> {
+    // TODO:
+    // we're only using the totals here but calling method actually gives us more information like subtotal
+    // Is there a way we can use that data so we don't have to call calculateScores one more time?
     const scores = this._playersArray.reduce((acc, player) => {
-      acc[player.name] = player.gameCard.calculateScore();
+      acc[player.name] = player.gameCard.calculateScores().total;
       return acc;
     }, {} as Record<string, number>)
 
