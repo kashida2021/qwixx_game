@@ -1,5 +1,3 @@
-import Player from "../models/PlayerClass";
-import Dice from "../models/DiceClass";
 import { rowColour } from "../enums/rowColours";
 import { SerializePlayer } from "../models/PlayerClass";
 import { TDiceValues } from "../models/DiceClass";
@@ -22,7 +20,27 @@ interface MoveValidationFailure {
   errorMessage: string;
 }
 
+interface GameResult {
+  winners: string[];
+  scores: {
+    subtotal: Record<string, number>;
+    penalties: number;
+    total: number;
+    name: string;
+  }[];
+}
+interface GameHasEnded {
+  hasGameEnded: true;
+  data: GameResult;
+}
+
+interface GameOngoing {
+  hasGameEnded: false;
+  data: null;
+}
+
 type ValidationResult = MoveValidationSuccess | MoveValidationFailure;
+type ProcessPlayerSubmissionResult = GameHasEnded | GameOngoing;
 
 interface SerializedGameState {
   players: Record<string, SerializePlayer>;
@@ -36,26 +54,37 @@ type PassMoveResult =
   | { isValid: false; errorMessage: string };
 
 type MakeMoveResult =
-  | { success: true; data: SerializedGameState }
+  | { success: true; gameEnd: false; data: SerializedGameState }
+  | { success: true; gameEnd: true; data: GameResult }
+  | { success: false; error: string };
+
+type ProcessPenaltyResult = 
+  | { success: true; gameEnd: false; data: SerializedGameState }
+  | { success: true; gameEnd: true; data: GameResult }
   | { success: false; error: string };
 
 type LockRowResult =
   | { success: true; data: SerializedGameState }
+  | { success: false; errorMessage: string };
+
+type EndTurnResult =
   | { success: false; errorMessage: string }
+  | { success: true; gameEnd: false; data: SerializedGameState }
+  | { success: true; gameEnd: true; data: GameResult };
 
 export default class QwixxLogic {
   private _playersArray: IPlayer[];
   private _dice: IDice;
   private _currentTurnIndex: number;
   private _hasRolled: boolean;
-  private _lockedRows: rowColour[]
+  private _lockedRows: rowColour[];
 
   constructor(players: IPlayer[], dice: IDice) {
     this._playersArray = players;
     this._dice = dice;
     this._currentTurnIndex = 0;
     this._hasRolled = false;
-    this._lockedRows = []
+    this._lockedRows = [];
   }
 
   public rollDice(): rollDiceResults {
@@ -99,23 +128,42 @@ export default class QwixxLogic {
   }
 
   private normaliseLockedRows() {
-    this._playersArray.forEach((player) => player.gameCard.normaliseRows(this._lockedRows))
+    this._playersArray.forEach((player) =>
+      player.gameCard.synchronizeLockedRows(this._lockedRows)
+    );
   }
 
-  private processPlayersSubmission() {
-    if (this.haveAllPlayersSubmitted()) {
-      this.resetAllPlayersSubmission();
+  private isGameEnd() {
+    return (
+      this._lockedRows.length >= 2 ||
+      this._playersArray.some((p) => p.gameCard.penalties.length === 4)
+    );
+  }
 
-      if (this._lockedRows) {
-        this.normaliseLockedRows();
-        this._lockedRows.forEach(row => {
-          const diceColour = this.getDiceColourFromLockedRow(row)
-          this._dice.disableDie(diceColour)
-        })
+  private handleEndOfRound() {
+    this.resetAllPlayersSubmission();
+
+    if (this._lockedRows) {
+      this.normaliseLockedRows();
+      this._lockedRows.forEach((row) => {
+        const diceColour = this.getDiceColourFromLockedRow(row);
+        this._dice.disableDie(diceColour);
+      });
+    }
+  }
+
+  private processPlayersSubmission(): ProcessPlayerSubmissionResult {
+    if (this.haveAllPlayersSubmitted()) {
+      this.handleEndOfRound();
+
+      if (this.isGameEnd()) {
+        const winners = this.determineWinner();
+        return { hasGameEnded: true, data: winners };
       }
 
       this.nextTurn();
     }
+    return { hasGameEnded: false, data: null };
   }
 
   private getDiceColourFromLockedRow(row: rowColour): DiceColour {
@@ -214,10 +262,18 @@ export default class QwixxLogic {
       (player !== this.activePlayer && player.submissionCount === 1)
     ) {
       player.markSubmitted();
-      this.processPlayersSubmission();
     }
 
-    return { success: true, data: this.serialize() };
+    const res = this.processPlayersSubmission();
+    if (res.hasGameEnded) {
+      return { success: true, gameEnd: res.hasGameEnded, data: res.data };
+    } else {
+      return {
+        success: true,
+        gameEnd: res.hasGameEnded,
+        data: this.serialize(),
+      };
+    }
   }
 
   private validateMove(
@@ -293,7 +349,7 @@ export default class QwixxLogic {
     };
   }
 
-  public endTurn(playerName: string) {
+  public endTurn(playerName: string): EndTurnResult {
     if (!this.hasRolled) {
       return { success: false, errorMessage: "Dice hasn't been rolled yet." };
     }
@@ -322,9 +378,13 @@ export default class QwixxLogic {
       player.markSubmitted();
     }
 
-    this.processPlayersSubmission();
+    const res = this.processPlayersSubmission();
 
-    return { success: true, data: this.serialize() };
+    if (res.hasGameEnded) {
+      return { success: true, gameEnd: res.hasGameEnded, data: res.data };
+    }
+
+    return { success: true, gameEnd: false, data: this.serialize() };
   }
 
   public processPenalty(playerName: string) {
@@ -350,22 +410,25 @@ export default class QwixxLogic {
 
     const res = player.gameCard.lockRow(colourToLock);
 
-    if (!res.success) {
-      return res
+    if (!res.success && res.errorMessage) {
+      return { success: false, errorMessage: res.errorMessage };
     }
-    // NOTE: 
+    // NOTE:
     //Does having this result in any bugs?
-    if (res.lockedRow && !this._lockedRows.includes(res.lockedRow)) {
-      this._lockedRows.push(res.lockedRow)
+    if (
+      res.success &&
+      res.lockedRow &&
+      !this._lockedRows.includes(res.lockedRow)
+    ) {
+      this._lockedRows.push(res.lockedRow);
     }
 
-    return { success: true, data: this.serialize() }
+    return { success: true, data: this.serialize() };
   }
   // private get players() {
   //   return this._playersArray;
   // }
 
-  // TODO: Should rename this method
   public collectPlayersScores() {
     const playerScores = this._playersArray.map((player) => ({
       name: player.name,
@@ -375,7 +438,7 @@ export default class QwixxLogic {
     return playerScores;
   }
 
-  public determineWinner() {
+  public determineWinner(): GameResult {
     const playerScores = this.collectPlayersScores();
     const highestScore = Math.max(
       ...playerScores.map((player) => player.total)
