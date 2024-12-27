@@ -341,14 +341,14 @@ export default class QwixxLogic {
   }
 
   public lockRow(playerName: string, row: string): LockRowResult {
-    const colourToLock = this.getColourFromRow(row)
+    const colourToLock = this.getColourFromRow(row);
 
-    const player = this.playerExistsInLobby(playerName)
+    const player = this.playerExistsInLobby(playerName);
     if (!player) {
-      throw new Error("Player not found")
+      throw new Error("Player not found");
     }
 
-    const res = player.gameCard.lockRow(colourToLock)
+    const res = player.gameCard.lockRow(colourToLock);
 
     if (!res.success) {
       return res
@@ -365,24 +365,26 @@ export default class QwixxLogic {
   //   return this._playersArray;
   // }
 
-  public calculateScores(): Record<string, number> {
-    // TODO:
-    // we're only using the totals here but calling method actually gives us more information like subtotal
-    // Is there a way we can use that data so we don't have to call calculateScores one more time?
-    const scores = this._playersArray.reduce((acc, player) => {
-      acc[player.name] = player.gameCard.calculateScores().total;
-      return acc;
-    }, {} as Record<string, number>)
+  // TODO: Should rename this method
+  public collectPlayersScores() {
+    const playerScores = this._playersArray.map((player) => ({
+      name: player.name,
+      ...player.gameCard.calculateScores(),
+    }));
 
-    return scores
+    return playerScores;
   }
 
   public determineWinner() {
-    const scores = this.calculateScores()
+    const playerScores = this.collectPlayersScores();
+    const highestScore = Math.max(
+      ...playerScores.map((player) => player.total)
+    );
+    const winners = playerScores
+      .filter((player) => player.total === highestScore)
+      .map((player) => player.name);
 
-    return Object.keys(scores).filter(
-      player => scores[player] == Math.max(...Object.values(scores))
-    )
+    return { winners, scores: playerScores };
   }
 
   public serialize(): SerializedGameState {
