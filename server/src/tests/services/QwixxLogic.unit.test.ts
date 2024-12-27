@@ -247,70 +247,130 @@ describe("Qwixx Logic tests", () => {
   // TODO: This should be combined with the game end phase test.
   describe("Calculate all players' score", () => {
     it("Can get back all players' score", () => {
-      gameCardMock1.calculateScores = jest.fn().mockReturnValueOnce(73)
-      gameCardMock2.calculateScores = jest.fn().mockReturnValueOnce(68)
-
-      const expected = {
-        player1: 73,
-        player2: 68,
+      const player1Scores = {
+          penalties: 0,
+          total: 78,
+          subtotal: { red: 78, yellow: 0, green: 0, blue: 0 },
       }
 
-      const testGame = new QwixxLogic(playersArrayMock, fakeDice)
-      const res = testGame.calculateScores()
+      const player2Scores = {
+          penalties: 0,
+          total: 66,
+          subtotal: { red: 0, yellow: 66, green: 0, blue: 0 },
+      }
 
-      expect(res).toEqual(expected)
-    })
+      gameCardMock1.calculateScores = jest.fn().mockReturnValueOnce(player1Scores);
+      gameCardMock2.calculateScores = jest.fn().mockReturnValueOnce(player2Scores);
+
+      const expected = [
+        {
+          name: "player1",
+          ...player1Scores
+        },
+        {
+          name: "player2",
+          ...player2Scores
+        },
+      ];
+
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
+      const res = testGame.collectPlayersScores();
+
+      expect(res).toEqual(expected);
+    });
 
     it("Can determine the winner", () => {
-      gameCardMock1.calculateScores = jest.fn().mockReturnValueOnce(73)
-      gameCardMock2.calculateScores = jest.fn().mockReturnValueOnce(68)
+      const player1Scores = {
+          penalties: 0,
+          total: 78,
+          subtotal: { red: 78, yellow: 0, green: 0, blue: 0 },
+      }
 
-      const testGame = new QwixxLogic(playersArrayMock, fakeDice)
-      const res = testGame.determineWinner()
+      const player2Scores = {
+          penalties: 0,
+          total: 66,
+          subtotal: { red: 0, yellow: 66, green: 0, blue: 0 },
+      }
 
-      expect(res).toEqual(["player1"])
-    })
+      gameCardMock1.calculateScores = jest.fn().mockReturnValueOnce(player1Scores);
+      gameCardMock2.calculateScores = jest.fn().mockReturnValueOnce(player2Scores);
+
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
+      const res = testGame.determineWinner();
+
+      expect(res.winners).toEqual(["player1"]);
+    });
 
     it("Can determine multiple winners", () => {
-      gameCardMock1.calculateScores = jest.fn().mockReturnValueOnce(73)
-      gameCardMock2.calculateScores = jest.fn().mockReturnValueOnce(73)
+      const player1Scores = {
+          penalties: 0,
+          total: 78,
+          subtotal: { red: 78, yellow: 0, green: 0, blue: 0 },
+      }
 
-      const testGame = new QwixxLogic(playersArrayMock, fakeDice)
-      const res = testGame.determineWinner()
+      const player2Scores = {
+          penalties: 0,
+          total: 78,
+          subtotal: { red: 0, yellow: 78, green: 0, blue: 0 },
+      }
 
-      expect(res).toEqual(["player1", "player2"])
-    })
-  })
+      gameCardMock1.calculateScores = jest.fn().mockReturnValueOnce(player1Scores);
+      gameCardMock2.calculateScores = jest.fn().mockReturnValueOnce(player2Scores);
+
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
+      const res = testGame.determineWinner();
+
+      expect(res.winners).toEqual(["player1", "player2"]);
+    });
+  });
 
   describe("Game end:", () => {
     it("Can determine the game has ended when 2 rows are locked", () => {
-      const testGame = new QwixxLogic(playersArrayMock, fakeDice)
-      testGame.rollDice()
+      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
+      testGame.rollDice();
 
-      gameCardMock1.lockRow = jest.fn()
+      gameCardMock1.lockRow = jest
+        .fn()
         .mockReturnValueOnce({ success: true, lockedRow: rowColour.Red })
-        .mockReturnValueOnce({ success: true, lockedRow: rowColour.Yellow })
+        .mockReturnValueOnce({ success: true, lockedRow: rowColour.Yellow });
 
-      gameCardMock1.calculateScores = jest.fn()
-        .mockReturnValueOnce({ penalties: 0, total: 48, subtotal: { red: 12, yellow: 12, green: 12, blue: 12 } })
-      gameCardMock2.calculateScores = jest.fn()
-        .mockReturnValueOnce({ penalties: 0, total: 36, subtotal: { red: 12, yellow: 12, green: 12, blue: 0 } })
-      testGame.lockRow("player1", "red")
-      testGame.lockRow("player1", "yellow")
+      gameCardMock1.calculateScores = jest.fn().mockReturnValueOnce({
+        penalties: 0,
+        total: 48,
+        subtotal: { red: 12, yellow: 12, green: 12, blue: 12 },
+      });
+      gameCardMock2.calculateScores = jest.fn().mockReturnValueOnce({
+        penalties: 0,
+        total: 36,
+        subtotal: { red: 12, yellow: 12, green: 12, blue: 0 },
+      });
+      testGame.lockRow("player1", "red");
+      testGame.lockRow("player1", "yellow");
 
-      jest.spyOn(player1Mock, "hasSubmittedChoice", "get").mockReturnValueOnce(false).mockReturnValueOnce(true)
-      jest.spyOn(player2Mock, "hasSubmittedChoice", "get").mockReturnValueOnce(true)
-      const res = testGame.endTurn("player1")
+      jest
+        .spyOn(player1Mock, "hasSubmittedChoice", "get")
+        .mockReturnValueOnce(false)
+        .mockReturnValueOnce(true);
+      jest
+        .spyOn(player2Mock, "hasSubmittedChoice", "get")
+        .mockReturnValueOnce(true);
+      const res = testGame.endTurn("player1");
 
-      console.log(res)
+      console.log(res);
       if (res.success) {
-        expect(res.data).toEqual(["player1"])
+        expect(res.data).toEqual(["player1"]);
       }
-    })
+    });
 
-    it.todo("Can determine the game has ended when more than 2 rows are locked")
-    it.todo("Can determine the game has ended when a player has 4 penalties")
-    it.todo("Can determine the game hasn't ended if at least 2 rows aren't locked")
-    it.todo("Can determine the game hasn't ended if 4 penalties haven't been accrued by a player")
-  })
+    it.todo(
+      "Can determine the game has ended when more than 2 rows are locked"
+    );
+    it.todo("Can determine the game has ended when a player has 4 penalties");
+    it.todo(
+      "Can determine the game hasn't ended if at least 2 rows aren't locked"
+    );
+    it.todo(
+      "Can determine the game hasn't ended if 4 penalties haven't been accrued by a player"
+    );
+  });
 });
