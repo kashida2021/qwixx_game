@@ -191,8 +191,8 @@ describe("Qwixx Logic tests", () => {
       const res = testGame.endTurn("player1");
 
       expect(res.success).toBeFalsy();
-      if(!res.success){
-      expect(res.errorMessage).toBe("Dice hasn't been rolled yet.");
+      if (!res.success) {
+        expect(res.errorMessage).toBe("Dice hasn't been rolled yet.");
       }
     });
 
@@ -250,28 +250,32 @@ describe("Qwixx Logic tests", () => {
   describe("Calculate all players' score", () => {
     it("Can get back all players' score", () => {
       const player1Scores = {
-          penalties: 0,
-          total: 78,
-          subtotal: { red: 78, yellow: 0, green: 0, blue: 0 },
-      }
+        penalties: 0,
+        total: 78,
+        subtotal: { red: 78, yellow: 0, green: 0, blue: 0 },
+      };
 
       const player2Scores = {
-          penalties: 0,
-          total: 66,
-          subtotal: { red: 0, yellow: 66, green: 0, blue: 0 },
-      }
+        penalties: 0,
+        total: 66,
+        subtotal: { red: 0, yellow: 66, green: 0, blue: 0 },
+      };
 
-      gameCardMock1.calculateScores = jest.fn().mockReturnValueOnce(player1Scores);
-      gameCardMock2.calculateScores = jest.fn().mockReturnValueOnce(player2Scores);
+      gameCardMock1.calculateScores = jest
+        .fn()
+        .mockReturnValueOnce(player1Scores);
+      gameCardMock2.calculateScores = jest
+        .fn()
+        .mockReturnValueOnce(player2Scores);
 
       const expected = [
         {
           name: "player1",
-          ...player1Scores
+          ...player1Scores,
         },
         {
           name: "player2",
-          ...player2Scores
+          ...player2Scores,
         },
       ];
 
@@ -283,19 +287,23 @@ describe("Qwixx Logic tests", () => {
 
     it("Can determine the winner", () => {
       const player1Scores = {
-          penalties: 0,
-          total: 78,
-          subtotal: { red: 78, yellow: 0, green: 0, blue: 0 },
-      }
+        penalties: 0,
+        total: 78,
+        subtotal: { red: 78, yellow: 0, green: 0, blue: 0 },
+      };
 
       const player2Scores = {
-          penalties: 0,
-          total: 66,
-          subtotal: { red: 0, yellow: 66, green: 0, blue: 0 },
-      }
+        penalties: 0,
+        total: 66,
+        subtotal: { red: 0, yellow: 66, green: 0, blue: 0 },
+      };
 
-      gameCardMock1.calculateScores = jest.fn().mockReturnValueOnce(player1Scores);
-      gameCardMock2.calculateScores = jest.fn().mockReturnValueOnce(player2Scores);
+      gameCardMock1.calculateScores = jest
+        .fn()
+        .mockReturnValueOnce(player1Scores);
+      gameCardMock2.calculateScores = jest
+        .fn()
+        .mockReturnValueOnce(player2Scores);
 
       const testGame = new QwixxLogic(playersArrayMock, fakeDice);
       const res = testGame.determineWinner();
@@ -305,19 +313,23 @@ describe("Qwixx Logic tests", () => {
 
     it("Can determine multiple winners", () => {
       const player1Scores = {
-          penalties: 0,
-          total: 78,
-          subtotal: { red: 78, yellow: 0, green: 0, blue: 0 },
-      }
+        penalties: 0,
+        total: 78,
+        subtotal: { red: 78, yellow: 0, green: 0, blue: 0 },
+      };
 
       const player2Scores = {
-          penalties: 0,
-          total: 78,
-          subtotal: { red: 0, yellow: 78, green: 0, blue: 0 },
-      }
+        penalties: 0,
+        total: 78,
+        subtotal: { red: 0, yellow: 78, green: 0, blue: 0 },
+      };
 
-      gameCardMock1.calculateScores = jest.fn().mockReturnValueOnce(player1Scores);
-      gameCardMock2.calculateScores = jest.fn().mockReturnValueOnce(player2Scores);
+      gameCardMock1.calculateScores = jest
+        .fn()
+        .mockReturnValueOnce(player1Scores);
+      gameCardMock2.calculateScores = jest
+        .fn()
+        .mockReturnValueOnce(player2Scores);
 
       const testGame = new QwixxLogic(playersArrayMock, fakeDice);
       const res = testGame.determineWinner();

@@ -31,7 +31,7 @@ interface EndGameSummary {
 }
 
 // type SuccessResult<T> = { success: true; data: T};
-type ErrorResult = { success: false; errorMessage: string};
+type ErrorResult = { success: false; errorMessage: string };
 
 interface GameHasEnded {
   hasGameEnded: true;
@@ -57,19 +57,16 @@ type PassMoveResult =
   | { success: true; data: SerializedGameState }
   | ErrorResult;
 
-type GameActionResult = 
-  | { success: true; gameEnd: false; data: SerializedGameState} 
-  | { success: true; gameEnd: true; data: EndGameSummary}
-  | ErrorResult
+type GameActionResult =
+  | { success: true; gameEnd: false; data: SerializedGameState }
+  | { success: true; gameEnd: true; data: EndGameSummary }
+  | ErrorResult;
 
-type MakeMoveResult = GameActionResult
-type ProcessPenaltyResult = GameActionResult
-type EndTurnResult = GameActionResult
+type MakeMoveResult = GameActionResult;
+type ProcessPenaltyResult = GameActionResult;
+type EndTurnResult = GameActionResult;
 
-type LockRowResult =
-  | { success: true; data: SerializedGameState }
-  | ErrorResult
-
+type LockRowResult = { success: true; data: SerializedGameState } | ErrorResult;
 
 export default class QwixxLogic {
   private _playersArray: IPlayer[];
@@ -386,17 +383,27 @@ export default class QwixxLogic {
     return { success: true, gameEnd: false, data: this.serialize() };
   }
 
-  public processPenalty(playerName: string) {
+  public processPenalty(playerName: string): ProcessPenaltyResult {
     const player = this.playerExistsInLobby(playerName);
     if (!player) {
       throw new Error("Player not found");
     }
 
+    if (player.hasSubmittedChoice) {
+      return {
+        success: false,
+        errorMessage: "Player has already ended their turn.",
+      };
+    }
+
     player.gameCard.addPenalty();
     player.markSubmitted();
-    this.processPlayersSubmission();
+    const res = this.processPlayersSubmission();
 
-    return this.serialize();
+    if (res.hasGameEnded) {
+      return { success: true, gameEnd: res.hasGameEnded, data: res.data };
+    }
+    return { success: true, gameEnd: res.hasGameEnded, data: this.serialize() };
   }
 
   public lockRow(playerName: string, row: string): LockRowResult {
