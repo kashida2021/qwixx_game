@@ -20,7 +20,7 @@ interface MoveValidationFailure {
   errorMessage: string;
 }
 
-interface GameResult {
+interface EndGameSummary {
   winners: string[];
   scores: {
     subtotal: Record<string, number>;
@@ -29,9 +29,13 @@ interface GameResult {
     name: string;
   }[];
 }
+
+// type SuccessResult<T> = { success: true; data: T};
+type ErrorResult = { success: false; errorMessage: string};
+
 interface GameHasEnded {
   hasGameEnded: true;
-  data: GameResult;
+  data: EndGameSummary;
 }
 
 interface GameOngoing {
@@ -50,27 +54,22 @@ interface SerializedGameState {
 }
 
 type PassMoveResult =
-  | { isValid: true; data: SerializedGameState }
-  | { isValid: false; errorMessage: string };
+  | { success: true; data: SerializedGameState }
+  | ErrorResult;
 
-type MakeMoveResult =
-  | { success: true; gameEnd: false; data: SerializedGameState }
-  | { success: true; gameEnd: true; data: GameResult }
-  | { success: false; error: string };
+type GameActionResult = 
+  | { success: true; gameEnd: false; data: SerializedGameState} 
+  | { success: true; gameEnd: true; data: EndGameSummary}
+  | ErrorResult
 
-type ProcessPenaltyResult = 
-  | { success: true; gameEnd: false; data: SerializedGameState }
-  | { success: true; gameEnd: true; data: GameResult }
-  | { success: false; error: string };
+type MakeMoveResult = GameActionResult
+type ProcessPenaltyResult = GameActionResult
+type EndTurnResult = GameActionResult
 
 type LockRowResult =
   | { success: true; data: SerializedGameState }
-  | { success: false; errorMessage: string };
+  | ErrorResult
 
-type EndTurnResult =
-  | { success: false; errorMessage: string }
-  | { success: true; gameEnd: false; data: SerializedGameState }
-  | { success: true; gameEnd: true; data: GameResult };
 
 export default class QwixxLogic {
   private _playersArray: IPlayer[];
@@ -203,24 +202,24 @@ export default class QwixxLogic {
     }
 
     if (!this.hasRolled) {
-      return { isValid: false, errorMessage: "Dice hasn't been rolled yet." };
+      return { success: false, errorMessage: "Dice hasn't been rolled yet." };
     }
     // Check if active player
     if (player !== this.activePlayer) {
       return {
-        isValid: false,
+        success: false,
         errorMessage: "Unable to pass if not active player.",
       };
     }
 
     // Check submission count is 0
     if (player?.submissionCount === 1) {
-      return { isValid: false, errorMessage: "Cannot pass on second choice." };
+      return { success: false, errorMessage: "Cannot pass on second choice." };
     }
 
     //add player method to update submission count for passmove
     player.passMove();
-    return { isValid: true, data: this.serialize() };
+    return { success: true, data: this.serialize() };
   }
 
   public makeMove(
@@ -243,7 +242,7 @@ export default class QwixxLogic {
     // returning an object literal because it is a game-rule violation
     if (!validationResult.isValid) {
       //throw validationResult.errorMessage;
-      return { success: false, error: validationResult.errorMessage };
+      return { success: false, errorMessage: validationResult.errorMessage };
     }
 
     const markNumberResult = player.markNumber(colourToMark, num);
@@ -253,7 +252,7 @@ export default class QwixxLogic {
       //throw new Error("Invalid move: cannot mark this number.");
       return {
         success: markNumberResult.success,
-        error: markNumberResult.errorMessage,
+        errorMessage: markNumberResult.errorMessage,
       };
     }
 
@@ -438,7 +437,7 @@ export default class QwixxLogic {
     return playerScores;
   }
 
-  public determineWinner(): GameResult {
+  public determineWinner(): EndGameSummary {
     const playerScores = this.collectPlayersScores();
     const highestScore = Math.max(
       ...playerScores.map((player) => player.total)
