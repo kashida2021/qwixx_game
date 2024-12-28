@@ -201,7 +201,7 @@ export default function initializeSocketHandler(io: Server) {
         // console.log("Updated game state:", res);
 
         if (!res?.success) {
-          const responseData = { message: res?.error };
+          const responseData = { message: res?.errorMessage };
           socket.emit("error_occured", { message: responseData });
           return callback(false);
         }
@@ -274,12 +274,12 @@ export default function initializeSocketHandler(io: Server) {
       try {
         const result = gameState.passMove(userId);
 
-        if (!result.isValid) {
+        if (!result.success) {
           console.log(result.errorMessage);
           socket.emit("error_occurred", { message: result.errorMessage });
         }
 
-        if (result.isValid) {
+        if (result.success) {
           io.to(lobbyId).emit("passMoveProcessed", { gameState: result.data });
           console.log("data for passMove:", result.data);
         }
