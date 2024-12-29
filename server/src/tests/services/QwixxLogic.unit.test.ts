@@ -78,7 +78,7 @@ describe("Qwixx Logic tests", () => {
   });
 
   describe("processPenalthy method tests", () => {
-    //TODO: Should be covered in integration test
+    //TODO: Should rename this description
     it("should add a penalty to the player and mark them as submitted", () => {
       const testGame = new QwixxLogic(playersArrayMock, fakeDice);
       const player1AddPenaltySpy = jest.spyOn(gameCardMock1, "addPenalty");
@@ -89,14 +89,6 @@ describe("Qwixx Logic tests", () => {
 
       expect(player1AddPenaltySpy).toHaveBeenCalledTimes(1);
       expect(player1MarkSubmittedSpy).toHaveBeenCalled();
-    });
-
-    //TODO: Should be covered in integration test
-    it("should throw an error if player not found", () => {
-      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
-      expect(() => testGame.processPenalty("player3")).toThrow(
-        "Player not found"
-      );
     });
   });
 

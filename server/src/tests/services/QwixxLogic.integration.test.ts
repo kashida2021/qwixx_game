@@ -438,4 +438,28 @@ describe("Qwixx Logic integration tests:", () => {
     testGame.rollDice();
     expect(() => testGame.endTurn("player3")).toThrow("Player not found");
   });
+
+  describe.only("Process Penalty test", () => {
+    it("should add a penalty to the player and mark them as submitted", () => {
+      testGame.rollDice()
+      const res = testGame.processPenalty("test-player1");
+
+      if(!res.success || res.gameEnd){
+        throw new Error()
+      }
+      expect(res.success).toBeTruthy();
+      
+      expect(res.data.players["test-player1"].gameCard.penalties).toEqual([1])
+      expect(res.data.players["test-player1"].hasSubmittedChoice).toBeTruthy()
+    });
+
+    test.todo("Can't add more than one penalty per round")
+
+    it("should throw an error if player not found", () => {
+      testGame.rollDice()
+      expect(() => testGame.processPenalty("player3")).toThrow(
+        "Player not found"
+      );
+    });
+  })
 });
