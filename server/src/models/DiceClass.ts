@@ -32,19 +32,12 @@ export default class Dice implements IDice {
     return this.diceValues.white1 + this.diceValues.white2;
   }
 
-  // get validColouredNumbers(): number[] {
-  //   const whiteValues = [this._diceValues.white1, this._diceValues.white2];
-  //   const colouredValues = [this._diceValues.red, this._diceValues.yellow, this._diceValues.green, this._diceValues.blue];
-  //   return whiteValues.flatMap(white => colouredValues.filter(value => value > 0).map(value => value + white));
-  // }
-
   /**
    * @description Returns all possible number combinations for white and coloured dice in accordance to game rules
    * @returns An object mapping dice colours to an array of white die + the respective coloured die's value
    */
   public get validColouredNumbers() {
     const { white1, white2, ...colouredValues } = this.diceValues;
-    //const result: { [key in rowColour]?: number[] } = {};
     const result: Partial<Record<rowColour, number[]>> = {};
 
     for (const [colour, value] of Object.entries(colouredValues)) {
@@ -61,13 +54,7 @@ export default class Dice implements IDice {
     let diceColours = Object.keys(this._dice) as DiceColour[];
     diceColours.forEach((colour) => {
       const dieColour = colour as DiceColour;
-      if (this._dice[dieColour].active === false) {
-        this.diceValues[dieColour] = 0;
-      } else {
-        // this._dice[dieColour].rollDie();
-        // this._diceValues[dieColour] = this._dice[dieColour].value;
-        this.diceValues[dieColour] = this._dice[dieColour].rollDie();
-      }
+      this.diceValues[dieColour] = this._dice[dieColour].rollDie();
     });
     return this.diceValues;
   }

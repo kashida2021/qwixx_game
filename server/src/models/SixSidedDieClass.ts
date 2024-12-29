@@ -14,6 +14,10 @@ export default class SixSidedDie implements IDie {
   }
 
   rollDie(): number {
+    if (!this._active) {
+      return 0;
+    }
+
     this._value = Math.floor(Math.random() * 6) + 1;
     return this._value;
   }
