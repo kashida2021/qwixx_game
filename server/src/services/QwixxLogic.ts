@@ -117,6 +117,21 @@ export default class QwixxLogic {
     return this._hasRolled;
   }
 
+  private validateGameActionPrerequisite(player: IPlayer): ValidationResult {
+    if (!this.hasRolled) {
+      return { isValid: false, errorMessage: "Dice hasn't been rolled yet." };
+    }
+
+    if (player.hasSubmittedChoice) {
+      return {
+        isValid: false,
+        errorMessage: "Player already finished their turn.",
+      };
+    }
+
+    return { isValid: true };
+  }
+
   private nextTurn() {
     this._hasRolled = false;
     return (this._currentTurnIndex =
@@ -199,13 +214,14 @@ export default class QwixxLogic {
   }
 
   public passMove(playerName: string): PassMoveResult {
-    // Call Player Method add submission to player
     const player = this.playerExistsInLobby(playerName);
 
-    if (!this.hasRolled) {
-      return { success: false, errorMessage: "Dice hasn't been rolled yet." };
+    const validationResult = this.validateGameActionPrerequisite(player);
+
+    if (!validationResult.isValid) {
+      return { success: false, errorMessage: validationResult.errorMessage };
     }
-    // Check if active player
+
     if (player !== this.activePlayer) {
       return {
         success: false,
@@ -213,12 +229,10 @@ export default class QwixxLogic {
       };
     }
 
-    // Check submission count is 0
-    if (player?.submissionCount === 1) {
+    if (player.submissionCount > 1) {
       return { success: false, errorMessage: "Cannot pass on second choice." };
     }
 
-    //add player method to update submission count for passmove
     player.passMove();
     return { success: true, data: this.serialize() };
   }
@@ -228,27 +242,25 @@ export default class QwixxLogic {
     row: string,
     num: number
   ): MakeMoveResult {
-    const colourToMark = this.getColourFromRow(row);
+    const rowToMark = this.getColourFromRow(row);
     const player = this.playerExistsInLobby(playerName);
-    // Moved this check up to here and early return
-    // Only throw error here because critical error and not game-rule violation
+    const validPrereq = this.validateGameActionPrerequisite(player);
 
-    //Passed the player object to validateMove instead of playerName
-    const validationResult = this.validateMove(player, row, num);
+    if (!validPrereq.isValid) {
+      return { success: false, errorMessage: validPrereq.errorMessage };
+    }
 
-    // returning an object literal because it is a game-rule violation
+    const validationResult = this.validateMove(player, rowToMark, num);
+
     if (!validationResult.isValid) {
-      //throw validationResult.errorMessage;
       return { success: false, errorMessage: validationResult.errorMessage };
     }
 
-    const markNumberResult = player.markNumber(colourToMark, num);
+    const markNumberResult = player.markNumber(rowToMark, num);
 
-    // returning an object literal because it is a game-rule violation
     if (!markNumberResult.success) {
-      //throw new Error("Invalid move: cannot mark this number.");
       return {
-        success: markNumberResult.success,
+        success: false,
         errorMessage: markNumberResult.errorMessage,
       };
     }
@@ -274,17 +286,9 @@ export default class QwixxLogic {
 
   private validateMove(
     player: IPlayer,
-    row: string,
+    row: rowColour,
     num: number
   ): ValidationResult {
-    const colourToMark = this.getColourFromRow(row);
-    if (!this.hasRolled) {
-      return {
-        isValid: false,
-        errorMessage: "Dice hasn't been rolled yet.",
-      };
-    }
-
     if (num < 2 || num > 12) {
       return {
         isValid: false,
@@ -292,16 +296,7 @@ export default class QwixxLogic {
       };
     }
 
-    if (player.hasSubmittedChoice) {
-      return {
-        isValid: false,
-        errorMessage: "Player already finished their turn.",
-      };
-    }
-
-    /*
-     * Checks the non-active player's number selection.
-     */
+    //Checks the non-active player's number selection.
     if (player !== this.activePlayer && num !== this._dice.whiteDiceSum) {
       return {
         isValid: false,
@@ -309,10 +304,8 @@ export default class QwixxLogic {
       };
     }
 
-    /*
-     * Checks the active player's first number selection is valid.
-     * A valid move for first selection is the sum of the white dice.
-     */
+    //Checks the active player's first number selection is valid.
+    //A valid move for first selection is the sum of the white dice.
     if (
       player === this.activePlayer &&
       player.submissionCount === 0 &&
@@ -324,14 +317,12 @@ export default class QwixxLogic {
       };
     }
 
-    /*
-     * Checks the active player's second number selection is valid.
-     * A valid move for the second selection is the sum of a white die + coloured die
-     */
+    //Checks the active player's second number selection is valid.
+    //A valid move for the second selection is the sum of a white die + coloured die
     if (
       player === this.activePlayer &&
       player.submissionCount === 1 &&
-      !this._dice.validColouredNumbers[colourToMark]?.includes(num)
+      !this._dice.validColouredNumbers[row]?.includes(num)
     ) {
       return {
         isValid: false,
@@ -346,17 +337,11 @@ export default class QwixxLogic {
   }
 
   public endTurn(playerName: string): EndTurnResult {
-    if (!this.hasRolled) {
-      return { success: false, errorMessage: "Dice hasn't been rolled yet." };
-    }
-
     const player = this.playerExistsInLobby(playerName);
+    const validationResult = this.validateGameActionPrerequisite(player);
 
-    if (player.hasSubmittedChoice) {
-      return {
-        success: false,
-        errorMessage: "Player has already ended their turn.",
-      };
+    if (!validationResult.isValid) {
+      return { success: false, errorMessage: validationResult.errorMessage };
     }
 
     if (player !== this.activePlayer) {
@@ -381,12 +366,10 @@ export default class QwixxLogic {
 
   public processPenalty(playerName: string): ProcessPenaltyResult {
     const player = this.playerExistsInLobby(playerName);
-    console.log(player)
-    if (player.hasSubmittedChoice) {
-      return {
-        success: false,
-        errorMessage: "Player has already ended their turn.",
-      };
+    const validationResult = this.validateGameActionPrerequisite(player);
+
+    if (!validationResult.isValid) {
+      return { success: false, errorMessage: validationResult.errorMessage };
     }
 
     player.gameCard.addPenalty();
@@ -420,9 +403,6 @@ export default class QwixxLogic {
 
     return { success: true, data: this.serialize() };
   }
-  // private get players() {
-  //   return this._playersArray;
-  // }
 
   public collectPlayersScores() {
     const playerScores = this._playersArray.map((player) => ({
