@@ -6,7 +6,15 @@ let testDice: Dice;
 
 describe("Dice integration tests", () => {
   beforeEach(() => {
-    testDice = new Dice(SixSidedDie);
+    const dice = {
+      [DiceColour.White1]: new SixSidedDie(),
+      [DiceColour.White2]: new SixSidedDie(),
+      [DiceColour.Red]: new SixSidedDie(),
+      [DiceColour.Yellow]: new SixSidedDie(),
+      [DiceColour.Green]: new SixSidedDie(),
+      [DiceColour.Blue]: new SixSidedDie(),
+    };
+    testDice = new Dice(dice);
   });
 
   it("should initialize with all dice values as 1", () => {
@@ -52,9 +60,10 @@ describe("Dice integration tests", () => {
 
   test("validColouredNumbers returns an object of valid number", () => {
     const diceValues = testDice.rollAllDice();
-
     const num = diceValues.white1 + diceValues.red;
 
-    expect(testDice.validColouredNumbers["red"]?.includes(num)).toBeTruthy();
-  })
+    expect(
+      testDice.validColouredNumbers[DiceColour.Red]?.includes(num)
+    ).toBeTruthy();
+  });
 });

@@ -1,26 +1,47 @@
 import Dice from "../../models/DiceClass";
 import SixSidedDie from "../../models/SixSidedDieClass";
 import IDice from "../../models/IDice";
+import IDie from "../../models/IDie";
 import { DiceColour } from "../../enums/DiceColours";
+
+const createDieMock = (): jest.Mocked<IDie> => {
+  return {
+    get value(){
+      return 1
+    },
+    get active(){
+      return true;
+    },
+    rollDie: jest.fn(),
+    disable: jest.fn(),
+  }
+}
+
+const mockSixSidedDice = {
+  [DiceColour.White1]: createDieMock(),
+  [DiceColour.White2]: createDieMock(),
+  [DiceColour.Red]: createDieMock(),
+  [DiceColour.Yellow]: createDieMock(),
+  [DiceColour.Green]: createDieMock(),
+  [DiceColour.Blue]: createDieMock(),
+}
 
 describe("DiceClass unit test", () => {
   let testDice: IDice;
   beforeEach(() => {
-    testDice = new Dice(SixSidedDie);
+    testDice = new Dice(mockSixSidedDice);
   });
 
   afterEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
   it("should return valid sums when dice values are positive numbers", () => {
-    SixSidedDie.prototype.rollDie = jest
-      .fn()
-      .mockReturnValueOnce(2) // Mock for White1
-      .mockReturnValueOnce(3) // Mock for White2
-      .mockReturnValueOnce(4) // Mock for Red
-      .mockReturnValueOnce(6) // Mock for Yellow (should be ignored)
-      .mockReturnValueOnce(5) // Mock for Green
-      .mockReturnValueOnce(1); // Mock for Blue (should be ignored)
+    mockSixSidedDice[DiceColour.White1].rollDie.mockReturnValue(2)
+    mockSixSidedDice[DiceColour.White2].rollDie.mockReturnValue(3)
+    mockSixSidedDice[DiceColour.Red].rollDie.mockReturnValue(4)
+    mockSixSidedDice[DiceColour.Yellow].rollDie.mockReturnValue(6)
+    mockSixSidedDice[DiceColour.Green].rollDie.mockReturnValue(5)
+    mockSixSidedDice[DiceColour.Blue].rollDie.mockReturnValue(1)
 
     const expectedNumbers = {
       red: [6, 7],
@@ -37,20 +58,16 @@ describe("DiceClass unit test", () => {
   });
 
   it("should ignore sums involving dice values of 0", () => {
-    SixSidedDie.prototype.rollDie = jest
-      .fn()
-      .mockReturnValueOnce(2)
-      .mockReturnValueOnce(3)
-      .mockReturnValueOnce(4)
-      .mockReturnValueOnce(0)
-      .mockReturnValueOnce(5)
-      .mockReturnValueOnce(0);
+    mockSixSidedDice[DiceColour.White1].rollDie.mockReturnValue(2)
+    mockSixSidedDice[DiceColour.White2].rollDie.mockReturnValue(3)
+    mockSixSidedDice[DiceColour.Red].rollDie.mockReturnValue(4)
+    mockSixSidedDice[DiceColour.Yellow].rollDie.mockReturnValue(0)
+    mockSixSidedDice[DiceColour.Green].rollDie.mockReturnValue(5)
+    mockSixSidedDice[DiceColour.Blue].rollDie.mockReturnValue(0)
 
     const expectedNumbers = {
       red: [6, 7],
-      // yellow: [],
       green: [7, 8],
-      // blue: [],
     };
 
     testDice.rollAllDice();
@@ -61,14 +78,12 @@ describe("DiceClass unit test", () => {
   });
 
   it("should ignore sums involving dice of negative values", () => {
-    SixSidedDie.prototype.rollDie = jest
-      .fn()
-      .mockReturnValueOnce(2)
-      .mockReturnValueOnce(3)
-      .mockReturnValueOnce(-3)
-      .mockReturnValueOnce(-4)
-      .mockReturnValueOnce(5)
-      .mockReturnValueOnce(-1);
+    mockSixSidedDice[DiceColour.White1].rollDie.mockReturnValue(2)
+    mockSixSidedDice[DiceColour.White2].rollDie.mockReturnValue(3)
+    mockSixSidedDice[DiceColour.Red].rollDie.mockReturnValue(-3)
+    mockSixSidedDice[DiceColour.Yellow].rollDie.mockReturnValue(-4)
+    mockSixSidedDice[DiceColour.Green].rollDie.mockReturnValue(5)
+    mockSixSidedDice[DiceColour.Blue].rollDie.mockReturnValue(-1)
 
     const expectedNumbers = {
       green: [7, 8],
@@ -82,14 +97,12 @@ describe("DiceClass unit test", () => {
   });
 
   it("should hanlde duplicate sums for duplicate values", () => {
-    SixSidedDie.prototype.rollDie = jest
-      .fn()
-      .mockReturnValueOnce(2)
-      .mockReturnValueOnce(2)
-      .mockReturnValueOnce(5)
-      .mockReturnValueOnce(4)
-      .mockReturnValueOnce(5)
-      .mockReturnValueOnce(4);
+    mockSixSidedDice[DiceColour.White1].rollDie.mockReturnValue(2)
+    mockSixSidedDice[DiceColour.White2].rollDie.mockReturnValue(2)
+    mockSixSidedDice[DiceColour.Red].rollDie.mockReturnValue(5)
+    mockSixSidedDice[DiceColour.Yellow].rollDie.mockReturnValue(4)
+    mockSixSidedDice[DiceColour.Green].rollDie.mockReturnValue(5)
+    mockSixSidedDice[DiceColour.Blue].rollDie.mockReturnValue(4)
 
     const expectedNumbers = {
       red: [7, 7],
@@ -104,12 +117,3 @@ describe("DiceClass unit test", () => {
     expect(validColouredNumbers).toEqual(expectedNumbers);
   });
 });
-
-// diceValues = {
-//   red: [3,5],
-//   yellow: [4,6],
-//   green: [8,5],
-//   blue: [3,4],
-// }
-
-// !validColouredNumbers[colourToMark].includes(num)

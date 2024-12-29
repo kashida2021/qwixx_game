@@ -1,7 +1,7 @@
 import IDie from "../../../models/IDie";
 import { DiceColour } from "../../../enums/DiceColours";
 
-function createDieMock(dieValue: number): IDie{
+function createDieMock(dieValue: number): jest.Mocked<IDie>{
     return {
         get value(){
             return dieValue
