@@ -93,27 +93,31 @@ describe("Qwixx Logic integration tests:", () => {
     });
 
     test("when all players have submitted a move, it should go to the next turn by making the next player the active player", () => {
-      testGame.rollDice();
+      const res = testGame.rollDice();
       const initialGameState = testGame.serialize();
       expect(initialGameState.activePlayer).toBe("test-player1");
 
       const firstMoveState = testGame.makeMove("test-player1", "red", 5);
-      expect(firstMoveState.success).toBeTruthy();
-      if (firstMoveState.success && !firstMoveState.gameEnd) {
-        expect(firstMoveState.data.activePlayer).toBe("test-player1");
+      if (!firstMoveState.success || firstMoveState.gameEnd) {
+        throw new Error();
       }
+
+      expect(firstMoveState.success).toBeTruthy();
+      expect(firstMoveState.data.activePlayer).toBe("test-player1");
 
       const secondMoveState = testGame.makeMove("test-player1", "red", 7);
-      expect(secondMoveState.success).toBeTruthy();
-      if (secondMoveState.success && !secondMoveState.gameEnd) {
-        expect(secondMoveState.data.activePlayer).toBe("test-player1");
+      if (!secondMoveState.success || secondMoveState.gameEnd) {
+        throw new Error();
       }
+      expect(secondMoveState.success).toBeTruthy();
+      expect(secondMoveState.data.activePlayer).toBe("test-player1");
 
       const finalMoveState = testGame.makeMove("test-player2", "blue", 5);
-      expect(finalMoveState).toBeTruthy();
-      if (finalMoveState.success && !finalMoveState.gameEnd) {
-        expect(finalMoveState.data.activePlayer).toBe("test-player2");
+      if (!finalMoveState.success || finalMoveState.gameEnd) {
+        throw new Error();
       }
+      expect(finalMoveState).toBeTruthy();
+      expect(finalMoveState.data.activePlayer).toBe("test-player2");
     });
 
     test("when the game goes to the next turn, all players' submission state is reset", () => {
@@ -411,14 +415,14 @@ describe("Qwixx Logic integration tests:", () => {
       }
     });
 
-    it("returns an error if player has already end their turn", () => {
+    it("returns an error if player has already ended their turn", () => {
       testGame.rollDice();
       testGame.endTurn("test-player1");
       const result = testGame.endTurn("test-player1");
       expect(result.success).toBeFalsy();
       if (!result.success) {
         expect(result.errorMessage).toBe(
-          "Player has already ended their turn."
+          "Player already finished their turn."
         );
       }
     });
@@ -439,27 +443,48 @@ describe("Qwixx Logic integration tests:", () => {
     expect(() => testGame.endTurn("player3")).toThrow("Player not found");
   });
 
-  describe.only("Process Penalty test", () => {
+  describe("Process Penalty test", () => {
     it("should add a penalty to the player and mark them as submitted", () => {
-      testGame.rollDice()
+      testGame.rollDice();
       const res = testGame.processPenalty("test-player1");
 
-      if(!res.success || res.gameEnd){
-        throw new Error()
+      if (!res.success || res.gameEnd) {
+        throw new Error();
       }
       expect(res.success).toBeTruthy();
-      
-      expect(res.data.players["test-player1"].gameCard.penalties).toEqual([1])
-      expect(res.data.players["test-player1"].hasSubmittedChoice).toBeTruthy()
+
+      expect(res.data.players["test-player1"].gameCard.penalties).toEqual([1]);
+      expect(res.data.players["test-player1"].hasSubmittedChoice).toBeTruthy();
     });
 
-    test.todo("Can't add more than one penalty per round")
+    test.todo("Can't add more than one penalty per round");
 
     it("should throw an error if player not found", () => {
-      testGame.rollDice()
+      testGame.rollDice();
       expect(() => testGame.processPenalty("player3")).toThrow(
         "Player not found"
       );
     });
-  })
+  });
+
+  describe("Pass move tests", () => {
+    test("Can't pass turn if a dice hasn't been rolled", () => {
+      const res = testGame.passMove("test-player1");
+
+      if (res.success) {
+        throw new Error();
+      }
+
+      expect(res.success).toBeFalsy();
+      expect(res.errorMessage).toBe("Dice hasn't been rolled yet.");
+    });
+  });
+
+  test("should throw an error if player not found", () => {
+    testGame.rollDice();
+    expect(() => testGame.passMove("player3")).toThrow("Player not found.");
+  });
+
+  test.todo("Verify that only active player can pass move");
+  test.todo("What's the expected behaviour when successful?");
 });
