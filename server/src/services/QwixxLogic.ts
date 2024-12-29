@@ -244,25 +244,20 @@ export default class QwixxLogic {
   ): MakeMoveResult {
     const rowToMark = this.getColourFromRow(row);
     const player = this.playerExistsInLobby(playerName);
-    const validPrereq = this.validateGameActionPrerequisite(player);
 
+    const validPrereq = this.validateGameActionPrerequisite(player);
     if (!validPrereq.isValid) {
       return { success: false, errorMessage: validPrereq.errorMessage };
     }
 
     const validationResult = this.validateMove(player, rowToMark, num);
-
     if (!validationResult.isValid) {
       return { success: false, errorMessage: validationResult.errorMessage };
     }
 
     const markNumberResult = player.markNumber(rowToMark, num);
-
     if (!markNumberResult.success) {
-      return {
-        success: false,
-        errorMessage: markNumberResult.errorMessage,
-      };
+      return { success: false, errorMessage: markNumberResult.errorMessage };
     }
 
     if (
