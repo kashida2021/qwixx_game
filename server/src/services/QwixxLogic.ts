@@ -4,8 +4,9 @@ import { TDiceValues } from "../models/DiceClass";
 import { DiceColour } from "../enums/DiceColours";
 import IPlayer from "../models/IPlayer";
 import IDice from "../models/IDice";
+import IQwixxLogic from "./IQwixxLogic";
 
-interface rollDiceResults {
+export interface RollDiceResult {
   hasRolled: boolean;
   hasAvailableMoves: boolean;
   diceValues: TDiceValues;
@@ -46,14 +47,14 @@ interface GameOngoing {
 type ValidationResult = MoveValidationSuccess | MoveValidationFailure;
 type ProcessPlayerSubmissionResult = GameHasEnded | GameOngoing;
 
-interface SerializedGameState {
+export interface SerializedGameState {
   players: Record<string, SerializePlayer>;
   dice: TDiceValues;
   activePlayer: string;
   hasRolled: boolean;
 }
 
-type PassMoveResult =
+export type PassMoveResult =
   | { success: true; data: SerializedGameState }
   | ErrorResult;
 
@@ -62,13 +63,15 @@ type GameActionResult =
   | { success: true; gameEnd: true; data: EndGameSummary }
   | ErrorResult;
 
-type MakeMoveResult = GameActionResult;
-type ProcessPenaltyResult = GameActionResult;
-type EndTurnResult = GameActionResult;
+export type MakeMoveResult = GameActionResult;
+export type ProcessPenaltyResult = GameActionResult;
+export type EndTurnResult = GameActionResult;
 
-type LockRowResult = { success: true; data: SerializedGameState } | ErrorResult;
+export type LockRowResult =
+  | { success: true; data: SerializedGameState }
+  | ErrorResult;
 
-export default class QwixxLogic {
+export default class QwixxLogic implements IQwixxLogic {
   private _playersArray: IPlayer[];
   private _dice: IDice;
   private _currentTurnIndex: number;
@@ -83,7 +86,7 @@ export default class QwixxLogic {
     this._lockedRows = [];
   }
 
-  public rollDice(): rollDiceResults {
+  public rollDice(): RollDiceResult {
     this._hasRolled = true;
     const hasRolled = this.hasRolled;
     const validColouredNumbers = this._dice.validColouredNumbers;
