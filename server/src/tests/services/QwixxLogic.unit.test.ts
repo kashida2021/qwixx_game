@@ -5,6 +5,7 @@ import Dice from "../../models/DiceClass";
 import { DiceColour } from "../../enums/DiceColours";
 import SixSidedDie from "../../models/SixSidedDieClass";
 import { rowColour } from "../../enums/rowColours";
+import { mockSixSidedDice } from "./__mocks__/QwixxLogicTestMocks";
 
 const MockedGameCardClass = qwixxBaseGameCard as jest.Mocked<
   typeof qwixxBaseGameCard
@@ -18,9 +19,8 @@ player1Mock.markNumber = jest.fn().mockReturnValue(true);
 const player2Mock = new Player("player2", gameCardMock2) as jest.Mocked<Player>;
 player2Mock.markNumber = jest.fn().mockReturnValue(true);
 
-const MockedDie = SixSidedDie as jest.Mocked<typeof SixSidedDie>;
 const MockedDiceClass = Dice as jest.Mocked<typeof Dice>;
-const fakeDice = new MockedDiceClass(MockedDie);
+const fakeDice = new MockedDiceClass(mockSixSidedDice);
 jest.spyOn(fakeDice, "diceValues", "get").mockReturnValue({
   [DiceColour.White1]: 5,
   [DiceColour.White2]: 5,

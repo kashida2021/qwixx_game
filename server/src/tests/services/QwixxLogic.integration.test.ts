@@ -1,37 +1,24 @@
 import QwixxLogic from "../../services/QwixxLogic";
 import qwixxBaseGameCard from "../../models/QwixxBaseGameCard";
 import Player from "../../models/PlayerClass";
-import SixSidedDie from "../../models/SixSidedDieClass";
 import Dice from "../../models/DiceClass";
-import IDice from "../../models/IDice";
+import { mockSixSidedDice } from "./__mocks__/QwixxLogicTestMocks";
+
 let mockPlayersArray: Player[];
 let mockDice: Dice;
 let testGame: QwixxLogic;
 let mockPlayer1: Player;
 let mockPlayer2: Player;
 
-jest.mock("../../models/SixSidedDieClass");
-
-const SixSidedDieMock = SixSidedDie as jest.MockedClass<typeof SixSidedDie>;
-
-// Set up the behavior of all `rollDie()` calls
 describe("Qwixx Logic integration tests:", () => {
   beforeEach(() => {
-    SixSidedDieMock.prototype.rollDie
-      .mockImplementationOnce(() => 2)
-      .mockImplementationOnce(() => 3)
-      .mockImplementationOnce(() => 4)
-      .mockImplementationOnce(() => 5)
-      .mockImplementationOnce(() => 6)
-      .mockImplementationOnce(() => 1);
-
     const mockgameCard1 = new qwixxBaseGameCard();
     mockPlayer1 = new Player("test-player1", mockgameCard1);
 
     const mockgameCard2 = new qwixxBaseGameCard();
     mockPlayer2 = new Player("test-player2", mockgameCard2);
 
-    mockDice = new Dice(SixSidedDieMock);
+    mockDice = new Dice(mockSixSidedDice);
 
     mockPlayersArray = [mockPlayer1, mockPlayer2];
 
