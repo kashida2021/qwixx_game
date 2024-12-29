@@ -162,6 +162,7 @@ describe("Qwixx Logic tests", () => {
       const player1AddPenaltySpy = jest.spyOn(gameCardMock1, "addPenalty");
       const player1MarkSubmittedSpy = jest.spyOn(player1Mock, "markSubmitted");
 
+      testGame.rollDice()
       testGame.processPenalty("player1");
 
       expect(player1AddPenaltySpy).toHaveBeenCalledTimes(1);
@@ -214,24 +215,14 @@ describe("Qwixx Logic tests", () => {
 
     test("passMove method should be called if valid", () => {
       const testGame = new QwixxLogic(playersArrayMock, fakeDice);
-      console.log("submission count before:", player1Mock.submissionCount);
 
       jest.spyOn(player1Mock, "submissionCount", "get").mockReturnValue(0);
-
-      if (player1Mock) {
-        jest.spyOn(player1Mock, "passMove");
-      }
+      jest.spyOn(player1Mock, "hasSubmittedChoice", "get").mockReturnValueOnce(false)
+      jest.spyOn(player1Mock, "passMove");
 
       testGame.rollDice();
-      console.log(
-        "expect submission count to be 0",
-        player1Mock.submissionCount
-      );
       const res = testGame.passMove("player1");
-      console.log(
-        "submission count should be increased after passMove",
-        player1Mock.submissionCount
-      );
+      
       expect(player1Mock.passMove).toHaveBeenCalled();
       expect(res.success).toBeTruthy();
     });
