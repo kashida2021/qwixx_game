@@ -1,4 +1,6 @@
-export default class SixSidedDie {
+import IDie from "./IDie";
+
+export default class SixSidedDie implements IDie {
   private _value: number;
   private _active: boolean;
 
