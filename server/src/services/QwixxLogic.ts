@@ -229,7 +229,7 @@ export default class QwixxLogic {
       };
     }
 
-    if (player.submissionCount > 1) {
+    if (player.submissionCount > 0) {
       return { success: false, errorMessage: "Cannot pass on second choice." };
     }
 
@@ -296,27 +296,6 @@ export default class QwixxLogic {
       };
     }
 
-    //Checks the non-active player's number selection.
-    if (player !== this.activePlayer && num !== this._dice.whiteDiceSum) {
-      return {
-        isValid: false,
-        errorMessage: "Number selected doesn't equal to sum of white dice.",
-      };
-    }
-
-    //Checks the active player's first number selection is valid.
-    //A valid move for first selection is the sum of the white dice.
-    if (
-      player === this.activePlayer &&
-      player.submissionCount === 0 &&
-      num !== this._dice.whiteDiceSum
-    ) {
-      return {
-        isValid: false,
-        errorMessage: "Number selected doesn't equal to sum of white dice.",
-      };
-    }
-
     //Checks the active player's second number selection is valid.
     //A valid move for the second selection is the sum of a white die + coloured die
     if (
@@ -328,6 +307,14 @@ export default class QwixxLogic {
         isValid: false,
         errorMessage:
           "Number selected doesn't equal to sum of white die and coloured die.",
+      };
+    }
+
+    //General rule: All player's first mark number action needs to be the sum of the white dice.
+    if (num !== this._dice.whiteDiceSum) {
+      return {
+        isValid: false,
+        errorMessage: "Number selected doesn't equal to sum of white dice.",
       };
     }
 
