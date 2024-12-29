@@ -290,6 +290,7 @@ export default class QwixxLogic {
         errorMessage: "Dice number is out of range.",
       };
     }
+    //NOTE: What happens if submissionCount > 1?
 
     //Checks the active player's second number selection is valid.
     //A valid move for the second selection is the sum of a white die + coloured die
@@ -306,7 +307,7 @@ export default class QwixxLogic {
     }
 
     //General rule: All player's first mark number action needs to be the sum of the white dice.
-    if (num !== this._dice.whiteDiceSum) {
+    if (player.submissionCount === 0 && num !== this._dice.whiteDiceSum) {
       return {
         isValid: false,
         errorMessage: "Number selected doesn't equal to sum of white dice.",

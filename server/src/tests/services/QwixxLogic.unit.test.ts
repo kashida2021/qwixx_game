@@ -93,25 +93,6 @@ describe("Qwixx Logic tests", () => {
   });
 
   describe("passMove method tests", () => {
-    //TODO: Should be covered in integration test
-    test("Can't pass turn if a dice hasn't been rolled", () => {
-      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
-      const res = testGame.passMove("player1");
-
-      expect(res.success).toBeFalsy();
-
-      if (!res.success) {
-        expect(res.errorMessage).toBe("Dice hasn't been rolled yet.");
-      }
-    });
-
-    //TODO: Should be covered in integration test
-    test("should throw an error if player not found", () => {
-      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
-      testGame.rollDice();
-      expect(() => testGame.passMove("player3")).toThrow("Player not found.");
-    });
-
     test("passMove method should be called if valid", () => {
       const testGame = new QwixxLogic(playersArrayMock, fakeDice);
 
