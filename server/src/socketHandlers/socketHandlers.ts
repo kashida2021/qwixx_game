@@ -206,11 +206,17 @@ export default function initializeSocketHandler(io: Server) {
           return callback(false);
         }
 
-        if (res?.success) {
+        if (res?.success && !res.gameEnd) {
           const responseData = { gameState: res.data };
           io.to(lobbyId).emit("update_marked_numbers", responseData);
           return callback(true);
         }
+
+        if (res.success && res.gameEnd) {
+          const responseData = { gameState: res.data }
+          io.to(lobbyId).emit("game_ended", responseData)
+        }
+
       } catch (err) {
         if (err instanceof Error) {
           socket.emit("error_occured", { message: err.message });
@@ -242,12 +248,20 @@ export default function initializeSocketHandler(io: Server) {
       }
 
       try {
-        const updatedGameState = gameState?.processPenalty(userId);
+        const res = gameState?.processPenalty(userId);
         //console.log("penalty processed gamedata:", updatedGameState);
 
-        io.to(lobbyId).emit("penalty_processed", {
-          responseData: updatedGameState,
-        });
+        if (!res.success) {
+          socket.emit("error_occured", { message: res.errorMessage })
+        }
+
+        if (res.success && res.gameEnd) {
+          io.to(lobbyId).emit("game_ended", { gameState: res.data })
+        }
+
+        if (res.success && !res.gameEnd) {
+          io.to(lobbyId).emit("penalty_processed", { gameState: res.data });
+        }
       } catch (err) {
         if (err instanceof Error) {
           socket.emit("error_occured", { message: err.message });
@@ -313,9 +327,12 @@ export default function initializeSocketHandler(io: Server) {
           console.log(res.errorMessage);
           socket.emit("error_occured", { message: res.errorMessage });
         }
-        if (res.success) {
+        if (res.success && !res.gameEnd) {
           console.log(res.data);
           io.to(lobbyId).emit("turn_ended", { gameState: res.data });
+        }
+        if (res.success && res.gameEnd) {
+          io.to(lobbyId).emit("game_ended", { gameState: res.data })
         }
       } catch (err) {
         if (err instanceof Error) {
