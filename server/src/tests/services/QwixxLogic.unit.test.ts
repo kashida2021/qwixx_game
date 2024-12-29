@@ -164,7 +164,7 @@ describe("Qwixx Logic tests", () => {
 
       testGame.processPenalty("player1");
 
-      expect(player1AddPenaltySpy).toHaveBeenCalled();
+      expect(player1AddPenaltySpy).toHaveBeenCalledTimes(1);
       expect(player1MarkSubmittedSpy).toHaveBeenCalled();
     });
 
@@ -173,15 +173,6 @@ describe("Qwixx Logic tests", () => {
       expect(() => testGame.processPenalty("player3")).toThrow(
         "Player not found"
       );
-    });
-
-    it("should add a penalty to the players gamecard", () => {
-      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
-
-      const addPenaltySpy = jest.spyOn(player1Mock.gameCard, "addPenalty");
-      testGame.processPenalty("player1");
-
-      expect(addPenaltySpy).toHaveBeenCalled();
     });
   });
 
