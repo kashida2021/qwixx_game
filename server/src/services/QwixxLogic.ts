@@ -101,8 +101,16 @@ export default class QwixxLogic {
     return this._playersArray[this._currentTurnIndex];
   }
 
-  private playerExistsInLobby(playerName: string): IPlayer | undefined {
-    return this._playersArray.find((player) => player.name === playerName);
+  private playerExistsInLobby(playerName: string): IPlayer {
+    const player = this._playersArray.find(
+      (player) => player.name === playerName
+    );
+
+    if (!player) {
+      throw new Error("Player not found.");
+    }
+
+    return player;
   }
 
   private get hasRolled() {
@@ -194,10 +202,6 @@ export default class QwixxLogic {
     // Call Player Method add submission to player
     const player = this.playerExistsInLobby(playerName);
 
-    if (!player) {
-      throw new Error("Player not found.");
-    }
-
     if (!this.hasRolled) {
       return { success: false, errorMessage: "Dice hasn't been rolled yet." };
     }
@@ -228,10 +232,6 @@ export default class QwixxLogic {
     const player = this.playerExistsInLobby(playerName);
     // Moved this check up to here and early return
     // Only throw error here because critical error and not game-rule violation
-    if (!player) {
-      //return { isValid: false, errorMessage: new Error("Player not found.") };
-      throw new Error("Player not found.");
-    }
 
     //Passed the player object to validateMove instead of playerName
     const validationResult = this.validateMove(player, row, num);
@@ -352,10 +352,6 @@ export default class QwixxLogic {
 
     const player = this.playerExistsInLobby(playerName);
 
-    if (!player) {
-      throw new Error("Player not found.");
-    }
-
     if (player.hasSubmittedChoice) {
       return {
         success: false,
@@ -385,10 +381,7 @@ export default class QwixxLogic {
 
   public processPenalty(playerName: string): ProcessPenaltyResult {
     const player = this.playerExistsInLobby(playerName);
-    if (!player) {
-      throw new Error("Player not found");
-    }
-
+    console.log(player)
     if (player.hasSubmittedChoice) {
       return {
         success: false,
@@ -408,11 +401,7 @@ export default class QwixxLogic {
 
   public lockRow(playerName: string, row: string): LockRowResult {
     const colourToLock = this.getColourFromRow(row);
-
     const player = this.playerExistsInLobby(playerName);
-    if (!player) {
-      throw new Error("Player not found");
-    }
 
     const res = player.gameCard.lockRow(colourToLock);
 
