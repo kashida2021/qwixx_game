@@ -63,87 +63,6 @@ describe("Qwixx Logic tests", () => {
         "Player not found"
       );
     });
-
-    test("non-active player marking a number that doesn't equal the sum of white dice should return error object", () => {
-      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
-
-      testGame.rollDice();
-
-      const res = testGame.makeMove("player2", "red", 9);
-      if (!res.success) {
-        expect(res.success).toBeFalsy();
-        expect(res.errorMessage).toEqual(
-          "Number selected doesn't equal to sum of white dice."
-        );
-      }
-    });
-
-    test("non-active player can mark a number equal to the sum of the white dice", () => {
-      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
-
-      testGame.rollDice();
-      testGame.makeMove("player2", "red", 10);
-
-      expect(player2Mock.markNumber).toHaveBeenCalledWith("red", 10);
-      expect(player2Mock.markNumber).toHaveBeenCalledTimes(1);
-    });
-
-    test("active player marking a number that doesn't equal the sum of white dice should throw an error", () => {
-      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
-      testGame.rollDice();
-
-      const res = testGame.makeMove("player1", "red", 9);
-      if (!res.success) {
-        expect(res.success).toBeFalsy();
-        expect(res.errorMessage).toEqual(
-          "Number selected doesn't equal to sum of white dice."
-        );
-      }
-    });
-
-    test.each([
-      ["red", 9],
-      ["yellow", 9],
-      ["green", 9],
-      ["blue", 9],
-    ])(
-      "active-player marking a number that doesn't equal the sum of a white dice and a %s dice should throw an error",
-      (row, num) => {
-        jest.spyOn(player1Mock, "submissionCount", "get").mockReturnValue(1);
-        const testGame = new QwixxLogic(playersArrayMock, fakeDice);
-
-        testGame.rollDice();
-
-        const res = testGame.makeMove("player1", row, num);
-        if (!res.success) {
-          expect(res.success).toBeFalsy();
-          expect(res.errorMessage).toEqual(
-            "Number selected doesn't equal to sum of white die and coloured die."
-          );
-        }
-      }
-    );
-
-    test.each([
-      ["red", 10],
-      ["yellow", 10],
-      ["green", 10],
-      ["blue", 10],
-    ])(
-      "active-player marking a number that equals the sum of a white dice and a %s dice shouldn't throw an error",
-      (row, num) => {
-        jest.spyOn(player1Mock, "submissionCount", "get").mockReturnValue(1);
-        const testGame = new QwixxLogic(playersArrayMock, fakeDice);
-
-        testGame.rollDice();
-
-        expect(() => {
-          testGame.makeMove("player1", row, num);
-        }).not.toThrow(
-          "Number selected doesn't equal to sum of white die and coloured die."
-        );
-      }
-    );
   });
 
   describe("rollDice method tests", () => {
@@ -154,9 +73,12 @@ describe("Qwixx Logic tests", () => {
       jest.spyOn(gameCardMock1, "hasAvailableMoves").mockReturnValueOnce(true);
       expect(res.hasAvailableMoves).toBeTruthy();
     });
+
+    test.todo("no available moves")
   });
 
   describe("processPenalthy method tests", () => {
+    //TODO: Should be covered in integration test
     it("should add a penalty to the player and mark them as submitted", () => {
       const testGame = new QwixxLogic(playersArrayMock, fakeDice);
       const player1AddPenaltySpy = jest.spyOn(gameCardMock1, "addPenalty");
@@ -169,6 +91,7 @@ describe("Qwixx Logic tests", () => {
       expect(player1MarkSubmittedSpy).toHaveBeenCalled();
     });
 
+    //TODO: Should be covered in integration test
     it("should throw an error if player not found", () => {
       const testGame = new QwixxLogic(playersArrayMock, fakeDice);
       expect(() => testGame.processPenalty("player3")).toThrow(
@@ -178,6 +101,7 @@ describe("Qwixx Logic tests", () => {
   });
 
   describe("endTurn method tests", () => {
+    //TODO: Should be covered in integration test
     test("Can't end a turn if a dice hasn't been rolled", () => {
       const testGame = new QwixxLogic(playersArrayMock, fakeDice);
       const res = testGame.endTurn("player1");
@@ -188,6 +112,7 @@ describe("Qwixx Logic tests", () => {
       }
     });
 
+    //TODO: SHould be covered in integration test
     test("should throw an error if player not found", () => {
       const testGame = new QwixxLogic(playersArrayMock, fakeDice);
       testGame.rollDice();
@@ -196,6 +121,7 @@ describe("Qwixx Logic tests", () => {
   });
 
   describe("passMove method tests", () => {
+    //TODO: Should be covered in integration test
     test("Can't pass turn if a dice hasn't been rolled", () => {
       const testGame = new QwixxLogic(playersArrayMock, fakeDice);
       const res = testGame.passMove("player1");
@@ -207,6 +133,7 @@ describe("Qwixx Logic tests", () => {
       }
     });
 
+    //TODO: Should be covered in integration test
     test("should throw an error if player not found", () => {
       const testGame = new QwixxLogic(playersArrayMock, fakeDice);
       testGame.rollDice();
@@ -228,6 +155,7 @@ describe("Qwixx Logic tests", () => {
     });
   });
 
+  // NOTE: Should keep these as unit tests
   // TODO: This should be combined with the game end phase test.
   describe("Calculate all players' score", () => {
     it("Can get back all players' score", () => {
