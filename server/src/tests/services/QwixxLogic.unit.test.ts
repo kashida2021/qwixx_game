@@ -100,26 +100,6 @@ describe("Qwixx Logic tests", () => {
     });
   });
 
-  describe("endTurn method tests", () => {
-    //TODO: Should be covered in integration test
-    test("Can't end a turn if a dice hasn't been rolled", () => {
-      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
-      const res = testGame.endTurn("player1");
-
-      expect(res.success).toBeFalsy();
-      if (!res.success) {
-        expect(res.errorMessage).toBe("Dice hasn't been rolled yet.");
-      }
-    });
-
-    //TODO: SHould be covered in integration test
-    test("should throw an error if player not found", () => {
-      const testGame = new QwixxLogic(playersArrayMock, fakeDice);
-      testGame.rollDice();
-      expect(() => testGame.endTurn("player3")).toThrow("Player not found.");
-    });
-  });
-
   describe("passMove method tests", () => {
     //TODO: Should be covered in integration test
     test("Can't pass turn if a dice hasn't been rolled", () => {

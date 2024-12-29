@@ -14,7 +14,6 @@ jest.mock("../../models/SixSidedDieClass");
 
 const SixSidedDieMock = SixSidedDie as jest.MockedClass<typeof SixSidedDie>;
 
-
 // Set up the behavior of all `rollDie()` calls
 describe("Qwixx Logic integration tests:", () => {
   beforeEach(() => {
@@ -255,21 +254,21 @@ describe("Qwixx Logic integration tests:", () => {
     );
 
     test("active-player can mark a number that equals the sum of the white dice", () => {
-      testGame.rollDice()
-      const res = testGame.makeMove("test-player1", "red", 5)
+      testGame.rollDice();
+      const res = testGame.makeMove("test-player1", "red", 5);
 
-      if(!res.success){
-        throw new Error()
+      if (!res.success) {
+        throw new Error();
       }
 
-      if(res.gameEnd){
-        throw new Error()
+      if (res.gameEnd) {
+        throw new Error();
       }
 
       expect(res.success).toBeTruthy();
       expect(res.data.players["test-player1"].hasSubmittedChoice).toBeFalsy();
-      expect(res.data.players["test-player1"].gameCard.rows.red).toEqual([5])
-    })
+      expect(res.data.players["test-player1"].gameCard.rows.red).toEqual([5]);
+    });
 
     //TODO: Maybe can use .each() here
     // Check this test is working
@@ -333,30 +332,36 @@ describe("Qwixx Logic integration tests:", () => {
 
     test("non-active player can mark a number equal to the sum of the white dice", () => {
       testGame.rollDice();
-      const res = testGame.makeMove("test-player2", "red", 5)
+      const res = testGame.makeMove("test-player2", "red", 5);
 
-      if(!res.success){
-        throw new Error("Marking a number equal to sum of white dice should be sucessful.")
+      if (!res.success) {
+        throw new Error(
+          "Marking a number equal to sum of white dice should be sucessful."
+        );
       }
 
-      if(res.gameEnd){
-        throw new Error("Game shouldn't have ended.")
+      if (res.gameEnd) {
+        throw new Error("Game shouldn't have ended.");
       }
 
-      expect(res.success).toBeTruthy()
-      expect(res.data.players["test-player2"].hasSubmittedChoice).toBeTruthy()
-    })
+      expect(res.success).toBeTruthy();
+      expect(res.data.players["test-player2"].hasSubmittedChoice).toBeTruthy();
+    });
 
     test("non-active player marking a number that doesn't equal to the sum of the white dice should return an error", () => {
       testGame.rollDice();
-      const res = testGame.makeMove("test-player2", "red", 6)
-      if(res.success){
-        throw new Error("Marking a number that doesnt' equal sum of white dice should fail.")
+      const res = testGame.makeMove("test-player2", "red", 6);
+      if (res.success) {
+        throw new Error(
+          "Marking a number that doesnt' equal sum of white dice should fail."
+        );
       }
 
-      expect(res.success).toBeFalsy()
-      expect(res.errorMessage).toBe("Number selected doesn't equal to sum of white dice.")
-    })
+      expect(res.success).toBeFalsy();
+      expect(res.errorMessage).toBe(
+        "Number selected doesn't equal to sum of white dice."
+      );
+    });
   });
 
   describe("end turn tests", () => {
@@ -417,5 +422,20 @@ describe("Qwixx Logic integration tests:", () => {
         );
       }
     });
+  });
+
+  test("Can't end a turn if a dice hasn't been rolled", () => {
+    const res = testGame.endTurn("test-player1");
+
+    if (res.success) {
+      throw new Error();
+    }
+    expect(res.success).toBeFalsy();
+    expect(res.errorMessage).toBe("Dice hasn't been rolled yet.");
+  });
+
+  test("should throw an error if player not found", () => {
+    testGame.rollDice();
+    expect(() => testGame.endTurn("player3")).toThrow("Player not found");
   });
 });
