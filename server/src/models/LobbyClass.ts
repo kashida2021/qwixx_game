@@ -3,8 +3,9 @@ import Dice from "../models/DiceClass";
 import QwixxLogic from "../services/QwixxLogic";
 import { initializeGameCards } from "./InitializeGameCards";
 import { initializePlayers } from "./InitializePlayer";
-import SixSidedDie from "./SixSidedDieClass";
 import { DiceColour } from "../enums/DiceColours";
+import IQwixxLogic from "../services/IQwixxLogic";
+import initializeDice from "./InitializeDice";
 
 interface SerializedGameState {
   players: Record<string, any>;
@@ -15,7 +16,7 @@ export default class Lobby {
   private _lobbyId: string;
   private _players: string[];
   private _playerObjects: Player[];
-  private _gameLogic: QwixxLogic | null;
+  private _gameLogic: IQwixxLogic | null;
 
   constructor(lobbyId: string) {
     this._lobbyId = lobbyId;
@@ -36,7 +37,7 @@ export default class Lobby {
     return this._playerObjects;
   }
 
-  get gameLogic(): QwixxLogic | null {
+  get gameLogic(): IQwixxLogic | null {
     return this._gameLogic;
   }
 
@@ -60,7 +61,8 @@ export default class Lobby {
   startGame() {
     const gameCards = initializeGameCards(this._players);
     this._playerObjects = initializePlayers(this._players, gameCards);
-    const dice = new Dice(SixSidedDie);
+    const sixSidedDice = initializeDice()
+    const dice = new Dice(sixSidedDice);
     this._gameLogic = new QwixxLogic(this._playerObjects, dice);
 
     return this._gameLogic.serialize();
