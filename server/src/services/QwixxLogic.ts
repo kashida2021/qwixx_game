@@ -77,6 +77,7 @@ export default class QwixxLogic implements IQwixxLogic {
   private _currentTurnIndex: number;
   private _hasRolled: boolean;
   private _lockedRows: rowColour[];
+  private _isGameEnded: boolean;
 
   constructor(players: IPlayer[], dice: IDice) {
     this._playersArray = players;
@@ -84,6 +85,7 @@ export default class QwixxLogic implements IQwixxLogic {
     this._currentTurnIndex = 0;
     this._hasRolled = false;
     this._lockedRows = [];
+    this._isGameEnded = false;
   }
 
   public rollDice(): RollDiceResult {
@@ -132,6 +134,10 @@ export default class QwixxLogic implements IQwixxLogic {
       };
     }
 
+    if (this._isGameEnded) {
+      return { isValid: false, errorMessage: "Can't perform action. Game has already ended." }
+    }
+
     return { isValid: true };
   }
 
@@ -178,7 +184,8 @@ export default class QwixxLogic implements IQwixxLogic {
     if (this.haveAllPlayersSubmitted()) {
       this.handleEndOfRound();
 
-      if (this.isGameEnd()) {
+      if (this.isGameEnd() && !this._isGameEnded) {
+        this._isGameEnded = true;
         const winners = this.determineWinner();
         return { hasGameEnded: true, data: winners };
       }
