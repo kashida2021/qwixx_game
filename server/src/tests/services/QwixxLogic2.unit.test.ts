@@ -157,4 +157,49 @@ describe("Game end:", () => {
     expect(res.gameEnd).toBeFalsy();
     expect(res.data.hasRolled).toBeFalsy();
   });
+
+  test("Players can't do any actions if game has ended", () => {
+    const testGame = new QwixxLogic([player1Mock, player2Mock], diceMock);
+    testGame.rollDice();
+
+    testGame.lockRow("Player1", "red");
+    testGame.lockRow("Player2", "yellow");
+
+    jest
+      .spyOn(player1Mock, "hasSubmittedChoice", "get")
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(true);
+    const res = testGame.endTurn("Player1");
+
+    if (!res.success || !res.gameEnd) {
+      throw new Error("Result is not a game-end state");
+    }
+
+    const makeMoveRes = testGame.makeMove("Player1", "red", 10)
+
+    if (makeMoveRes.success) {
+      throw new Error("Can't make a move if game has ended");
+    }
+
+    expect(makeMoveRes.success).toBeFalsy()
+    expect(makeMoveRes.errorMessage).toBe("Can't perform action. Game has already ended.")
+
+    const endTurnRes = testGame.endTurn("Player1")
+
+    if (endTurnRes.success) {
+      throw new Error("Can't end a turn if game has ended");
+    }
+
+    expect(endTurnRes.success).toBeFalsy()
+    expect(endTurnRes.errorMessage).toBe("Can't perform action. Game has already ended.")
+
+    const processPenaltyRes = testGame.processPenalty("Player1")
+
+    if (processPenaltyRes.success) {
+      throw new Error("Can't process a penalty if game has ended");
+    }
+
+    expect(processPenaltyRes.success).toBeFalsy()
+    expect(processPenaltyRes.errorMessage).toBe("Can't perform action. Game has already ended.")
+  })
 });
