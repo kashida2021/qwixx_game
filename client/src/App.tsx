@@ -19,6 +19,8 @@ function App() {
   const [gameState, setGameState] = useState<QwixxLogic | null>(null);
   const [gamePath, setGamePath] = useState("");
   const [availableMoves, setAvailableMoves] = useState<boolean>(false);
+  const [isGameEnd, setIsGameEnd] = useState<boolean>(false);
+  const [gameSummary, setGameSummary] = useState(null)
 
   //Need to consier if this is overkill for our app as it's only being used in one place.
   //  const handleInputChange =
@@ -123,7 +125,7 @@ function App() {
       console.log("penalty data", data.responseData);
     }
 
-    const handlePassMove = ( data: {gameState: QwixxLogic} ) => {
+    const handlePassMove = (data: { gameState: QwixxLogic }) => {
       setGameState(data.gameState);
       console.log(data.gameState);
     }
@@ -131,6 +133,11 @@ function App() {
     const onRowLocked = (data: { gameState: QwixxLogic }) => {
       setGameState(data.gameState)
       console.log("Data after locking a row", data)
+    }
+
+    const onGameEnd = (data: { gameState: any }) => {
+      setIsGameEnd(true)
+      setGameSummary(data.gameState)
     }
 
     socket.on("connect", onConnect);
@@ -147,6 +154,7 @@ function App() {
     socket.on("row_locked", onRowLocked)
     socket.on("turn_ended", onTurnEnded);
     socket.on("passMoveProcessed", handlePassMove);
+    socket.on("game_ended", onGameEnd);
 
     return () => {
       socket.off("connect");
@@ -163,6 +171,7 @@ function App() {
       socket.off("turn_ended");
       socket.off("passMoveProcessed");
       socket.off("row_locked")
+      socket.off("game_ended")
     };
   }, []);
 
@@ -208,6 +217,8 @@ function App() {
                 members={members}
                 gameState={gameState}
                 availableMoves={availableMoves}
+                isGameEnd={isGameEnd}
+                gameSummary={gameSummary}
               // setGameBoardState={setGameBoardState}
               />
             ) : (

@@ -23,6 +23,8 @@ interface IGameProps {
   members: string[];
   gameState: QwixxLogic;
   availableMoves: boolean;
+  isGameEnd: boolean;
+  gameSummary: any;
   // setGameBoardState: Dispatch<SetStateAction<GameBoard | null>>;
 }
 
@@ -33,12 +35,14 @@ export const Game: React.FC<IGameProps> = ({
   gameState,
   socket,
   availableMoves,
+  isGameEnd,
+  gameSummary,
 }) => {
   const [playerChoice, setPlayerChoice] = useState<{
     row: string;
     num: number;
   } | null>(null);
-  
+
   const [submissionCount, setSubmissionCount] = useState<number>(0);
 
   useEffect(() => {
@@ -79,7 +83,7 @@ export const Game: React.FC<IGameProps> = ({
 
   const handleNumberSelection = () => {
     socket.emit("mark_numbers", { lobbyId, userId, playerChoice }, (isSuccessful: boolean) => {
-      if(isSuccessful){
+      if (isSuccessful) {
         setSubmissionCount((prev) => prev + 1);
       } else {
         console.log("move not successful");
@@ -93,7 +97,7 @@ export const Game: React.FC<IGameProps> = ({
   }
 
   const handlePassMove = () => {
-    socket.emit("pass_move", {lobbyId, userId});
+    socket.emit("pass_move", { lobbyId, userId });
     setSubmissionCount((prev) => prev + 1);
   }
 
@@ -155,11 +159,14 @@ export const Game: React.FC<IGameProps> = ({
             (<button onClick={handleNumberSelection} disabled={hasSubmitted}>Confirm</button>)
           }
           {/* For ending a turn even if there are available moves */}
-          <button className="" onClick={handleEndTurn} disabled={hasSubmitted || !hasRolled}>End Turn</button>          
+          <button className="" onClick={handleEndTurn} disabled={hasSubmitted || !hasRolled}>End Turn</button>
           {/* Possibly need to update structure of data sent back from backend to include submission count to disable button on 2nd choice rather than hasSubmitted */}
-          <button className="" onClick={handlePassMove} disabled={hasSubmitted || !hasRolled || activePlayer !== userId || submissionCount > 0  }>Pass Move</button>
-
+          <button className="" onClick={handlePassMove} disabled={hasSubmitted || !hasRolled || activePlayer !== userId || submissionCount > 0}>Pass Move</button>
         </div>
+      </div>
+      {/* Temporarily putting this here so we can see who is the winner*/}
+      <div className="game-page__game-summary">
+        {isGameEnd ? (<p> Winner is {gameSummary.winners}</p>) : (<p></p>)}
       </div>
     </div>
   );
