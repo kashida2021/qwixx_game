@@ -1,5 +1,6 @@
 import { Socket } from "socket.io-client"
 import "./Modal.css";
+import { defaultMaxListeners } from "events";
 
 interface IGameEndModal {
     socket: Socket;
@@ -17,16 +18,24 @@ export const GameEndModal: React.FC<IGameEndModal> = ({
     gameSummary,
 }) => {
 
-    const endGameResults =  [...gameSummary].sort((a, b) => b.total - a.total);
+    console.log("gameSummary before sorting", gameSummary);
+    const endGameResults = Array.isArray(gameSummary.scores)
+        ? [...gameSummary.scores].sort((a, b) => b.total - a.total)
+        : [];
+
+    console.log("endGameResults after sorting", endGameResults);
+    
     const rankedResults = endGameResults.map((player, index, array) => {
         const rank = index > 0 && player.total === array[index-1].total ? array[index-1].rank : index + 1;
         return {...player, rank};
     })
 
+    console.log("ranked results are:", rankedResults);
+
     return(
-        <div className="modal__endGame-container">
-            <div className="modal__overlay"></div>
-            <div className="modal-endGame-content">
+        <div className="modal">
+            <div className="overlay"></div>
+            <div className="modal__endGame-content">
                 <h2>Game End Summary: Lobby {lobbyId}</h2>
                 <h3> Winner is {gameSummary.winners}</h3>
                 <table className="modal__endGame-table">
