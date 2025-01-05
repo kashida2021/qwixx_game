@@ -9,7 +9,8 @@ import { QwixxLogic } from "../../types/qwixxLogic";
 // import { rowColour} from "../../../../shared/types";
 import DiceContainer from "../../components/Dice/DiceContainer";
 import ScoreGuideTable from "../../components/ScoreGuideTable/ScoreGuideTable";
-import { MoveAvailability } from "../../types/GameCardData";
+//import { MoveAvailability } from "../../types/GameCardData";
+import { GameEndModal } from "../../components/Modal/GameEndModal";
 //interface GameState {
 //players: {
 //[playerId: string]: GameCardData
@@ -110,7 +111,7 @@ export const Game: React.FC<IGameProps> = ({
     socket.emit("lock_row", { userId, lobbyId, rowColour })
   }
 
-
+  console.log(gameSummary);
 
   return (
     <div className="game-page-container">
@@ -166,7 +167,14 @@ export const Game: React.FC<IGameProps> = ({
       </div>
       {/* Temporarily putting this here so we can see who is the winner*/}
       <div className="game-page__game-summary">
-        {isGameEnd ? (<p> Winner is {gameSummary.winners}</p>) : (<p></p>)}
+        {isGameEnd ? (
+          <GameEndModal
+            socket={socket}
+            lobbyId={lobbyId}
+            userId = {userId}
+            members = {members}
+            gameSummary = {gameSummary}
+          />): (<p></p>)}
       </div>
     </div>
   );
