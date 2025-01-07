@@ -1,5 +1,5 @@
 import { describe, it, test, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 //import { userEvent } from "@testing-library/user-event";
 import React from "react";
 import GamePage from "../../../src/pages/GamePage/GamePage";
@@ -7,7 +7,8 @@ import "@testing-library/jest-dom";
 // import { MemoryRouter } from "react-router-dom";
 import { socket } from "../../../src/services/socketServices";
 //const user = userEvent.setup();
-import { initialGameState, hasRolledGameState, user1HasSubmittedState } from "./__fixtures__/gameStates";
+import { initialGameState, hasRolledGameState, user1HasSubmittedState, gameEndStateLocked } from "./__fixtures__/gameStates";
+import { endGameSummaryLockedState } from "./__fixtures__/gameSummaryStates";
 
 const lobbyIdMock = "1234";
 const membersArrayMock = ["testUser1", "testUser2", "testUser3"];
@@ -22,6 +23,8 @@ describe("Game Page Unit Test:", () => {
         lobbyId={lobbyIdMock}
         gameState={hasRolledGameState}
         availableMoves={true}
+        gameSummary={undefined}
+        isGameEnd={false}
       />
     );
 
@@ -53,6 +56,8 @@ describe("Game Page Unit Test:", () => {
         lobbyId={lobbyIdMock}
         gameState={hasRolledGameState}
         availableMoves={true}
+        gameSummary={undefined}
+        isGameEnd={false}
       />
     );
 
@@ -70,6 +75,8 @@ describe("Game Page Unit Test:", () => {
         lobbyId={lobbyIdMock}
         gameState={initialGameState}
         availableMoves={true}
+        gameSummary={undefined}
+        isGameEnd={false}
       />
     );
 
@@ -87,6 +94,8 @@ describe("Game Page Unit Test:", () => {
         lobbyId={lobbyIdMock}
         gameState={user1HasSubmittedState}
         availableMoves={true}
+        gameSummary={undefined}
+        isGameEnd={false}
       />
     );
 
@@ -104,6 +113,8 @@ describe("Game Page Unit Test:", () => {
         lobbyId={lobbyIdMock}
         gameState={initialGameState}
         availableMoves={true}
+        gameSummary={undefined}
+        isGameEnd={false}
       />
     )
     const passMoveBtn = screen.getByText("Pass Move");
@@ -120,6 +131,8 @@ describe("Game Page Unit Test:", () => {
         lobbyId={lobbyIdMock}
         gameState={user1HasSubmittedState}
         availableMoves={false}
+        gameSummary={undefined}
+        isGameEnd={false}
       />
       )
       const passMoveBtn = screen.getByText("Pass Move");
@@ -137,6 +150,8 @@ describe("Game Page Unit Test:", () => {
           lobbyId={lobbyIdMock}
           gameState={user1HasSubmittedState}
           availableMoves={true}
+          gameSummary={undefined}
+          isGameEnd={false}
         />
       )
 
@@ -154,6 +169,8 @@ describe("Game Page Unit Test:", () => {
         lobbyId={lobbyIdMock}
         gameState={hasRolledGameState}
         availableMoves={true}
+        gameSummary={undefined}
+        isGameEnd={false}
       />
     );
 
@@ -170,11 +187,32 @@ describe("Game Page Unit Test:", () => {
         lobbyId={lobbyIdMock}
         gameState={hasRolledGameState}
         availableMoves={false}
+        gameSummary={undefined}
+        isGameEnd={false}
       />
     );
 
     const acceptPenaltyBtc = screen.getByText("Accept Penalty");
     expect(acceptPenaltyBtc).toBeVisible()
+  })
+
+  test.skip("GameEndModal should render when gameEnd conditions have been met", async ()=> {
+    render(<GamePage
+      socket={socket}
+      userId={"testUser1"}
+      members={membersArrayMock}
+      lobbyId={lobbyIdMock}
+      gameState={gameEndStateLocked}
+      availableMoves={false}
+      isGameEnd={true}
+      gameSummary={endGameSummaryLockedState}
+    />
+    );
+
+    await waitFor(()=> {
+      const gameEndModal = screen.getByText("Game End Summary");
+      expect(gameEndModal).toBeVisible();
+    });
   })
 
   test.todo("When hasSubmited choice is true, confirm button is disabled")

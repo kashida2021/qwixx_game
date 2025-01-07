@@ -1,6 +1,5 @@
 import { Socket } from "socket.io-client"
 import "./Modal.css";
-import { defaultMaxListeners } from "events";
 
 interface IGameEndModal {
     socket: Socket;
