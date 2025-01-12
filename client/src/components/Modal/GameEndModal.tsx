@@ -1,5 +1,6 @@
 import { Socket } from "socket.io-client"
 import "./Modal.css";
+import { useNavigate } from "react-router-dom";
 
 interface IGameEndModal {
     socket: Socket;
@@ -17,6 +18,8 @@ export const GameEndModal: React.FC<IGameEndModal> = ({
     gameSummary,
 }) => {
 
+    const navigate = useNavigate();
+
     console.log("gameSummary before sorting", gameSummary);
     const endGameResults = Array.isArray(gameSummary.scores)
         ? [...gameSummary.scores].sort((a, b) => b.total - a.total)
@@ -33,6 +36,11 @@ export const GameEndModal: React.FC<IGameEndModal> = ({
 
     const handlePlayAgain = () => {
         socket.emit("play_again", {lobbyId, userId});
+    }
+
+    const handleLeaveGame = () => {
+        socket.emit("leave_lobby", {lobbyId, userId});
+        navigate(`/`);
     }
 
     return(
@@ -61,7 +69,7 @@ export const GameEndModal: React.FC<IGameEndModal> = ({
                 </table>
                 <div className="modal__endGame-btnContainer">
                     <button onClick={handlePlayAgain}>Play Again</button>
-                    <button>Leave Game</button>
+                    <button onClick={handleLeaveGame}>Leave Game</button>
                 </div>
             </div>
         </div>
