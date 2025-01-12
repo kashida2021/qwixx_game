@@ -61,7 +61,7 @@ export default class Lobby {
   startGame() {
     const gameCards = initializeGameCards(this._players);
     this._playerObjects = initializePlayers(this._players, gameCards);
-    const sixSidedDice = initializeDice()
+    const sixSidedDice = initializeDice();
     const dice = new Dice(sixSidedDice);
     this._gameLogic = new QwixxLogic(this._playerObjects, dice);
 
@@ -70,5 +70,10 @@ export default class Lobby {
 
   isFull(): boolean {
     return this._players.length >= 4;
+  }
+
+  playAgain() {
+    this._gameLogic = null;
+    this._playerObjects = [];
   }
 }
