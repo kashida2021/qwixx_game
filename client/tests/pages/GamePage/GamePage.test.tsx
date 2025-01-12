@@ -1,5 +1,5 @@
 import { describe, it, test, expect } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 //import { userEvent } from "@testing-library/user-event";
 import React from "react";
 import GamePage from "../../../src/pages/GamePage/GamePage";
@@ -196,7 +196,7 @@ describe("Game Page Unit Test:", () => {
     expect(acceptPenaltyBtc).toBeVisible()
   })
 
-  test.skip("GameEndModal should render when gameEnd conditions have been met", async ()=> {
+  test("GameEndModal should render when gameEnd conditions have been met", ()=> {
     render(<GamePage
       socket={socket}
       userId={"testUser1"}
@@ -209,11 +209,12 @@ describe("Game Page Unit Test:", () => {
     />
     );
 
-    await waitFor(()=> {
-      const gameEndModal = screen.getByText("Game End Summary");
-      expect(gameEndModal).toBeVisible();
+    screen.debug();
+    console.log("end game locked summary", endGameSummaryLockedState);
+    
+    const gameEndModal = screen.getByText(/Game End Summary/i);
+    expect(gameEndModal).toBeVisible();
     });
-  })
 
   test.todo("When hasSubmited choice is true, confirm button is disabled")
   test.todo("When a player confirms their selected number, that number cell becomes disabled")
