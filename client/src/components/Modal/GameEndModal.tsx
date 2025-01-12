@@ -31,6 +31,10 @@ export const GameEndModal: React.FC<IGameEndModal> = ({
 
     console.log("ranked results are:", rankedResults);
 
+    const handlePlayAgain = () => {
+        socket.emit("play_again", {lobbyId, userId});
+    }
+
     return(
         <div className="modal">
             <div className="overlay"></div>
@@ -56,7 +60,7 @@ export const GameEndModal: React.FC<IGameEndModal> = ({
                     </tbody>
                 </table>
                 <div className="modal__endGame-btnContainer">
-                    <button>Play Again</button>
+                    <button onClick={handlePlayAgain}>Play Again</button>
                     <button>Leave Game</button>
                 </div>
             </div>
