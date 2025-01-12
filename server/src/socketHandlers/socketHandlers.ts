@@ -213,10 +213,9 @@ export default function initializeSocketHandler(io: Server) {
         }
 
         if (res.success && res.gameEnd) {
-          const responseData = { gameState: res.data }
-          io.to(lobbyId).emit("game_ended", responseData)
+          const responseData = { gameState: res.data };
+          io.to(lobbyId).emit("game_ended", responseData);
         }
-
       } catch (err) {
         if (err instanceof Error) {
           socket.emit("error_occured", { message: err.message });
@@ -252,11 +251,11 @@ export default function initializeSocketHandler(io: Server) {
         //console.log("penalty processed gamedata:", updatedGameState);
 
         if (!res.success) {
-          socket.emit("error_occured", { message: res.errorMessage })
+          socket.emit("error_occured", { message: res.errorMessage });
         }
 
         if (res.success && res.gameEnd) {
-          io.to(lobbyId).emit("game_ended", { gameState: res.data })
+          io.to(lobbyId).emit("game_ended", { gameState: res.data });
         }
 
         if (res.success && !res.gameEnd) {
@@ -332,15 +331,14 @@ export default function initializeSocketHandler(io: Server) {
           io.to(lobbyId).emit("turn_ended", { gameState: res.data });
         }
         if (res.success && res.gameEnd) {
-          io.to(lobbyId).emit("game_ended", { gameState: res.data })
+          io.to(lobbyId).emit("game_ended", { gameState: res.data });
         }
       } catch (err) {
         if (err instanceof Error) {
           socket.emit("error_occured", { message: err.message });
         }
       }
-
-    })
+    });
 
     socket.on("lock_row", ({ userId, lobbyId, rowColour }) => {
       if (!lobbyId || !userId) {
@@ -358,21 +356,29 @@ export default function initializeSocketHandler(io: Server) {
       }
 
       try {
-        const res = game.lockRow(userId, rowColour)
+        const res = game.lockRow(userId, rowColour);
 
         if (!res.success) {
-          socket.emit("error_occured", { message: res.errorMessage })
+          socket.emit("error_occured", { message: res.errorMessage });
         }
 
         if (res?.success) {
           io.to(lobbyId).emit("row_locked", { gameState: res.data });
         }
-
       } catch (err) {
         if (err instanceof Error) {
           socket.emit("error_occured", { message: err.message });
         }
       }
-    })
+    });
+
+    socket.on("play_again", ({ lobbyId, userId }) => {
+      const lobby = lobbiesMap[lobbyId];
+
+      if (lobby) {
+        lobby.resetGameState();
+        io.to(lobbyId).emit("redirectToLobby", lobbyId);
+      }
+    });
   });
 }

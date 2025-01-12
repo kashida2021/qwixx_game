@@ -72,7 +72,7 @@ export default class Lobby {
     return this._players.length >= 4;
   }
 
-  playAgain() {
+  resetGameState() {
     this._gameLogic = null;
     this._playerObjects = [];
   }
