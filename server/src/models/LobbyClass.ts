@@ -12,17 +12,23 @@ interface SerializedGameState {
   dice: Record<DiceColour, number>;
   activePlayer: string;
 }
+
+interface playersReadinessInLobby {
+  [userId: string]: boolean;
+}
 export default class Lobby {
   private _lobbyId: string;
   private _players: string[];
   private _playerObjects: Player[];
   private _gameLogic: IQwixxLogic | null;
+  private _playersReadinessInLobby: playersReadinessInLobby = {};
 
   constructor(lobbyId: string) {
     this._lobbyId = lobbyId;
     this._players = [];
     this._playerObjects = [];
     this._gameLogic = null;
+    this._playersReadinessInLobby = {};
   }
 
   get lobbyId(): string {
@@ -48,6 +54,7 @@ export default class Lobby {
   addPlayer(userId: string): boolean {
     if (this._players.length < 4) {
       this._players.push(userId);
+      this._playersReadinessInLobby[userId] = false;
       return true;
     } else {
       return false; // Lobby is full
@@ -56,6 +63,7 @@ export default class Lobby {
 
   removePlayer(userId: string): void {
     this._players = this._players.filter((playerId) => playerId !== userId);
+    delete this._playersReadinessInLobby[userId];
   }
 
   startGame() {
@@ -72,8 +80,18 @@ export default class Lobby {
     return this._players.length >= 4;
   }
 
+  markPlayerReady(userId: string) {
+    if (userId in this._playersReadinessInLobby) {
+      this._playersReadinessInLobby[userId] = true;
+    }
+  }
+
   resetGameState() {
     this._gameLogic = null;
     this._playerObjects = [];
+
+    for (const userId in this._playersReadinessInLobby) {
+      this._playersReadinessInLobby[userId] = false;
+    }
   }
 }

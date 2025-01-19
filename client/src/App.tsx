@@ -1,6 +1,6 @@
 import "./App.css";
 import { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import Home from "./pages/HomePage/HomePage";
 import Lobby from "./pages/LobbyPage/LobbyPage";
 import { socket } from "./services/socketServices";
@@ -29,6 +29,7 @@ function App() {
   //    e.preventDefault();
   //    setter(e.target.value);
   //   };
+  const navigate = useNavigate();
 
   useEffect(() => {
     const onConnect = () => {
@@ -140,6 +141,10 @@ function App() {
       setGameSummary(data.gameState)
     }
 
+    const onRedirectToLobby = (data: {lobbyId: string}) => {
+      navigate(`/lobby/${data.lobbyId}`);
+    }
+
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
     socket.on("player_joined", onPlayerJoined);
@@ -155,6 +160,7 @@ function App() {
     socket.on("turn_ended", onTurnEnded);
     socket.on("passMoveProcessed", handlePassMove);
     socket.on("game_ended", onGameEnd);
+    socket.on("redirectToLobby", onRedirectToLobby);
 
     return () => {
       socket.off("connect");
@@ -170,8 +176,9 @@ function App() {
       socket.off("penalty_processed");
       socket.off("turn_ended");
       socket.off("passMoveProcessed");
-      socket.off("row_locked")
-      socket.off("game_ended")
+      socket.off("row_locked");
+      socket.off("game_ended");
+      socket.off("redirectToLobby");
     };
   }, []);
 
