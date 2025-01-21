@@ -372,12 +372,28 @@ export default function initializeSocketHandler(io: Server) {
       }
     });
 
-    socket.on("play_again", ({ lobbyId, userId }) => {
+    socket.on("play_again", ({ lobbyId, userId }, callback) => {
       const lobby = lobbiesMap[lobbyId];
 
       if (lobby) {
-        lobby.resetGameState();
-        io.to(lobbyId).emit("redirectToLobby", lobbyId);
+        lobby.markPlayerReady(userId);
+
+        const allPlayersReady = Object.values(
+          lobby.playersReadinessInLobby
+        ).every((isReady) => isReady);
+
+        if (allPlayersReady) {
+          lobby.resetGameState();
+        }
+
+        callback({
+          success: true,
+        });
+      } else {
+        callback({
+          success: false,
+          error: "Lobby not found!",
+        });
       }
     });
   });

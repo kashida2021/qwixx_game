@@ -10,6 +10,11 @@ interface IGameEndModal {
     gameSummary: any;
 }
 
+interface playAgainResponse{
+    success: boolean,
+    error?: string
+}
+
 export const GameEndModal: React.FC<IGameEndModal> = ({
     socket,
     lobbyId,
@@ -35,7 +40,14 @@ export const GameEndModal: React.FC<IGameEndModal> = ({
     console.log("ranked results are:", rankedResults);
 
     const handlePlayAgain = () => {
-        socket.emit("play_again", {lobbyId, userId});
+        socket.emit("play_again", {lobbyId, userId}, (response: playAgainResponse)=>{
+            if(response.success){
+                console.log("play again lobby", lobbyId);
+                navigate(`/lobby/${lobbyId}`);
+            } else {
+                 console.log(response.error);
+            }
+        });
     }
 
     const handleLeaveGame = () => {
