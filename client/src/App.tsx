@@ -206,6 +206,7 @@ function App() {
               notifications={notifications}
               setNotifications={setNotifications}
               gamePath={gamePath}
+              isGameActive={isGameActive}
             />
           }
         />
