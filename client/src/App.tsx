@@ -1,6 +1,6 @@
 import "./App.css";
 import { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/HomePage/HomePage";
 import Lobby from "./pages/LobbyPage/LobbyPage";
 import { socket } from "./services/socketServices";
@@ -21,6 +21,7 @@ function App() {
   const [availableMoves, setAvailableMoves] = useState<boolean>(false);
   const [isGameEnd, setIsGameEnd] = useState<boolean>(false);
   const [gameSummary, setGameSummary] = useState(null)
+  const [isGameActive, setIsGameActive] = useState(false);
 
   //Need to consier if this is overkill for our app as it's only being used in one place.
   //  const handleInputChange =
@@ -29,7 +30,6 @@ function App() {
   //    e.preventDefault();
   //    setter(e.target.value);
   //   };
-  const navigate = useNavigate();
 
   useEffect(() => {
     const onConnect = () => {
@@ -85,6 +85,7 @@ function App() {
       // If not, we can refactor the data object to not include it.
       setGamePath(data.path);
       setGameState(data.gameState);
+      setIsGameActive(true);
       console.log(data.gameState);
     };
 
@@ -141,9 +142,6 @@ function App() {
       setGameSummary(data.gameState)
     }
 
-    const onRedirectToLobby = (data: {lobbyId: string}) => {
-      navigate(`/lobby/${data.lobbyId}`);
-    }
 
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
@@ -160,7 +158,6 @@ function App() {
     socket.on("turn_ended", onTurnEnded);
     socket.on("passMoveProcessed", handlePassMove);
     socket.on("game_ended", onGameEnd);
-    socket.on("redirectToLobby", onRedirectToLobby);
 
     return () => {
       socket.off("connect");
@@ -178,7 +175,6 @@ function App() {
       socket.off("passMoveProcessed");
       socket.off("row_locked");
       socket.off("game_ended");
-      socket.off("redirectToLobby");
     };
   }, []);
 

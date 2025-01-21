@@ -43,6 +43,10 @@ export default class Lobby {
     return this._playerObjects;
   }
 
+  get playersReadinessInLobby(): playersReadinessInLobby {
+    return this._playersReadinessInLobby;
+  }
+
   get gameLogic(): IQwixxLogic | null {
     return this._gameLogic;
   }
