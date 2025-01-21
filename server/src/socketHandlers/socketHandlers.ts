@@ -373,9 +373,22 @@ export default function initializeSocketHandler(io: Server) {
     });
 
     socket.on("play_again", ({ lobbyId, userId }, callback) => {
+      if (!lobbyId || !userId) {
+        socket.emit("error_occured", {
+          message: "Missing userId or lobbyId to play again",
+        });
+        return;
+      }
+
       const lobby = lobbiesMap[lobbyId];
 
-      if (lobby) {
+      if (!lobby) {
+        socket.emit("error_occured", { message: "Lobby or game not found" });
+        callback({ success: false, error: "Lobby not found!" });
+        return;
+      }
+
+      try {
         lobby.markPlayerReady(userId);
 
         const allPlayersReady = Object.values(
@@ -386,13 +399,18 @@ export default function initializeSocketHandler(io: Server) {
           lobby.resetGameState();
         }
 
+        socket.emit("playAgain_lobbyRedirect", { isGameActive: false });
+
         callback({
           success: true,
         });
-      } else {
+      } catch (err) {
+        if (err instanceof Error) {
+          socket.emit("error_occured", { message: err.message });
+        }
         callback({
           success: false,
-          error: "Lobby not found!",
+          error: "Unable to redirect to play again!",
         });
       }
     });
