@@ -142,6 +142,10 @@ function App() {
       setGameSummary(data.gameState)
     }
 
+    const onPlayAgain = ( data: {isGameActive: boolean}) => {
+      setIsGameActive(data.isGameActive);
+    }
+
 
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
@@ -158,6 +162,7 @@ function App() {
     socket.on("turn_ended", onTurnEnded);
     socket.on("passMoveProcessed", handlePassMove);
     socket.on("game_ended", onGameEnd);
+    socket.on("playAgain_lobbyRedirect", onPlayAgain);
 
     return () => {
       socket.off("connect");
@@ -175,6 +180,7 @@ function App() {
       socket.off("passMoveProcessed");
       socket.off("row_locked");
       socket.off("game_ended");
+      socket.off("playAgain_lobbyRedirect");
     };
   }, []);
 
