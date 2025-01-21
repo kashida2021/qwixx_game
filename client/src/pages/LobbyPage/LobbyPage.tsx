@@ -12,6 +12,7 @@ interface ILobbyProps {
   notifications: string[];
   setNotifications: Dispatch<SetStateAction<string[]>>;
   gamePath: string;
+  isGameActive: boolean;
 }
 
 //The lobby page should:
@@ -40,6 +41,7 @@ export const Lobby: React.FC<ILobbyProps> = ({
   setMembers,
   setNotifications,
   gamePath,
+  isGameActive
 }) => {
   const navigate = useNavigate();
 
@@ -79,8 +81,10 @@ export const Lobby: React.FC<ILobbyProps> = ({
   };
 
   useEffect(() => {
-    navigate(gamePath);
-  }, [navigate, gamePath]);
+    if(isGameActive){
+      navigate(gamePath);
+    }
+  }, [navigate, gamePath, isGameActive]);
 
   return (
     <div className="Lobby-container">
