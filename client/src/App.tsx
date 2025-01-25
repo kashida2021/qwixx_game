@@ -229,6 +229,8 @@ function App() {
                 availableMoves={availableMoves}
                 isGameEnd={isGameEnd}
                 gameSummary={gameSummary}
+                setNotifications={setNotifications}
+                setMembers={setMembers}
               // setGameBoardState={setGameBoardState}
               />
             ) : (
