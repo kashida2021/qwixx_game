@@ -1,6 +1,7 @@
 import { Socket } from "socket.io-client"
 import "./Modal.css";
 import { useNavigate } from "react-router-dom";
+import { SetStateAction, Dispatch } from "react";
 
 interface IGameEndModal {
     socket: Socket;
@@ -8,6 +9,8 @@ interface IGameEndModal {
     userId: string;
     members: string[];
     gameSummary: any;
+    setNotifications: Dispatch<SetStateAction<string[]>>;
+    setMembers: Dispatch<SetStateAction<string[]>>;
 }
 
 interface playAgainResponse{
@@ -21,6 +24,8 @@ export const GameEndModal: React.FC<IGameEndModal> = ({
     userId,
     members,
     gameSummary,
+    setNotifications,
+    setMembers,
 }) => {
 
     const navigate = useNavigate();
@@ -51,9 +56,14 @@ export const GameEndModal: React.FC<IGameEndModal> = ({
     }
 
     const handleLeaveGame = () => {
-        socket.emit("leave_lobby", {lobbyId, userId});
-        navigate(`/`);
-    }
+        socket.emit("leave_lobby", {lobbyId, userId}), (response: {success: boolean}) => {
+            if(response.success){
+                setNotifications([]);
+                setMembers([]);
+                navigate("/");
+            }
+        };
+    };
 
     return(
         <div className="modal">
