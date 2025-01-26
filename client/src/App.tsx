@@ -236,6 +236,7 @@ function App() {
                 setGameState={setGameState}
                 setIsGameActive={setIsGameActive}
                 setGameSummary={setGameSummary}
+                setIsGameEnd={setIsGameEnd}
               // setGameBoardState={setGameBoardState}
               />
             ) : (

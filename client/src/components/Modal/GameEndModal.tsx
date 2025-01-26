@@ -16,6 +16,7 @@ interface IGameEndModal {
     setGameState: Dispatch<SetStateAction<QwixxLogic | null>>;
     setGameSummary: Dispatch<SetStateAction<any>>;
     setIsGameActive: Dispatch<SetStateAction<boolean>>;
+    setIsGameEnd: Dispatch<SetStateAction<boolean>>;
 }
 
 interface playAgainResponse{
@@ -34,7 +35,8 @@ export const GameEndModal: React.FC<IGameEndModal> = ({
     setGamePath,
     setGameState,
     setIsGameActive,
-    setGameSummary
+    setGameSummary,
+    setIsGameEnd
 }) => {
 
     const navigate = useNavigate();
@@ -61,6 +63,7 @@ export const GameEndModal: React.FC<IGameEndModal> = ({
                 setGameState(null);
                 setIsGameActive(false);
                 setGameSummary(null);
+                setIsGameEnd(false);
                 navigate(`/lobby/${lobbyId}`);
             } else {
                  console.log(response.error);
