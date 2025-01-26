@@ -144,6 +144,7 @@ function App() {
 
     const onPlayAgain = ( data: {isGameActive: boolean}) => {
       setIsGameActive(data.isGameActive);
+      console.log("play again game state", gameState, gameSummary);
     }
 
 
