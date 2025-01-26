@@ -32,6 +32,7 @@ interface IGameProps {
   setGameState: Dispatch<SetStateAction<QwixxLogic | null>>;
   setGameSummary: Dispatch<SetStateAction<any>>;
   setIsGameActive: Dispatch<SetStateAction<boolean>>;
+  setIsGameEnd: Dispatch<SetStateAction<boolean>>;
   // setGameBoardState: Dispatch<SetStateAction<GameBoard | null>>;
 }
 
@@ -49,7 +50,8 @@ export const Game: React.FC<IGameProps> = ({
   setGamePath,
   setGameState,
   setIsGameActive,
-  setGameSummary
+  setGameSummary,
+  setIsGameEnd,
   
 }) => {
   const [playerChoice, setPlayerChoice] = useState<{
@@ -193,6 +195,7 @@ export const Game: React.FC<IGameProps> = ({
             setGamePath={setGamePath}
             setIsGameActive={setIsGameActive}
             setGameSummary={setGameSummary}
+            setIsGameEnd={setIsGameEnd}
           />): (<p></p>)}
       </div>
     </div>
