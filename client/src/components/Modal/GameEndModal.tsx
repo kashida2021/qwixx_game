@@ -40,7 +40,7 @@ export const GameEndModal: React.FC<IGameEndModal> = ({
     const navigate = useNavigate();
 
     console.log("gameSummary before sorting", gameSummary);
-    const endGameResults = Array.isArray(gameSummary.scores)
+    const endGameResults = Array.isArray(gameSummary?.scores)
         ? [...gameSummary.scores].sort((a, b) => b.total - a.total)
         : [];
 
@@ -84,7 +84,7 @@ export const GameEndModal: React.FC<IGameEndModal> = ({
             <div className="overlay"></div>
             <div className="modal__endGame-content">
                 <h2>Game End Summary: Lobby {lobbyId}</h2>
-                <h3> Winner is {gameSummary.winners}</h3>
+                <h3> Winner is {gameSummary?.winners}</h3>
                 <table className="modal__endGame-table">
                     <thead>
                         <tr>
