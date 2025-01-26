@@ -71,6 +71,8 @@ export default class Lobby {
   }
 
   startGame() {
+    this.resetGameState();
+
     const gameCards = initializeGameCards(this._players);
     this._playerObjects = initializePlayers(this._players, gameCards);
     const sixSidedDice = initializeDice();

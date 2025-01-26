@@ -399,6 +399,8 @@ export default function initializeSocketHandler(io: Server) {
           lobby.resetGameState();
         }
 
+        console.log("gamelogic on reset", lobbiesMap[lobbyId].gameLogic);
+
         socket.emit("playAgain_lobbyRedirect", { isGameActive: false });
 
         callback({
