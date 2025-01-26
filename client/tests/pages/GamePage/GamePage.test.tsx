@@ -4,11 +4,11 @@ import { render, screen } from "@testing-library/react";
 import React from "react";
 import GamePage from "../../../src/pages/GamePage/GamePage";
 import "@testing-library/jest-dom";
-// import { MemoryRouter } from "react-router-dom";
 import { socket } from "../../../src/services/socketServices";
 //const user = userEvent.setup();
 import { initialGameState, hasRolledGameState, user1HasSubmittedState, gameEndStateLocked } from "./__fixtures__/gameStates";
 import { endGameSummaryLockedState } from "./__fixtures__/gameSummaryStates";
+import { MemoryRouter } from "react-router-dom";
 
 const lobbyIdMock = "1234";
 const membersArrayMock = ["testUser1", "testUser2", "testUser3"];
@@ -197,16 +197,20 @@ describe("Game Page Unit Test:", () => {
   })
 
   test("GameEndModal should render when gameEnd conditions have been met", ()=> {
-    render(<GamePage
-      socket={socket}
-      userId={"testUser1"}
-      members={membersArrayMock}
-      lobbyId={lobbyIdMock}
-      gameState={gameEndStateLocked}
-      availableMoves={false}
-      isGameEnd={true}
-      gameSummary={endGameSummaryLockedState}
-    />
+    render(
+    
+      <MemoryRouter>
+        <GamePage
+          socket={socket}
+          userId={"testUser1"}
+          members={membersArrayMock}
+          lobbyId={lobbyIdMock}
+          gameState={gameEndStateLocked}
+          availableMoves={false}
+          isGameEnd={true}
+          gameSummary={endGameSummaryLockedState}
+      />
+      </MemoryRouter>
     );
 
     screen.debug();
