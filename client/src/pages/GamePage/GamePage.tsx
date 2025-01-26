@@ -1,5 +1,5 @@
 import "./GamePage.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { Socket } from "socket.io-client";
 import GameCard from "../../components/GameCard/GameCard";
 //import { GameCardData } from "../../types/GameCardData";
@@ -26,6 +26,12 @@ interface IGameProps {
   availableMoves: boolean;
   isGameEnd: boolean;
   gameSummary: any;
+  setMembers: Dispatch<SetStateAction<string[]>>;
+  setNotifications: Dispatch<SetStateAction<string[]>>;
+  setGamePath: Dispatch<SetStateAction<string>>;
+  setGameState: Dispatch<SetStateAction<QwixxLogic | null>>;
+  setGameSummary: Dispatch<SetStateAction<any>>;
+  setIsGameActive: Dispatch<SetStateAction<boolean>>;
   // setGameBoardState: Dispatch<SetStateAction<GameBoard | null>>;
 }
 
@@ -38,6 +44,13 @@ export const Game: React.FC<IGameProps> = ({
   availableMoves,
   isGameEnd,
   gameSummary,
+  setMembers,
+  setNotifications,
+  setGamePath,
+  setGameState,
+  setIsGameActive,
+  setGameSummary
+  
 }) => {
   const [playerChoice, setPlayerChoice] = useState<{
     row: string;
@@ -174,6 +187,12 @@ export const Game: React.FC<IGameProps> = ({
             userId = {userId}
             members = {members}
             gameSummary = {gameSummary}
+            setNotifications = {setNotifications}
+            setMembers = {setMembers}
+            setGameState={setGameState}
+            setGamePath={setGamePath}
+            setIsGameActive={setIsGameActive}
+            setGameSummary={setGameSummary}
           />): (<p></p>)}
       </div>
     </div>

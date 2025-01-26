@@ -2,6 +2,7 @@ import { Socket } from "socket.io-client"
 import "./Modal.css";
 import { useNavigate } from "react-router-dom";
 import { SetStateAction, Dispatch } from "react";
+import { QwixxLogic } from "../../types/qwixxLogic";
 
 interface IGameEndModal {
     socket: Socket;
@@ -11,6 +12,10 @@ interface IGameEndModal {
     gameSummary: any;
     setNotifications: Dispatch<SetStateAction<string[]>>;
     setMembers: Dispatch<SetStateAction<string[]>>;
+    setGamePath: Dispatch<SetStateAction<string>>;
+    setGameState: Dispatch<SetStateAction<QwixxLogic | null>>;
+    setGameSummary: Dispatch<SetStateAction<any>>;
+    setIsGameActive: Dispatch<SetStateAction<boolean>>;
 }
 
 interface playAgainResponse{
@@ -26,6 +31,10 @@ export const GameEndModal: React.FC<IGameEndModal> = ({
     gameSummary,
     setNotifications,
     setMembers,
+    setGamePath,
+    setGameState,
+    setIsGameActive,
+    setGameSummary
 }) => {
 
     const navigate = useNavigate();
@@ -48,6 +57,10 @@ export const GameEndModal: React.FC<IGameEndModal> = ({
         socket.emit("play_again", {lobbyId, userId}, (response: playAgainResponse)=>{
             if(response.success){
                 console.log("play again lobby", lobbyId);
+                setGamePath("");
+                setGameState(null);
+                setIsGameActive(false);
+                setGameSummary(null);
                 navigate(`/lobby/${lobbyId}`);
             } else {
                  console.log(response.error);
@@ -56,13 +69,14 @@ export const GameEndModal: React.FC<IGameEndModal> = ({
     }
 
     const handleLeaveGame = () => {
-        socket.emit("leave_lobby", {lobbyId, userId}), (response: {success: boolean}) => {
+        socket.emit("leave_lobby", {lobbyId, userId}, (response: {success: boolean}) => {
             if(response.success){
                 setNotifications([]);
                 setMembers([]);
                 navigate("/");
             }
-        };
+        }
+        );
     };
 
     return(

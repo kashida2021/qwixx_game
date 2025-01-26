@@ -231,6 +231,10 @@ function App() {
                 gameSummary={gameSummary}
                 setNotifications={setNotifications}
                 setMembers={setMembers}
+                setGamePath={setGamePath}
+                setGameState={setGameState}
+                setIsGameActive={setIsGameActive}
+                setGameSummary={setGameSummary}
               // setGameBoardState={setGameBoardState}
               />
             ) : (
