@@ -19,6 +19,9 @@ function App() {
   const [gameState, setGameState] = useState<QwixxLogic | null>(null);
   const [gamePath, setGamePath] = useState("");
   const [availableMoves, setAvailableMoves] = useState<boolean>(false);
+  const [isGameEnd, setIsGameEnd] = useState<boolean>(false);
+  const [gameSummary, setGameSummary] = useState(null)
+  const [isGameActive, setIsGameActive] = useState(false);
 
   //Need to consier if this is overkill for our app as it's only being used in one place.
   //  const handleInputChange =
@@ -82,6 +85,7 @@ function App() {
       // If not, we can refactor the data object to not include it.
       setGamePath(data.path);
       setGameState(data.gameState);
+      setIsGameActive(true);
       console.log(data.gameState);
     };
 
@@ -123,7 +127,7 @@ function App() {
       console.log("penalty data", data.responseData);
     }
 
-    const handlePassMove = ( data: {gameState: QwixxLogic} ) => {
+    const handlePassMove = (data: { gameState: QwixxLogic }) => {
       setGameState(data.gameState);
       console.log(data.gameState);
     }
@@ -132,6 +136,17 @@ function App() {
       setGameState(data.gameState)
       console.log("Data after locking a row", data)
     }
+
+    const onGameEnd = (data: { gameState: any }) => {
+      setIsGameEnd(true)
+      setGameSummary(data.gameState)
+    }
+
+    const onPlayAgain = ( data: {isGameActive: boolean}) => {
+      setIsGameActive(data.isGameActive);
+      console.log("play again game state", gameState, gameSummary);
+    }
+
 
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
@@ -147,6 +162,8 @@ function App() {
     socket.on("row_locked", onRowLocked)
     socket.on("turn_ended", onTurnEnded);
     socket.on("passMoveProcessed", handlePassMove);
+    socket.on("game_ended", onGameEnd);
+    socket.on("playAgain_lobbyRedirect", onPlayAgain);
 
     return () => {
       socket.off("connect");
@@ -162,7 +179,9 @@ function App() {
       socket.off("penalty_processed");
       socket.off("turn_ended");
       socket.off("passMoveProcessed");
-      socket.off("row_locked")
+      socket.off("row_locked");
+      socket.off("game_ended");
+      socket.off("playAgain_lobbyRedirect");
     };
   }, []);
 
@@ -194,6 +213,7 @@ function App() {
               notifications={notifications}
               setNotifications={setNotifications}
               gamePath={gamePath}
+              isGameActive={isGameActive}
             />
           }
         />
@@ -208,6 +228,15 @@ function App() {
                 members={members}
                 gameState={gameState}
                 availableMoves={availableMoves}
+                isGameEnd={isGameEnd}
+                gameSummary={gameSummary}
+                setNotifications={setNotifications}
+                setMembers={setMembers}
+                setGamePath={setGamePath}
+                setGameState={setGameState}
+                setIsGameActive={setIsGameActive}
+                setGameSummary={setGameSummary}
+                setIsGameEnd={setIsGameEnd}
               // setGameBoardState={setGameBoardState}
               />
             ) : (

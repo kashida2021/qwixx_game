@@ -1,5 +1,5 @@
 import "./GamePage.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { Socket } from "socket.io-client";
 import GameCard from "../../components/GameCard/GameCard";
 //import { GameCardData } from "../../types/GameCardData";
@@ -9,7 +9,8 @@ import { QwixxLogic } from "../../types/qwixxLogic";
 // import { rowColour} from "../../../../shared/types";
 import DiceContainer from "../../components/Dice/DiceContainer";
 import ScoreGuideTable from "../../components/ScoreGuideTable/ScoreGuideTable";
-import { MoveAvailability } from "../../types/GameCardData";
+//import { MoveAvailability } from "../../types/GameCardData";
+import { GameEndModal } from "../../components/Modal/GameEndModal";
 //interface GameState {
 //players: {
 //[playerId: string]: GameCardData
@@ -23,6 +24,15 @@ interface IGameProps {
   members: string[];
   gameState: QwixxLogic;
   availableMoves: boolean;
+  isGameEnd: boolean;
+  gameSummary: any;
+  setMembers: Dispatch<SetStateAction<string[]>>;
+  setNotifications: Dispatch<SetStateAction<string[]>>;
+  setGamePath: Dispatch<SetStateAction<string>>;
+  setGameState: Dispatch<SetStateAction<QwixxLogic | null>>;
+  setGameSummary: Dispatch<SetStateAction<any>>;
+  setIsGameActive: Dispatch<SetStateAction<boolean>>;
+  setIsGameEnd: Dispatch<SetStateAction<boolean>>;
   // setGameBoardState: Dispatch<SetStateAction<GameBoard | null>>;
 }
 
@@ -33,12 +43,22 @@ export const Game: React.FC<IGameProps> = ({
   gameState,
   socket,
   availableMoves,
+  isGameEnd,
+  gameSummary,
+  setMembers,
+  setNotifications,
+  setGamePath,
+  setGameState,
+  setIsGameActive,
+  setGameSummary,
+  setIsGameEnd,
+  
 }) => {
   const [playerChoice, setPlayerChoice] = useState<{
     row: string;
     num: number;
   } | null>(null);
-  
+
   const [submissionCount, setSubmissionCount] = useState<number>(0);
 
   useEffect(() => {
@@ -79,7 +99,7 @@ export const Game: React.FC<IGameProps> = ({
 
   const handleNumberSelection = () => {
     socket.emit("mark_numbers", { lobbyId, userId, playerChoice }, (isSuccessful: boolean) => {
-      if(isSuccessful){
+      if (isSuccessful) {
         setSubmissionCount((prev) => prev + 1);
       } else {
         console.log("move not successful");
@@ -93,7 +113,7 @@ export const Game: React.FC<IGameProps> = ({
   }
 
   const handlePassMove = () => {
-    socket.emit("pass_move", {lobbyId, userId});
+    socket.emit("pass_move", { lobbyId, userId });
     setSubmissionCount((prev) => prev + 1);
   }
 
@@ -106,7 +126,7 @@ export const Game: React.FC<IGameProps> = ({
     socket.emit("lock_row", { userId, lobbyId, rowColour })
   }
 
-
+  console.log(gameSummary);
 
   return (
     <div className="game-page-container">
@@ -155,11 +175,28 @@ export const Game: React.FC<IGameProps> = ({
             (<button onClick={handleNumberSelection} disabled={hasSubmitted}>Confirm</button>)
           }
           {/* For ending a turn even if there are available moves */}
-          <button className="" onClick={handleEndTurn} disabled={hasSubmitted || !hasRolled}>End Turn</button>          
+          <button className="" onClick={handleEndTurn} disabled={hasSubmitted || !hasRolled}>End Turn</button>
           {/* Possibly need to update structure of data sent back from backend to include submission count to disable button on 2nd choice rather than hasSubmitted */}
-          <button className="" onClick={handlePassMove} disabled={hasSubmitted || !hasRolled || activePlayer !== userId || submissionCount > 0  }>Pass Move</button>
-
+          <button className="" onClick={handlePassMove} disabled={hasSubmitted || !hasRolled || activePlayer !== userId || submissionCount > 0}>Pass Move</button>
         </div>
+      </div>
+      {/* Temporarily putting this here so we can see who is the winner*/}
+      <div className="game-page__game-summary">
+        {isGameEnd ? (
+          <GameEndModal
+            socket={socket}
+            lobbyId={lobbyId}
+            userId = {userId}
+            members = {members}
+            gameSummary = {gameSummary}
+            setNotifications = {setNotifications}
+            setMembers = {setMembers}
+            setGameState={setGameState}
+            setGamePath={setGamePath}
+            setIsGameActive={setIsGameActive}
+            setGameSummary={setGameSummary}
+            setIsGameEnd={setIsGameEnd}
+          />): (<p></p>)}
       </div>
     </div>
   );

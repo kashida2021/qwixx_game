@@ -1,8 +1,8 @@
 import { rowColour } from "../../enums/rowColours";
+import IQwixxGameCard from "../../models/IQwixxGameCard";
 import Player from "../../models/PlayerClass";
-import qwixxBaseGameCard from "../../models/QwixxBaseGameCard";
 
-const mockGameCard: Partial<qwixxBaseGameCard> = {
+const mockGameCard: Partial<IQwixxGameCard> = {
   markNumbers: jest.fn(),
 };
 
@@ -10,7 +10,7 @@ let testPlayer: Player;
 
 describe("Player Class tests", () => {
   beforeEach(() => {
-    testPlayer = new Player("testPlayer", mockGameCard as qwixxBaseGameCard);
+    testPlayer = new Player("testPlayer", mockGameCard as IQwixxGameCard);
   });
 
   it("Should take a name and be able to return it", () => {

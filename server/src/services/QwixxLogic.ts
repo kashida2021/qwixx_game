@@ -1,11 +1,12 @@
-import Player from "../models/PlayerClass";
-import Dice from "../models/DiceClass";
 import { rowColour } from "../enums/rowColours";
 import { SerializePlayer } from "../models/PlayerClass";
 import { TDiceValues } from "../models/DiceClass";
 import { DiceColour } from "../enums/DiceColours";
+import IPlayer from "../models/IPlayer";
+import IDice from "../models/IDice";
+import IQwixxLogic from "./IQwixxLogic";
 
-interface rollDiceResults {
+export interface RollDiceResult {
   hasRolled: boolean;
   hasAvailableMoves: boolean;
   diceValues: TDiceValues;
@@ -20,43 +21,74 @@ interface MoveValidationFailure {
   errorMessage: string;
 }
 
-type ValidationResult = MoveValidationSuccess | MoveValidationFailure;
+interface EndGameSummary {
+  winners: string[];
+  scores: {
+    subtotal: Record<string, number>;
+    penalties: number;
+    total: number;
+    name: string;
+  }[];
+}
 
-interface SerializedGameState {
+// type SuccessResult<T> = { success: true; data: T};
+type ErrorResult = { success: false; errorMessage: string };
+
+interface GameHasEnded {
+  hasGameEnded: true;
+  data: EndGameSummary;
+}
+
+interface GameOngoing {
+  hasGameEnded: false;
+  data: null;
+}
+
+type ValidationResult = MoveValidationSuccess | MoveValidationFailure;
+type ProcessPlayerSubmissionResult = GameHasEnded | GameOngoing;
+
+export interface SerializedGameState {
   players: Record<string, SerializePlayer>;
   dice: TDiceValues;
   activePlayer: string;
   hasRolled: boolean;
 }
 
-type PassMoveResult =
-  | { isValid: true; data: SerializedGameState }
-  | { isValid: false; errorMessage: string };
-
-type MakeMoveResult =
+export type PassMoveResult =
   | { success: true; data: SerializedGameState }
-  | { success: false; error: string };
+  | ErrorResult;
 
-type LockRowResult =
+type GameActionResult =
+  | { success: true; gameEnd: false; data: SerializedGameState }
+  | { success: true; gameEnd: true; data: EndGameSummary }
+  | ErrorResult;
+
+export type MakeMoveResult = GameActionResult;
+export type ProcessPenaltyResult = GameActionResult;
+export type EndTurnResult = GameActionResult;
+
+export type LockRowResult =
   | { success: true; data: SerializedGameState }
-  | { success: false; errorMessage: string }
+  | ErrorResult;
 
-export default class QwixxLogic {
-  private _playersArray: Player[];
-  private _dice: Dice;
+export default class QwixxLogic implements IQwixxLogic {
+  private _playersArray: IPlayer[];
+  private _dice: IDice;
   private _currentTurnIndex: number;
   private _hasRolled: boolean;
-  private _lockedRows: rowColour[]
+  private _lockedRows: rowColour[];
+  private _isGameEnded: boolean;
 
-  constructor(players: Player[], dice: Dice) {
+  constructor(players: IPlayer[], dice: IDice) {
     this._playersArray = players;
     this._dice = dice;
     this._currentTurnIndex = 0;
     this._hasRolled = false;
-    this._lockedRows = []
+    this._lockedRows = [];
+    this._isGameEnded = false;
   }
 
-  public rollDice(): rollDiceResults {
+  public rollDice(): RollDiceResult {
     this._hasRolled = true;
     const hasRolled = this.hasRolled;
     const validColouredNumbers = this._dice.validColouredNumbers;
@@ -74,12 +106,39 @@ export default class QwixxLogic {
     return this._playersArray[this._currentTurnIndex];
   }
 
-  private playerExistsInLobby(playerName: string): Player | undefined {
-    return this._playersArray.find((player) => player.name === playerName);
+  private playerExistsInLobby(playerName: string): IPlayer {
+    const player = this._playersArray.find(
+      (player) => player.name === playerName
+    );
+
+    if (!player) {
+      throw new Error("Player not found.");
+    }
+
+    return player;
   }
 
   private get hasRolled() {
     return this._hasRolled;
+  }
+
+  private validateGameActionPrerequisite(player: IPlayer): ValidationResult {
+    if (!this.hasRolled) {
+      return { isValid: false, errorMessage: "Dice hasn't been rolled yet." };
+    }
+
+    if (player.hasSubmittedChoice) {
+      return {
+        isValid: false,
+        errorMessage: "Player already finished their turn.",
+      };
+    }
+
+    if (this._isGameEnded) {
+      return { isValid: false, errorMessage: "Can't perform action. Game has already ended." }
+    }
+
+    return { isValid: true };
   }
 
   private nextTurn() {
@@ -97,23 +156,43 @@ export default class QwixxLogic {
   }
 
   private normaliseLockedRows() {
-    this._playersArray.forEach((player) => player.gameCard.normaliseRows(this._lockedRows))
+    this._playersArray.forEach((player) =>
+      player.gameCard.synchronizeLockedRows(this._lockedRows)
+    );
   }
 
-  private processPlayersSubmission() {
-    if (this.haveAllPlayersSubmitted()) {
-      this.resetAllPlayersSubmission();
+  private isGameEnd() {
+    return (
+      this._lockedRows.length >= 2 ||
+      this._playersArray.some((p) => p.gameCard.penalties.length === 4)
+    );
+  }
 
-      if (this._lockedRows) {
-        this.normaliseLockedRows();
-        this._lockedRows.forEach(row => {
-          const diceColour = this.getDiceColourFromLockedRow(row)
-          this._dice.disableDie(diceColour)
-        })
+  private handleEndOfRound() {
+    this.resetAllPlayersSubmission();
+
+    if (this._lockedRows) {
+      this.normaliseLockedRows();
+      this._lockedRows.forEach((row) => {
+        const diceColour = this.getDiceColourFromLockedRow(row);
+        this._dice.disableDie(diceColour);
+      });
+    }
+  }
+
+  private processPlayersSubmission(): ProcessPlayerSubmissionResult {
+    if (this.haveAllPlayersSubmitted()) {
+      this.handleEndOfRound();
+
+      if (this.isGameEnd() && !this._isGameEnded) {
+        this._isGameEnded = true;
+        const winners = this.determineWinner();
+        return { hasGameEnded: true, data: winners };
       }
 
       this.nextTurn();
     }
+    return { hasGameEnded: false, data: null };
   }
 
   private getDiceColourFromLockedRow(row: rowColour): DiceColour {
@@ -145,32 +224,27 @@ export default class QwixxLogic {
   }
 
   public passMove(playerName: string): PassMoveResult {
-    // Call Player Method add submission to player
     const player = this.playerExistsInLobby(playerName);
 
-    if (!player) {
-      throw new Error("Player not found.");
+    const validationResult = this.validateGameActionPrerequisite(player);
+
+    if (!validationResult.isValid) {
+      return { success: false, errorMessage: validationResult.errorMessage };
     }
 
-    if (!this.hasRolled) {
-      return { isValid: false, errorMessage: "Dice hasn't been rolled yet." };
-    }
-    // Check if active player
     if (player !== this.activePlayer) {
       return {
-        isValid: false,
+        success: false,
         errorMessage: "Unable to pass if not active player.",
       };
     }
 
-    // Check submission count is 0
-    if (player?.submissionCount === 1) {
-      return { isValid: false, errorMessage: "Cannot pass on second choice." };
+    if (player.submissionCount > 0) {
+      return { success: false, errorMessage: "Cannot pass on second choice." };
     }
 
-    //add player method to update submission count for passmove
     player.passMove();
-    return { isValid: true, data: this.serialize() };
+    return { success: true, data: this.serialize() };
   }
 
   public makeMove(
@@ -178,33 +252,22 @@ export default class QwixxLogic {
     row: string,
     num: number
   ): MakeMoveResult {
-    const colourToMark = this.getColourFromRow(row);
+    const rowToMark = this.getColourFromRow(row);
     const player = this.playerExistsInLobby(playerName);
-    // Moved this check up to here and early return
-    // Only throw error here because critical error and not game-rule violation
-    if (!player) {
-      //return { isValid: false, errorMessage: new Error("Player not found.") };
-      throw new Error("Player not found.");
+
+    const validPrereq = this.validateGameActionPrerequisite(player);
+    if (!validPrereq.isValid) {
+      return { success: false, errorMessage: validPrereq.errorMessage };
     }
 
-    //Passed the player object to validateMove instead of playerName
-    const validationResult = this.validateMove(player, row, num);
-
-    // returning an object literal because it is a game-rule violation
+    const validationResult = this.validateMove(player, rowToMark, num);
     if (!validationResult.isValid) {
-      //throw validationResult.errorMessage;
-      return { success: false, error: validationResult.errorMessage };
+      return { success: false, errorMessage: validationResult.errorMessage };
     }
 
-    const markNumberResult = player.markNumber(colourToMark, num);
-
-    // returning an object literal because it is a game-rule violation
+    const markNumberResult = player.markNumber(rowToMark, num);
     if (!markNumberResult.success) {
-      //throw new Error("Invalid move: cannot mark this number.");
-      return {
-        success: markNumberResult.success,
-        error: markNumberResult.errorMessage,
-      };
+      return { success: false, errorMessage: markNumberResult.errorMessage };
     }
 
     if (
@@ -212,72 +275,39 @@ export default class QwixxLogic {
       (player !== this.activePlayer && player.submissionCount === 1)
     ) {
       player.markSubmitted();
-      this.processPlayersSubmission();
     }
 
-    return { success: true, data: this.serialize() };
+    const res = this.processPlayersSubmission();
+    if (res.hasGameEnded) {
+      return { success: true, gameEnd: res.hasGameEnded, data: res.data };
+    } else {
+      return {
+        success: true,
+        gameEnd: res.hasGameEnded,
+        data: this.serialize(),
+      };
+    }
   }
 
   private validateMove(
-    player: Player,
-    row: string,
+    player: IPlayer,
+    row: rowColour,
     num: number
   ): ValidationResult {
-    const colourToMark = this.getColourFromRow(row);
-    if (!this.hasRolled) {
-      return {
-        isValid: false,
-        errorMessage: "Dice hasn't been rolled yet.",
-      };
-    }
-
     if (num < 2 || num > 12) {
       return {
         isValid: false,
         errorMessage: "Dice number is out of range.",
       };
     }
+    //NOTE: What happens if submissionCount > 1?
 
-    if (player.hasSubmittedChoice) {
-      return {
-        isValid: false,
-        errorMessage: "Player already finished their turn.",
-      };
-    }
-
-    /*
-     * Checks the non-active player's number selection.
-     */
-    if (player !== this.activePlayer && num !== this._dice.whiteDiceSum) {
-      return {
-        isValid: false,
-        errorMessage: "Number selected doesn't equal to sum of white dice.",
-      };
-    }
-
-    /*
-     * Checks the active player's first number selection is valid.
-     * A valid move for first selection is the sum of the white dice.
-     */
-    if (
-      player === this.activePlayer &&
-      player.submissionCount === 0 &&
-      num !== this._dice.whiteDiceSum
-    ) {
-      return {
-        isValid: false,
-        errorMessage: "Number selected doesn't equal to sum of white dice.",
-      };
-    }
-
-    /*
-     * Checks the active player's second number selection is valid.
-     * A valid move for the second selection is the sum of a white die + coloured die
-     */
+    //Checks the active player's second number selection is valid.
+    //A valid move for the second selection is the sum of a white die + coloured die
     if (
       player === this.activePlayer &&
       player.submissionCount === 1 &&
-      !this._dice.validColouredNumbers[colourToMark]?.includes(num)
+      !this._dice.validColouredNumbers[row]?.includes(num)
     ) {
       return {
         isValid: false,
@@ -286,27 +316,25 @@ export default class QwixxLogic {
       };
     }
 
+    //General rule: All player's first mark number action needs to be the sum of the white dice.
+    if (player.submissionCount === 0 && num !== this._dice.whiteDiceSum) {
+      return {
+        isValid: false,
+        errorMessage: "Number selected doesn't equal to sum of white dice.",
+      };
+    }
+
     return {
       isValid: true,
     };
   }
 
-  public endTurn(playerName: string) {
-    if (!this.hasRolled) {
-      return { success: false, errorMessage: "Dice hasn't been rolled yet." };
-    }
-
+  public endTurn(playerName: string): EndTurnResult {
     const player = this.playerExistsInLobby(playerName);
+    const validationResult = this.validateGameActionPrerequisite(player);
 
-    if (!player) {
-      throw new Error("Player not found.");
-    }
-
-    if (player.hasSubmittedChoice) {
-      return {
-        success: false,
-        errorMessage: "Player has already ended their turn.",
-      };
+    if (!validationResult.isValid) {
+      return { success: false, errorMessage: validationResult.errorMessage };
     }
 
     if (player !== this.activePlayer) {
@@ -320,64 +348,74 @@ export default class QwixxLogic {
       player.markSubmitted();
     }
 
-    this.processPlayersSubmission();
+    const res = this.processPlayersSubmission();
 
-    return { success: true, data: this.serialize() };
+    if (res.hasGameEnded) {
+      return { success: true, gameEnd: res.hasGameEnded, data: res.data };
+    }
+
+    return { success: true, gameEnd: false, data: this.serialize() };
   }
 
-  public processPenalty(playerName: string) {
+  public processPenalty(playerName: string): ProcessPenaltyResult {
     const player = this.playerExistsInLobby(playerName);
-    if (!player) {
-      throw new Error("Player not found");
+    const validationResult = this.validateGameActionPrerequisite(player);
+
+    if (!validationResult.isValid) {
+      return { success: false, errorMessage: validationResult.errorMessage };
     }
 
     player.gameCard.addPenalty();
     player.markSubmitted();
-    this.processPlayersSubmission();
+    const res = this.processPlayersSubmission();
 
-    return this.serialize();
+    if (res.hasGameEnded) {
+      return { success: true, gameEnd: res.hasGameEnded, data: res.data };
+    }
+    return { success: true, gameEnd: res.hasGameEnded, data: this.serialize() };
   }
 
   public lockRow(playerName: string, row: string): LockRowResult {
-    const colourToLock = this.getColourFromRow(row)
+    const colourToLock = this.getColourFromRow(row);
+    const player = this.playerExistsInLobby(playerName);
 
-    const player = this.playerExistsInLobby(playerName)
-    if (!player) {
-      throw new Error("Player not found")
+    const res = player.gameCard.lockRow(colourToLock);
+
+    if (!res.success && res.errorMessage) {
+      return { success: false, errorMessage: res.errorMessage };
     }
-
-    const res = player.gameCard.lockRow(colourToLock)
-
-    if (!res.success) {
-      return res
-    }
-    // NOTE: 
+    // NOTE:
     //Does having this result in any bugs?
-    if (res.lockedRow && !this._lockedRows.includes(res.lockedRow)) {
-      this._lockedRows.push(res.lockedRow)
+    if (
+      res.success &&
+      res.lockedRow &&
+      !this._lockedRows.includes(res.lockedRow)
+    ) {
+      this._lockedRows.push(res.lockedRow);
     }
 
-    return { success: true, data: this.serialize() }
-  }
-  // private get players() {
-  //   return this._playersArray;
-  // }
-
-  public calculateScores(): Record<string, number> {
-    const scores = this._playersArray.reduce((acc, player) => {
-      acc[player.name] = player.gameCard.calculateScore();
-      return acc;
-    }, {} as Record<string, number>)
-
-    return scores
+    return { success: true, data: this.serialize() };
   }
 
-  public determineWinner() {
-    const scores = this.calculateScores()
+  public collectPlayersScores() {
+    const playerScores = this._playersArray.map((player) => ({
+      name: player.name,
+      ...player.gameCard.calculateScores(),
+    }));
 
-    return Object.keys(scores).filter(
-      player => scores[player] == Math.max(...Object.values(scores))
-    )
+    return playerScores;
+  }
+
+  public determineWinner(): EndGameSummary {
+    const playerScores = this.collectPlayersScores();
+    const highestScore = Math.max(
+      ...playerScores.map((player) => player.total)
+    );
+    const winners = playerScores
+      .filter((player) => player.total === highestScore)
+      .map((player) => player.name);
+
+    return { winners, scores: playerScores };
   }
 
   public serialize(): SerializedGameState {

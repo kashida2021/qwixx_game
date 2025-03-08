@@ -1,4 +1,6 @@
-export default class SixSidedDie {
+import IDie from "./IDie";
+
+export default class SixSidedDie implements IDie {
   private _value: number;
   private _active: boolean;
 
@@ -12,6 +14,10 @@ export default class SixSidedDie {
   }
 
   rollDie(): number {
+    if (!this._active) {
+      return 0;
+    }
+
     this._value = Math.floor(Math.random() * 6) + 1;
     return this._value;
   }

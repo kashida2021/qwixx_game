@@ -1,5 +1,7 @@
 import { io, Socket } from "socket.io-client";
 
+const BACKEND_URL = import.meta.env.BACKEND_URL;
+
 // // To make this more advanced, think about promises and errors
 // // let instance;
 
@@ -18,8 +20,9 @@ import { io, Socket } from "socket.io-client";
 //  //     });
 //  //   }
 
-const developmentURL = "http://localhost:3001"
+const developmentURL = "http://localhost:3001";
 
-const URL = process.env.NODE_ENV === "production" ? undefined: developmentURL
+const URL =
+  process.env.NODE_ENV === "production" ? BACKEND_URL : developmentURL;
 
-export const socket: Socket = URL? io(URL) : io(); 
+export const socket: Socket = URL ? io(URL) : io();

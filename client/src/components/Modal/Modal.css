@@ -12,7 +12,7 @@
     background: rgba(49,49,49,0.8); 
 }
 
-.modal-content{
+.modal-content, .modal__endGame-content{
     position: absolute;
     top: 40%; 
     left: 50%;
@@ -23,6 +23,11 @@
     border-radius: 3px;
     max-width: 600px;
     min-width: 300px;
+}
+
+.modal__endGame-content{
+    display: flex;
+    flex-direction: column;
 }
 
 .close-modal{

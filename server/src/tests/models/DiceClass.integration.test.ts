@@ -6,7 +6,15 @@ let testDice: Dice;
 
 describe("Dice integration tests", () => {
   beforeEach(() => {
-    testDice = new Dice(SixSidedDie);
+    const dice = {
+      [DiceColour.White1]: new SixSidedDie(),
+      [DiceColour.White2]: new SixSidedDie(),
+      [DiceColour.Red]: new SixSidedDie(),
+      [DiceColour.Yellow]: new SixSidedDie(),
+      [DiceColour.Green]: new SixSidedDie(),
+      [DiceColour.Blue]: new SixSidedDie(),
+    };
+    testDice = new Dice(dice);
   });
 
   it("should initialize with all dice values as 1", () => {
@@ -17,8 +25,8 @@ describe("Dice integration tests", () => {
   });
 
   it("should roll all dice and return values within the expected range", () => {
-    testDice.rollAllDice();
-    const diceValues = Object.values(testDice.diceValues);
+    const res = testDice.rollAllDice();
+    const diceValues = Object.values(res);
     diceValues.forEach((value) => {
       expect(value).toBeGreaterThanOrEqual(1);
       expect(value).toBeLessThanOrEqual(6);
@@ -28,9 +36,8 @@ describe("Dice integration tests", () => {
   it("should change the dice values after rolling", () => {
     const initialValues = Object.values(testDice.diceValues);
 
-    testDice.rollAllDice();
-
-    const newValues = Object.values(testDice.diceValues);
+    const res = testDice.rollAllDice();
+    const newValues = Object.values(res);
 
     expect(initialValues).not.toEqual(newValues);
   });
@@ -39,9 +46,9 @@ describe("Dice integration tests", () => {
     testDice.rollAllDice();
 
     testDice.disableDie(DiceColour.Red);
-    testDice.rollAllDice();
+    const res = testDice.rollAllDice();
 
-    expect(testDice.diceValues["red"]).toBe(0);
+    expect(res.red).toBe(0);
   });
 
   test("disabling a non-existant die should not throw an error", () => {
@@ -52,9 +59,9 @@ describe("Dice integration tests", () => {
 
   test("validColouredNumbers returns an object of valid number", () => {
     const diceValues = testDice.rollAllDice();
-
     const num = diceValues.white1 + diceValues.red;
 
-    expect(testDice.validColouredNumbers["red"]?.includes(num)).toBeTruthy();
-  })
+    const validColouredNums = testDice.validColouredNumbers;
+    expect(validColouredNums.red?.includes(num)).toBeTruthy();
+  });
 });
